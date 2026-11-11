@@ -8,14 +8,14 @@
 <link rel="icon" href="icon-192.png?v=3" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png?v=3">
 <title>ASHIX</title>
-<meta name="description" content="ASHIX - my futuristic neon personal website. Learning, building and exploring technology.">
+<meta name="description" content="ASHIX - my personal website. Learning, building and exploring technology.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASHIX">
-<meta property="og:description" content="My futuristic neon personal website. Learning, building and exploring technology.">
-<meta property="og:image" content="https://ashik-mangalan.github.io/neon-personal-website/icon-512.png">
-<meta property="og:url" content="https://ashik-mangalan.github.io/neon-personal-website/">
+<meta property="og:description" content="My personal website. Learning, building and exploring technology.">
+<meta property="og:image" content="https://ashik-mangalan.github.io/icon-512.png">
+<meta property="og:url" content="https://ashik-mangalan.github.io/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ashik-mangalan.github.io/neon-personal-website/icon-512.png">
+<meta name="twitter:image" content="https://ashik-mangalan.github.io/icon-512.png">
 <style>
 :root{--bg:#050711;--panel:#0b1020;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -130,10 +130,10 @@ footer{text-align:center;padding:28px;color:#71809b;border-top:1px solid #00eaff
 (function(){
   var b=document.getElementById('shareBtn');
   if(!b)return;
-  var url='https://ashik-mangalan.github.io/neon-personal-website/';
+  var url='https://ashik-mangalan.github.io/';
   b.addEventListener('click',function(){
     if(navigator.share){
-      navigator.share({title:'ASHIX',text:'Check out my neon personal website!',url:url}).catch(function(){});
+      navigator.share({title:'ASHIX',text:'Check out my website!',url:url}).catch(function(){});
     }else if(navigator.clipboard){
       navigator.clipboard.writeText(url).then(function(){b.textContent='Link copied ✓';setTimeout(function(){b.textContent='Share ↗';},2000);});
     }else{
