@@ -1,4 +1,4 @@
-const CACHE_NAME = "neon-portfolio-v1";
+const CACHE_NAME = "neon-portfolio-v2";
 const FILES_TO_CACHE = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", (event) => {
