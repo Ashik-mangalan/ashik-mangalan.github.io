@@ -1,0 +1,19 @@
+{
+  "name": "My Neon Personal Website",
+  "short_name": "Neon Me",
+  "description": "My futuristic neon personal portfolio",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050711",
+  "theme_color": "#050711",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
