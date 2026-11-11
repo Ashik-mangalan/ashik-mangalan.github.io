@@ -8,6 +8,14 @@
 <link rel="icon" href="icon-192.png?v=3" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png?v=3">
 <title>ASHIX</title>
+<meta name="description" content="ASHIX - my futuristic neon personal website. Learning, building and exploring technology.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ASHIX">
+<meta property="og:description" content="My futuristic neon personal website. Learning, building and exploring technology.">
+<meta property="og:image" content="https://ashik-mangalan.github.io/neon-personal-website/icon-512.png">
+<meta property="og:url" content="https://ashik-mangalan.github.io/neon-personal-website/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ashik-mangalan.github.io/neon-personal-website/icon-512.png">
 <style>
 :root{--bg:#050711;--panel:#0b1020;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,11 +36,18 @@ h1 span{color:var(--cyan);text-shadow:0 0 28px #00eaff55}
 .hero p{max-width:570px;color:var(--muted);font-size:1.08rem}
 .actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
 .btn{display:inline-block;padding:12px 20px;border:1px solid var(--cyan);border-radius:8px;color:var(--cyan);transition:.25s;box-shadow:0 0 18px #00eaff12}
+button.btn{background:transparent;cursor:pointer;font:inherit}
+[hidden]{display:none!important}
 .btn.primary{background:var(--cyan);color:#061018;font-weight:700}
 .btn:hover{transform:translateY(-3px);box-shadow:0 0 24px #00eaff55}
 .orb-wrap{display:grid;place-items:center;min-height:300px}
 .hero-logo{width:min(300px,72vw);aspect-ratio:1;border-radius:24%;box-shadow:0 0 40px #a855f766,0 0 70px #00eaff33;animation:float 5s ease-in-out infinite}
 @keyframes float{50%{transform:translateY(-12px)}}
+h1 .typed-wrap,h1 .typed-wrap span{color:var(--text);text-shadow:none}
+h1 .typed-wrap .cursor{color:var(--cyan);text-shadow:0 0 18px #00eaff99;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.reveal.show{opacity:1;transform:none}
 section{max-width:1100px;margin:auto;padding:70px 24px}
 .section-title{font-size:2rem;margin-bottom:10px}.section-title span{color:var(--cyan)}
 .sub{color:var(--muted);margin-bottom:30px}
@@ -54,16 +69,78 @@ footer{text-align:center;padding:28px;color:#71809b;border-top:1px solid #00eaff
 <header><div class="nav"><a class="logo" href="#home"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><nav><a href="#about">About</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#contact">Contact</a></nav></div></header>
 <main>
 <section class="hero" id="home">
-<div><div class="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>ASHIX</span><br>Future Creator.</h1><p>I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects">Explore Projects ↗</a><a class="btn" href="#contact">Say Hello</a></div></div>
+<div><div class="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>ASHIX</span><br><span class="typed-wrap"><span id="typed">Future Creator.</span><span class="cursor">|</span></span></h1><p>I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects">Explore Projects ↗</a><a class="btn" href="#contact">Say Hello</a><button class="btn" id="installBtn" type="button" hidden>Install App ⬇</button></div></div>
 <div class="orb-wrap"><img class="hero-logo" src="icon-512.png?v=3" alt="ASHIX logo"></div>
 </section>
 <section id="about"><h2 class="section-title">About <span>Me</span></h2><p class="sub">A little introduction</p><div class="card about"><img class="me" src="me.jpg" alt="Ashik" onerror="this.remove()"><p>Hi! I’m <b>Ashik</b>. I’m curious about coding, design, and creating things on the web. I enjoy learning new skills and turning ideas into real projects and don't get it wrong, I'm not a book learner . </p></div></section>
-<section id="skills"><h2 class="section-title">My <span>Skills</span></h2><p class="sub">Things I’m learning and exploring</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">GitHub</span><span class="tag">Web Apps (PWA)</span><span class="tag">Creative Thinking</span><span class="tag">Problem Solving</span></div></section>
+<section id="skills"><h2 class="section-title">My <span>Skills</span></h2><p class="sub">Things I’m learning and exploring</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Python</span><span class="tag">GitHub</span><span class="tag">Web Apps (PWA)</span><span class="tag">Creative Thinking</span><span class="tag">Problem Solving</span></div></section>
 <section id="projects"><h2 class="section-title">Featured <span>Projects</span></h2><p class="sub">A few things I’ve made (or plan to make)</p><div class="cards"><article class="card"><h3>01 / ASHIX Personal Website</h3><p>My futuristic neon portfolio, built with HTML, CSS and JavaScript and hosted on GitHub Pages. My first step into web development.</p></article><article class="card"><h3>02 / Installable App</h3><p>I turned my website into an app you can install on your phone, with my own ASHIX logo, a manifest and a service worker.</p></article><article class="card"><h3>03 / Coming Soon</h3><p>My next project is on the way. Keep checking back.</p></article></div></section>
-<section id="contact"><div class="contact"><h2 class="section-title">Let’s <span>Connect</span></h2><p>Want to say hello or talk about a project? Reach me here.</p><div class="actions"><a class="btn primary" href="mailto:manumangalan78@gmail.com">Email Me ↗</a><a class="btn" href="https://instagram.com/ashik_bin_abdulsalam" target="_blank" rel="noopener">Instagram ↗</a><a class="btn" href="https://wa.me/919048395338" target="_blank" rel="noopener">WhatsApp ↗</a></div></div></section>
+<section id="contact"><div class="contact"><h2 class="section-title">Let’s <span>Connect</span></h2><p>Want to say hello or talk about a project? Reach me here.</p><div class="actions"><a class="btn primary" href="mailto:manumangalan78@gmail.com">Email Me ↗</a><a class="btn" href="https://instagram.com/ashik_bin_abdulsalam" target="_blank" rel="noopener">Instagram ↗</a><a class="btn" href="https://wa.me/919048395338" target="_blank" rel="noopener">WhatsApp ↗</a><button class="btn" id="shareBtn" type="button">Share ↗</button></div></div></section>
 </main>
 <footer>© <span id="year"></span> ASHIX · Made with curiosity & neon</footer>
 <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 <script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(console.error)); }</script>
+<script>
+(function(){
+  var installBtn=document.getElementById('installBtn');
+  var deferredPrompt=null;
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+  if(standalone)return;
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});
+  window.addEventListener('appinstalled',function(){installBtn.hidden=true;deferredPrompt=null;});
+  if(isIOS)installBtn.hidden=false;
+  installBtn.addEventListener('click',function(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(){deferredPrompt=null;installBtn.hidden=true;});
+    }else if(isIOS){
+      alert('Tap the Share button, then choose "Add to Home Screen".');
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  var el=document.getElementById('typed');
+  if(el){
+    var words=['Future Creator.','Python Learner.','Web Builder.','Problem Solver.'];
+    var w=0,c=0,del=false;
+    var tick=function(){
+      var word=words[w];
+      el.textContent=word.slice(0,c);
+      if(!del&&c===word.length){del=true;setTimeout(tick,1400);return;}
+      if(del&&c===0){del=false;w=(w+1)%words.length;}
+      c+=del?-1:1;
+      setTimeout(tick,del?40:80);
+    };
+    el.textContent='';
+    tick();
+  }
+  var secs=document.querySelectorAll('main section:not(.hero)');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target);}});
+    },{threshold:0.12});
+    secs.forEach(function(s){s.classList.add('reveal');io.observe(s);});
+  }
+})();
+</script>
+<script>
+(function(){
+  var b=document.getElementById('shareBtn');
+  if(!b)return;
+  var url='https://ashik-mangalan.github.io/neon-personal-website/';
+  b.addEventListener('click',function(){
+    if(navigator.share){
+      navigator.share({title:'ASHIX',text:'Check out my neon personal website!',url:url}).catch(function(){});
+    }else if(navigator.clipboard){
+      navigator.clipboard.writeText(url).then(function(){b.textContent='Link copied ✓';setTimeout(function(){b.textContent='Share ↗';},2000);});
+    }else{
+      prompt('Copy this link:',url);
+    }
+  });
+})();
+</script>
 </body>
 </html>
