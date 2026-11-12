@@ -196,6 +196,17 @@ h1 span{color:var(--cyan);text-shadow:0 0 24px #00eaff55}
 .c4fall{position:absolute;border-radius:50%;z-index:5;pointer-events:none}
 
 footer{text-align:center;padding:24px;color:#71809b;font-size:.85rem;border-top:1px solid #00eaff18}
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:14px;background:#050711;text-align:center;transition:opacity .6s;cursor:pointer;perspective:700px}
+#intro.out{opacity:0;pointer-events:none}
+#intro .ring{width:190px;height:190px;border-radius:50%;padding:5px;background:conic-gradient(#00eaff,#a855f7,#00eaff);animation:pulse 2s ease-in-out infinite;transition:transform .1s}
+#intro img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+#intro h2{font-size:1.6rem;letter-spacing:3px}#intro h2 span{color:var(--cyan)}#intro p{color:var(--muted)}
+@keyframes pulse{50%{box-shadow:0 0 70px #a855f7aa}0%,100%{box-shadow:0 0 40px #00eaff88}}
+.spark{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);pointer-events:none;z-index:101;animation:sp .8s forwards}
+@keyframes sp{to{transform:translateY(-40px);opacity:0}}
+body.mx{--cyan:#39ff14;--purple:#00b86b;--text:#d6ffd6}
+.xbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.xbox .banner{flex:1 1 100%;padding:12px;border:1px solid var(--purple);border-radius:12px;background:#a855f71a}
 </style>
 </head>
 <body>
@@ -203,11 +214,13 @@ footer{text-align:center;padding:24px;color:#71809b;font-size:.85rem;border-top:
 <linearGradient id="gW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fd8ff"/></linearGradient>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c79cff"/><stop offset="1" stop-color="#5b21b6"/></linearGradient>
 </defs></svg>
+<div id="intro"><div class="ring"><img src="me.jpg" alt="Profile photo"></div><h2>ASHIX <span>Game Zone</span></h2><p>Tap to enter</p></div>
 <header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><div class="navr"><button class="iconbtn" id="snd" type="button" aria-label="Sound on or off">🔊</button><a class="home" href="index.html">← Home</a></div></div></header>
 <main>
 <section id="hub">
 <h1>Game <span>Zone</span></h1>
-<p class="sub">10 games. Pick one and play.</p>
+<p class="sub">11 games. Pick one and play.</p>
+<div class="xbox" id="xtra"></div>
 <div class="hubgrid" id="glist"></div>
 </section>
 <section id="view" hidden>
@@ -1689,8 +1702,45 @@ function connect4(stage, ui) {
   return function () { alive = false; timers.forEach(clearTimeout); };
 }
 
+
+/* ---------------------------------------------------------------- Orbit Dash (original) */
+function orbit(stage, ui) {
+  var W = 440, TAU = Math.PI * 2, R = [80, 140], cv = h('canvas', 'gcanvas'); cv.width = cv.height = W; stage.appendChild(cv);
+  var c = cv.getContext('2d'), res = h('div', 'rpsout', 'Tap to start'), lane = 0, ang = 0, obs = [], t = 0, spawn = 0, run = false, raf = 0, last = 0, score = 0;
+  stage.appendChild(res); stage.appendChild(h('p', 'hint', 'You orbit the core. Tap to hop between the two rings. Flashing blocks are warnings, solid red ones hurt!'));
+  function lb() { try { return JSON.parse(localStorage.getItem('ashix_lb_orbit') || '[]'); } catch (e) { return []; } }
+  function die() {
+    run = false; Snd.fx('lose'); vib(60); var a = lb(); a.push(score); a.sort(function (x, y) { return y - x; }); a = a.slice(0, 5);
+    try { localStorage.setItem('ashix_lb_orbit', JSON.stringify(a)); } catch (e) { } setBest('orbit', score);
+    res.textContent = 'Crashed at ' + score + '! Top 5: ' + a.join(' · ') + ' — tap to retry'; if (score >= a[0]) confetti();
+  }
+  function tap() {
+    if (!run) { obs = []; t = 0; spawn = 0; lane = 0; run = true; res.textContent = ''; Snd.fx('tap'); } else { lane = 1 - lane; Snd.fx('pop'); }
+  }
+  cv.addEventListener('pointerdown', function (e) { e.preventDefault(); tap(); });
+  var off = onKeys(function (e) { if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); tap(); } });
+  function frame(ts) {
+    var dt = Math.min(.04, (ts - last) / 1000); last = ts;
+    if (run) {
+      t += dt; ang += (2 + t * .04) * dt; spawn -= dt;
+      if (spawn <= 0) { obs.push({ l: rnd(2), a: Math.random() * TAU, life: 4 }); spawn = Math.max(.35, 1 - t * .012); }
+      obs.forEach(function (o) { o.a += dt * .6 * (o.l ? -1 : 1); o.life -= dt; if (o.l === lane && o.life < 3.6 && Math.abs(((o.a - ang) % TAU + 1.5 * TAU) % TAU - Math.PI) < .2) die(); });
+      obs = obs.filter(function (o) { return o.life > 0; }); score = Math.floor(t * 10); ui.score('Score ' + score + ' · Best ' + (store('orbit') || 0));
+    }
+    c.clearRect(0, 0, W, W); c.lineWidth = 3;
+    R.forEach(function (r, i) { c.strokeStyle = i ? '#a855f777' : '#00eaff77'; c.beginPath(); c.arc(W / 2, W / 2, r, 0, TAU); c.stroke(); });
+    c.fillStyle = '#ffd23f'; c.shadowColor = '#ffd23f'; c.shadowBlur = 20; c.beginPath(); c.arc(W / 2, W / 2, 12, 0, TAU); c.fill();
+    obs.forEach(function (o) { var warn = o.life > 3.6; c.fillStyle = warn && Math.floor(o.life * 14) % 2 ? '#ff4d6d44' : warn ? '#ff4d6d99' : '#ff4d6d'; c.shadowColor = '#ff4d6d'; c.beginPath(); c.arc(W / 2 + R[o.l] * Math.cos(o.a), W / 2 + R[o.l] * Math.sin(o.a), 13, 0, TAU); c.fill(); });
+    c.fillStyle = '#00eaff'; c.shadowColor = '#00eaff'; c.beginPath(); c.arc(W / 2 + R[lane] * Math.cos(ang), W / 2 + R[lane] * Math.sin(ang), 10, 0, TAU); c.fill(); c.shadowBlur = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame); ui.score('Best ' + (store('orbit') || 0));
+  return function () { cancelAnimationFrame(raf); off(); };
+}
+
 /* ------------------------------------------------------------------ Hub */
 var GAMES = [
+  { name: 'Orbit Dash', icon: '🪐', ac: '#00eaff', desc: 'Original · hop the rings', start: orbit, best: function () { return 'Best: ' + (store('orbit') || 0); } },
   { name: 'Ludo', icon: '🎲', ac: '#ff4d6d', desc: '2 or 4 players', start: ludo, best: function () { return 'Wins: ' + wins('ludo'); } },
   { name: 'Chess', icon: '♟️', ac: '#a855f7', desc: 'Beat the computer', start: chess, best: function () { return 'Wins: ' + wins('chess'); } },
   { name: 'Snake', icon: '🐍', ac: '#35e07a', desc: 'Eat, grow, survive', start: snake, best: function () { return 'Best: ' + Math.max(store('snake_0') || 0, store('snake_1') || 0, store('snake_2') || 0); } },
@@ -1747,6 +1797,37 @@ function sndLabel() { sndBtn.textContent = Snd.on() ? '🔊' : '🔇'; }
 sndBtn.addEventListener('click', function () { Snd.toggle(); sndLabel(); });
 sndLabel(); renderHub();
 
+
+
+/* ---------------------------------------------------------------- Extras: intro, friends, secrets */
+(function () {
+  var intro = $('intro'), ring = intro.querySelector('.ring');
+  function spark(x, y) { var d = h('i', 'spark'); d.style.left = x + 'px'; d.style.top = y + 'px'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 800); }
+  intro.addEventListener('pointermove', function (e) {
+    var x = (e.clientX / innerWidth - .5) * 2, y = (e.clientY / innerHeight - .5) * 2;
+    ring.style.transform = 'rotateY(' + x * 25 + 'deg) rotateX(' + -y * 25 + 'deg)'; spark(e.clientX, e.clientY);
+  });
+  function enter() { intro.classList.add('out'); try { sessionStorage.setItem('ashix_intro', '1'); } catch (e) { } Snd.fx('win'); setTimeout(function () { intro.remove(); }, 700); }
+  intro.addEventListener('click', enter);
+  try { if (sessionStorage.getItem('ashix_intro')) intro.remove(); } catch (e) { }
+  var box = $('xtra'), me = GAMES[0];
+  box.appendChild(button('🔗 Challenge a friend', function () {
+    var n = localStorage.getItem('ashix_name') || prompt('Your name?') || 'A friend'; try { localStorage.setItem('ashix_name', n); } catch (e) { }
+    var url = location.origin + location.pathname + '?c=' + encodeURIComponent(n + '|' + (store('orbit') || 0));
+    if (navigator.share) navigator.share({ title: 'Beat my Orbit Dash score!', url: url }).catch(function () { }); else { try { navigator.clipboard.writeText(url); } catch (e) { } alert('Link copied! Send it to a friend.'); }
+  }, 'btn small'));
+  var found = function () { return JSON.parse(localStorage.getItem('ashix_eggs') || '[]'); };
+  var tag = h('span', 'hint'); function eggs() { tag.textContent = '🥚 Secrets found: ' + found().length + '/2'; } eggs(); box.appendChild(tag);
+  function unlock(k) { var f = found(); if (f.indexOf(k) < 0) { f.push(k); try { localStorage.setItem('ashix_eggs', JSON.stringify(f)); } catch (e) { } } eggs(); confetti(); Snd.fx('win'); }
+  var taps = 0, tt; document.querySelector('h1').addEventListener('click', function () {
+    clearTimeout(tt); tt = setTimeout(function () { taps = 0; }, 1500);
+    if (++taps === 7) { taps = 0; document.body.classList.toggle('mx'); unlock('matrix'); }
+  });
+  var K = 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a'.split(','), ki = 0;
+  document.addEventListener('keydown', function (e) { ki = e.key === K[ki] ? ki + 1 : (e.key === K[0] ? 1 : 0); if (ki === K.length) { ki = 0; unlock('konami'); alert('🎮 Konami unlocked. You found the secret!'); } });
+  var q = new URLSearchParams(location.search).get('c');
+  if (q) { var p = q.split('|'); var bn = h('div', 'banner'); bn.appendChild(h('div', '', '⚔️ ' + p[0].slice(0, 20) + ' scored ' + (parseInt(p[1], 10) || 0) + ' in Orbit Dash. Can you beat it?')); bn.appendChild(button('Accept challenge', function () { openGame(me); }, 'btn small primary')); box.prepend(bn); }
+})();
 
 })();
 </script>
