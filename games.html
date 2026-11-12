@@ -10,7 +10,7 @@
 <title>ASHIX Games</title>
 <meta name="description" content="ASHIX Games - Ludo, Chess, Snake, 2048 and more mini games.">
 <meta name="copyright" content="© ASHIX. All rights reserved.">
-<meta name="robots" content="noarchive">
+<meta name="robots" content="noarchive"><meta property="og:title" content="ASHIX Games"><meta property="og:description" content="11 neon mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <style>
 :root{--bg:#050711;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4;--card:#0b1226}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -207,6 +207,15 @@ footer{text-align:center;padding:24px;color:#71809b;font-size:.85rem;border-top:
 body.mx{--cyan:#39ff14;--purple:#00b86b;--text:#d6ffd6}
 .xbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
 .xbox .banner{flex:1 1 100%;padding:12px;border:1px solid var(--purple);border-radius:12px;background:#a855f71a}
+html[data-theme=pink]{--cyan:#ff4dc4;--purple:#ffb13d}html[data-theme=green]{--cyan:#39ff14;--purple:#00b8d4}
+#glow{position:fixed;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--cyan) 18%,transparent),transparent 65%);pointer-events:none;z-index:-1;left:-999px}
+.tr{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);pointer-events:none;z-index:50;animation:tf .6s forwards}@keyframes tf{to{transform:scale(0);opacity:0}}
+.prof{margin-top:26px}.prof h3{margin-bottom:10px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}.stt{background:var(--card);border:1px solid #00eaff33;border-radius:14px;padding:12px;text-align:center}.stt b{display:block;font-size:1.5rem;color:var(--cyan)}.stt span{font-size:.78rem;color:var(--muted)}
+.bdg{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.bd{padding:6px 12px;border-radius:999px;border:1px solid #ffffff22;font-size:.82rem;opacity:.4}.bd.on{opacity:1;border-color:var(--cyan);box-shadow:0 0 14px #00eaff44}
+#cmd{border:1px solid var(--cyan);border-radius:18px;background:var(--card);color:var(--text);padding:18px;width:min(92vw,420px);margin:12vh auto 0;box-shadow:0 0 50px #00eaff33}#cmd::backdrop{background:#000a;backdrop-filter:blur(4px)}
+#cmd input{width:100%;padding:12px;border-radius:12px;border:1px solid #00eaff44;background:#050711;color:var(--text);font:inherit;margin-bottom:8px}#cmd button.o{display:block;width:100%;text-align:left;padding:10px;border:0;border-radius:10px;background:transparent;color:var(--text);cursor:pointer;font-size:1rem}#cmd button.o:hover,#cmd button.o.f{background:#00eaff22}
+#inst{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:40;display:none;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:var(--card);border:1px solid var(--cyan)}
+.rv{animation:rvi .6s both}@keyframes rvi{from{opacity:0;transform:translateY(22px)}}
 </style>
 </head>
 <body>
@@ -215,7 +224,7 @@ body.mx{--cyan:#39ff14;--purple:#00b86b;--text:#d6ffd6}
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c79cff"/><stop offset="1" stop-color="#5b21b6"/></linearGradient>
 </defs></svg>
 <div id="intro"><div class="ring"><img src="me.jpg" alt="Profile photo"></div><h2>ASHIX <span>Game Zone</span></h2><p>Tap to enter</p></div>
-<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><div class="navr"><button class="iconbtn" id="snd" type="button" aria-label="Sound on or off">🔊</button><a class="home" href="index.html">← Home</a></div></div></header>
+<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=3" alt="ASHIX logo" width="32" height="32">ASHIX</a><div class="navr"><button class="iconbtn" id="tc" type="button" aria-label="Change color">🎨</button><button class="iconbtn" id="cb" type="button" aria-label="Search games">⌕</button><button class="iconbtn" id="snd" type="button" aria-label="Sound on or off">🔊</button><a class="home" href="index.html">← Home</a></div></div></header>
 <main>
 <section id="hub">
 <h1>Game <span>Zone</span></h1>
@@ -230,6 +239,7 @@ body.mx{--cyan:#39ff14;--purple:#00b86b;--text:#d6ffd6}
 <div class="stage" id="stage"></div>
 </section>
 </main>
+<div id="glow"></div><dialog id="cmd"><input id="cq" placeholder="Jump to a game…" autocomplete="off"><div id="cl"></div></dialog><div id="inst"><span>📲 Install ASHIX Games</span><button class="btn small primary" id="ib2" type="button">Install</button></div>
 <footer>© <span id="year"></span> ASHIX · All rights reserved<br><span style="font-size:.78rem;opacity:.8">Copying or reusing any part of this website without written permission is not allowed.</span></footer>
 <script>
 document.getElementById('year').textContent=new Date().getFullYear();
@@ -1829,7 +1839,41 @@ sndLabel(); renderHub();
   if (q) { var p = q.split('|'); var bn = h('div', 'banner'); bn.appendChild(h('div', '', '⚔️ ' + p[0].slice(0, 20) + ' scored ' + (parseInt(p[1], 10) || 0) + ' in Orbit Dash. Can you beat it?')); bn.appendChild(button('Accept challenge', function () { openGame(me); }, 'btn small primary')); box.prepend(bn); }
 })();
 
+
+/* ---------------------------------------------------------------- Site upgrades: themes, trail, profile, search, install */
+(function () {
+  var R = document.documentElement, TH = ['cyan', 'pink', 'green'], th = '';
+  try { th = localStorage.getItem('ashix_th') || ''; } catch (e) { } if (TH.indexOf(th) < 0) th = 'cyan'; R.dataset.theme = th;
+  $('tc').addEventListener('click', function () { th = TH[(TH.indexOf(th) + 1) % 3]; R.dataset.theme = th; try { localStorage.setItem('ashix_th', th); } catch (e) { } Snd.fx('tap'); });
+  var g = $('glow'), last = 0;
+  addEventListener('pointermove', function (e) {
+    g.style.left = e.clientX + 'px'; g.style.top = e.clientY + 'px';
+    var n = Date.now(); if (n - last < 45 || !view.hidden) return; last = n;
+    var d = h('i', 'tr'); d.style.left = e.clientX - 3 + 'px'; d.style.top = e.clientY - 3 + 'px'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 600);
+  });
+  var prof = h('div', 'prof rv'); $('hub').appendChild(prof);
+  function drawProf() {
+    var W = wins('ludo') + wins('chess') + wins('c4') + wins('ttt'), E = []; try { E = JSON.parse(localStorage.getItem('ashix_eggs') || '[]'); } catch (e) { }
+    var o = store('orbit') || 0, q = store('g2048') || 0;
+    prof.innerHTML = '<h3>Player <span style="color:var(--cyan)">profile</span></h3>';
+    var st = h('div', 'stats'); [[o, 'Orbit Dash best'], [q, '2048 best'], [W, 'Total wins'], [E.length + '/2', 'Secrets found']].forEach(function (a) { var d = h('div', 'stt'); d.appendChild(h('b', '', a[0])); d.appendChild(h('span', '', a[1])); st.appendChild(d); });
+    var bd = h('div', 'bdg'); [['🪐 Orbit 100+', o >= 100], ['🏆 10 wins', W >= 10], ['🔢 2048: 1000+', q >= 1000], ['🥚 Secret hunter', E.length > 0], ['🕶️ Matrix mode', E.indexOf('matrix') > -1]].forEach(function (a) { bd.appendChild(h('span', 'bd' + (a[1] ? ' on' : ''), a[0])); });
+    prof.appendChild(st); prof.appendChild(bd);
+  }
+  var _r = renderHub; renderHub = function () { _r(); drawProf(); }; drawProf();
+  var cm = $('cmd'), cq = $('cq'), cl = $('cl');
+  function fill(q) { cl.innerHTML = ''; GAMES.filter(function (x) { return x.name.toLowerCase().indexOf(q.toLowerCase()) > -1; }).forEach(function (x, i) { var b = h('button', 'o' + (i ? '' : ' f'), x.icon + ' ' + x.name); b.type = 'button'; b.addEventListener('click', function () { cm.close(); openGame(x); }); cl.appendChild(b); }); }
+  function oc() { fill(''); cq.value = ''; cm.showModal(); cq.focus(); }
+  $('cb').addEventListener('click', oc);
+  addEventListener('keydown', function (e) { if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); oc(); } });
+  cq.addEventListener('input', function () { fill(cq.value); });
+  cq.addEventListener('keydown', function (e) { if (e.key === 'Enter') { var f = cl.querySelector('button'); if (f) f.click(); } });
+  var dp; addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dp = e; try { if (localStorage.getItem('ashix_noinst')) return; } catch (x) { } $('inst').style.display = 'flex'; });
+  $('ib2').addEventListener('click', function () { $('inst').style.display = 'none'; try { localStorage.setItem('ashix_noinst', '1'); } catch (e) { } if (dp) dp.prompt(); });
+})();
+
 })();
 </script>
+<script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){})});</script>
 </body>
 </html>
