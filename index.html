@@ -10,7 +10,7 @@
 <title>ASHIX | Ashik Mangalan – Personal Website &amp; Games</title>
 <meta name="copyright" content="© ASHIX. All rights reserved.">
 <meta name="robots" content="noarchive">
-<meta name="description" content="ASHIX is the personal website of Ashik Mangalan: web projects, skills, contact links and 12 free neon games you can play offline.">
+<meta name="description" content="ASHIX is the personal website of Ashik Mangalan: web projects, skills, contact links and 15 free neon games you can play offline.">
 <meta name="keywords" content="ASHIX, Ashik Mangalan, Ashik, personal website, portfolio, web developer, free games">
 <meta name="author" content="Ashik Mangalan">
 <link rel="canonical" href="https://ashik-mangalan.github.io/">
@@ -69,21 +69,45 @@ section{max-width:1100px;margin:auto;padding:70px 24px}
 .contact .actions{justify-content:center;margin-top:0}
 footer{text-align:center;padding:28px;color:#71809b;border-top:1px solid #00eaff18;font-size:.85rem}
 @media(max-width:760px){.about{flex-direction:column;text-align:center}.hero{grid-template-columns:1fr;text-align:center;padding-top:65px}.hero p{margin:auto}.actions{justify-content:center}.orb-wrap{min-height:260px}.cards{grid-template-columns:1fr}nav{gap:12px;font-size:.8rem}.nav{padding:10px 16px}.logo{font-size:.9rem}}
+
+.tools{display:flex;gap:8px;align-items:center;margin-left:12px}
+.tbtn{min-width:38px;height:38px;padding:0 10px;border:1px solid #00eaff44;border-radius:10px;background:transparent;color:var(--cyan);font:inherit;font-size:.9rem;cursor:pointer}
+.tbtn:hover{box-shadow:0 0 14px #00eaff44}
+.cform{display:grid;gap:12px;max-width:520px;margin:26px auto 0;text-align:left}
+.cform label{font-size:.85rem;color:var(--muted)}
+.cform input,.cform textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #00eaff44;background:var(--bg);color:var(--text);font:inherit}
+.cform input:focus,.cform textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 14px #00eaff33}
+.cform textarea{min-height:110px;resize:vertical}
+.cform .hp{position:absolute;left:-9999px;height:0;overflow:hidden}
+#cstat{min-height:1.4em;text-align:center;font-size:.92rem;color:var(--cyan)}
+.contact h3.sm{font-size:1.1rem;margin-top:30px;color:var(--text)}
+html[data-mode=light]{--bg:#f3f6ff;--panel:#fff;--cyan:#0072a8;--purple:#7c3aed;--text:#10182f;--muted:#4a5878}
+html[data-mode=light] body:before{background:radial-gradient(circle at 20% 15%,#cfe3ff 0,transparent 38%),radial-gradient(circle at 85% 50%,#e4d8ff 0,transparent 34%),#f3f6ff}
+html[data-mode=light] body:after{opacity:.05}
+html[data-mode=light] header{background:#ffffffe8;border-color:#0072a833}
+html[data-mode=light] .card{background:linear-gradient(145deg,#fff,#eef3ff);border-color:#0072a822}
+html[data-mode=light] .contact{background:#fff;border-color:#0072a822}
+html[data-mode=light] .tag{color:#5b2bb0;background:#7c3aed12}
+html[data-mode=light] #toTop{background:#fffe}
+html[data-mode=light] footer{color:#5a6784}
+html[data-mode=light] .btn.primary{color:#fff}
+html[data-mode=light] #fx{opacity:.35}
+@media(max-width:760px){.nav{flex-wrap:wrap;row-gap:6px;padding:10px 16px}.logo{margin-right:auto}.tools{margin-left:0}nav{order:3;width:100%;justify-content:center;gap:16px;font-size:.88rem}}
 </style>
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <a id="toTop" href="#home" aria-label="Back to top">↑</a>
-<header><div class="nav"><a class="logo" href="#home"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><nav><a href="#about">About</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#contact">Contact</a><a href="games.html">Games</a></nav></div></header>
+<header><div class="nav"><a class="logo" href="#home"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><nav><a href="#about" data-t="nav_about">About</a><a href="#skills" data-t="nav_skills">Skills</a><a href="#projects" data-t="nav_projects">Projects</a><a href="#contact" data-t="nav_contact">Contact</a><a href="games.html" data-t="nav_games">Games</a></nav><div class="tools"><button class="tbtn" id="themeBtn" type="button" aria-label="Light or dark mode">☀</button><button class="tbtn" id="langBtn" type="button" aria-label="Language">മല</button></div></div></header>
 <main>
 <section class="hero" id="home">
-<div><div class="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>ASHIX</span><br><span class="typed-wrap"><span id="typed">Future Creator.</span><span class="cursor">|</span></span></h1><p>I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects">Explore Projects ↗</a><a class="btn" href="#contact">Say Hello</a><a class="btn" href="games.html">Play Games 🎮</a><button class="btn" id="installBtn" type="button" hidden>Install App ⬇</button></div></div>
+<div><div class="eyebrow" data-t="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>ASHIX</span><br><span class="typed-wrap"><span id="typed">Future Creator.</span><span class="cursor">|</span></span></h1><p data-t="hero_p">I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects" data-t="b_explore">Explore Projects ↗</a><a class="btn" href="#contact" data-t="b_hello">Say Hello</a><a class="btn" href="games.html" data-t="b_games">Play Games 🎮</a><button class="btn" id="installBtn" type="button" data-t="b_install" hidden>Install App ⬇</button></div></div>
 <div class="orb-wrap"><img class="hero-logo" src="icon-512.png?v=3" alt="ASHIX logo"></div>
 </section>
-<section id="about"><h2 class="section-title">About <span>Me</span></h2><p class="sub">A little introduction</p><div class="card about"><img class="me" src="me.jpg" alt="Ashik" onerror="this.remove()"><p>Hi! I’m <b>Ashik</b>. I’m curious about coding, design, and creating things on the web. I enjoy learning new skills and turning ideas into real projects and don't get it wrong, I'm not a book learner . </p></div></section>
-<section id="skills"><h2 class="section-title">My <span>Skills</span></h2><p class="sub">Things I’m learning and exploring</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Python</span><span class="tag">GitHub</span><span class="tag">Web Apps (PWA)</span><span class="tag">Creative Thinking</span><span class="tag">Problem Solving</span></div></section>
-<section id="projects"><h2 class="section-title">Featured <span>Projects</span></h2><p class="sub">A few things I’ve made (or plan to make)</p><div class="cards"><article class="card"><h3>01 / ASHIX Personal Website</h3><p>My futuristic neon portfolio, built with HTML, CSS and JavaScript and hosted on GitHub Pages. My first step into web development.</p></article><article class="card"><h3>02 / Installable App</h3><p>I turned my website into an app you can install on your phone, with my own ASHIX logo, a manifest and a service worker.</p></article><article class="card"><h3>03 / Coming Soon</h3><p>My next project is on the way. Keep checking back.</p></article></div></section>
-<section id="contact"><div class="contact"><h2 class="section-title">Let’s <span>Connect</span></h2><p>Want to say hello or talk about a project? Reach me here.</p><div class="actions"><a class="btn primary" href="mailto:manumangalan78@gmail.com">Email Me ↗</a><a class="btn" href="https://instagram.com/ashik_bin_abdulsalam" target="_blank" rel="noopener">Instagram ↗</a><a class="btn" href="https://wa.me/919048395338" target="_blank" rel="noopener">WhatsApp ↗</a><button class="btn" id="shareBtn" type="button">Share ↗</button></div></div></section>
+<section id="about"><h2 class="section-title" data-t="t_about">About <span>Me</span></h2><p class="sub" data-t="s_about">A little introduction</p><div class="card about"><img class="me" src="me.jpg" alt="Ashik" onerror="this.remove()"><p>Hi! I’m <b>Ashik</b>. I’m curious about coding, design, and creating things on the web. I enjoy learning new skills and turning ideas into real projects and don't get it wrong, I'm not a book learner . </p></div></section>
+<section id="skills"><h2 class="section-title" data-t="t_skills">My <span>Skills</span></h2><p class="sub" data-t="s_skills">Things I’m learning and exploring</p><div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Python</span><span class="tag">GitHub</span><span class="tag">Web Apps (PWA)</span><span class="tag">Creative Thinking</span><span class="tag">Problem Solving</span></div></section>
+<section id="projects"><h2 class="section-title" data-t="t_projects">Featured <span>Projects</span></h2><p class="sub" data-t="s_projects">A few things I’ve made (or plan to make)</p><div class="cards"><article class="card"><h3>01 / ASHIX Personal Website</h3><p>My futuristic neon portfolio, built with HTML, CSS and JavaScript and hosted on GitHub Pages. My first step into web development.</p></article><article class="card"><h3>02 / Installable App</h3><p>I turned my website into an app you can install on your phone, with my own ASHIX logo, a manifest and a service worker.</p></article><article class="card"><h3>03 / Coming Soon</h3><p>My next project is on the way. Keep checking back.</p></article></div></section>
+<section id="contact"><div class="contact"><h2 class="section-title" data-t="t_contact">Let’s <span>Connect</span></h2><p data-t="c_p">Want to say hello or talk about a project? Reach me here.</p><div class="actions"><a class="btn primary" href="mailto:manumangalan78@gmail.com">Email Me ↗</a><a class="btn" href="https://instagram.com/ashik_bin_abdulsalam" target="_blank" rel="noopener">Instagram ↗</a><a class="btn" href="https://wa.me/919048395338" target="_blank" rel="noopener">WhatsApp ↗</a><button class="btn" id="shareBtn" type="button">Share ↗</button></div><h3 class="sm" data-t="f_title">Or send me a message</h3><form class="cform" id="cf" action="" method="POST"><div><label for="cn" data-t="f_name">Your name</label><input id="cn" name="name" required maxlength="80" autocomplete="name"></div><div><label for="ce" data-t="f_email">Your email</label><input id="ce" name="email" type="email" required maxlength="120" autocomplete="email"></div><div><label for="cm" data-t="f_msg">Message</label><textarea id="cm" name="message" required maxlength="2000"></textarea></div><div class="hp" aria-hidden="true"><input name="_gotcha" tabindex="-1" autocomplete="off"></div><button class="btn primary" type="submit" data-t="f_send">Send message ↗</button><div id="cstat" role="status"></div></form></div></section>
 </main>
 <footer>© <span id="year"></span> ASHIX · All rights reserved<br><span style="font-size:.78rem;opacity:.8">Copying or reusing any part of this website without written permission is not allowed.</span></footer>
 <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
@@ -179,6 +203,40 @@ footer{text-align:center;padding:28px;color:#71809b;border-top:1px solid #00eaff
     window.requestAnimationFrame(draw);
   }
   draw();
+})();
+</script>
+<script>
+(function(){
+  /* Contact form: paste your Formspree form link below (looks like https://formspree.io/f/abcdwxyz). Empty = opens the visitor's email app instead. */
+  var FORM_URL='';
+  var R=document.documentElement,L='en',T='dark';
+  function g(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function p(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  var ML={nav_about:'എന്നെക്കുറിച്ച്',nav_skills:'കഴിവുകൾ',nav_projects:'പ്രോജക്റ്റുകൾ',nav_contact:'ബന്ധപ്പെടാം',nav_games:'ഗെയിമുകൾ',eyebrow:'● എന്റെ ഡിജിറ്റൽ ലോകത്തേക്ക് സ്വാഗതം',hero_p:'ഞാൻ ടെക്നോളജിയുടെ ലോകം പഠിക്കുകയും നിർമ്മിക്കുകയും ചെയ്യുന്നു. ഇത് ഇന്റർനെറ്റിലെ എന്റെ സ്വന്തം ഇടമാണ്—കൂടുതൽ പ്രോജക്റ്റുകൾ ഉടൻ വരുന്നു.',b_explore:'പ്രോജക്റ്റുകൾ കാണാം ↗',b_hello:'ഹായ് പറയൂ',b_games:'ഗെയിം കളിക്കാം 🎮',b_install:'ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യൂ ⬇',t_about:'എന്നെക്കുറിച്ച് <span>അറിയാം</span>',s_about:'ഒരു ചെറിയ പരിചയം',t_skills:'എന്റെ <span>കഴിവുകൾ</span>',s_skills:'ഞാൻ പഠിക്കുന്നതും പരീക്ഷിക്കുന്നതുമായ കാര്യങ്ങൾ',t_projects:'പ്രധാന <span>പ്രോജക്റ്റുകൾ</span>',s_projects:'ഞാൻ ഉണ്ടാക്കിയതും ഉണ്ടാക്കാനിരിക്കുന്നതുമായ ചിലത്',t_contact:'നമുക്ക് <span>ബന്ധപ്പെടാം</span>',c_p:'ഹായ് പറയാനോ ഒരു പ്രോജക്റ്റിനെക്കുറിച്ച് സംസാരിക്കാനോ ആഗ്രഹമുണ്ടോ? എന്നെ ബന്ധപ്പെടൂ.',f_title:'അല്ലെങ്കിൽ ഒരു സന്ദേശം അയയ്ക്കൂ',f_name:'നിങ്ങളുടെ പേര്',f_email:'നിങ്ങളുടെ ഇമെയിൽ',f_msg:'സന്ദേശം',f_send:'സന്ദേശം അയയ്ക്കൂ ↗',ok:'സന്ദേശം അയച്ചു. നന്ദി! 🎉',err:'അയക്കാൻ കഴിഞ്ഞില്ല. ഇമെയിൽ വഴി ശ്രമിക്കൂ.',mail:'നിങ്ങളുടെ ഇമെയിൽ ആപ്പ് തുറക്കുന്നു…',sending:'അയയ്ക്കുന്നു…'};
+  var EN={ok:'Message sent. Thank you! 🎉',err:'Could not send. Please try email instead.',mail:'Opening your email app…',sending:'Sending…'};
+  var nodes=[].slice.call(document.querySelectorAll('[data-t]'));
+  nodes.forEach(function(n){EN[n.getAttribute('data-t')]=n.innerHTML;});
+  function tr(k){return (L==='ml'&&ML[k])||EN[k]||'';}
+  function applyLang(){nodes.forEach(function(n){n.innerHTML=tr(n.getAttribute('data-t'));});R.lang=L==='ml'?'ml':'en';var b=document.getElementById('langBtn');if(b)b.textContent=L==='ml'?'EN':'മല';}
+  function applyTheme(){R.setAttribute('data-mode',T);var b=document.getElementById('themeBtn');if(b)b.textContent=T==='light'?'☾':'☀';var m=document.querySelector('meta[name=theme-color]');if(m)m.content=T==='light'?'#f3f6ff':'#080018';}
+  L=g('ashix_lang')==='ml'?'ml':'en';T=g('ashix_mode')||(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');if(T!=='light')T='dark';
+  document.getElementById('langBtn').addEventListener('click',function(){L=L==='ml'?'en':'ml';p('ashix_lang',L);applyLang();});
+  document.getElementById('themeBtn').addEventListener('click',function(){T=T==='light'?'dark':'light';p('ashix_mode',T);applyTheme();});
+  applyTheme();if(L==='ml')applyLang();
+  var f=document.getElementById('cf'),st=document.getElementById('cstat');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(f.elements._gotcha.value)return;
+    var n=f.elements.name.value.trim(),em=f.elements.email.value.trim(),m=f.elements.message.value.trim();
+    if(!FORM_URL){
+      location.href='mailto:manumangalan78@gmail.com?subject='+encodeURIComponent('Message from '+n+' (ASHIX website)')+'&body='+encodeURIComponent(m+'\n\nFrom: '+n+' <'+em+'>');
+      st.textContent=tr('mail');return;
+    }
+    st.textContent=tr('sending');
+    fetch(FORM_URL,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m})})
+      .then(function(r){if(!r.ok)throw 0;f.reset();st.textContent=tr('ok');})
+      .catch(function(){st.textContent=tr('err');});
+  });
 })();
 </script>
 </body>
