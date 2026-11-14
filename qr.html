@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Share by QR code | ASHIX</title>
+<meta name="description" content="A QR code for the ASHIX website. Scan it to open ashik-mangalan.github.io.">
+<meta name="copyright" content="© 2026 ASHIX. All rights reserved.">
+<meta name="theme-color" content="#080018">
+<link rel="icon" href="icon-192.png?v=3"><link rel="apple-touch-icon" href="icon-192.png?v=3">
+<style>
+:root{--bg:#050711;--text:#e9f1ff;--muted:#9ba9c4;--cyan:#00eaff;--card:#0b1226}
+html[data-mode=light]{--bg:#f3f6ff;--text:#10182f;--muted:#4a5878;--cyan:#0072a8;--card:#fff}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 20% 10%,#10234b 0,transparent 38%),radial-gradient(circle at 85% 55%,#2a1050 0,transparent 34%),var(--bg)}
+html[data-mode=light] body:before{background:radial-gradient(circle at 20% 10%,#cfe3ff 0,transparent 38%),radial-gradient(circle at 85% 55%,#e4d8ff 0,transparent 34%),#f3f6ff}
+header{position:sticky;top:0;background:#050711e0;backdrop-filter:blur(12px);border-bottom:1px solid #00eaff25}
+html[data-mode=light] header{background:#ffffffe8}
+.nav{max-width:760px;margin:auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;color:var(--cyan);font-weight:800;letter-spacing:3px;text-decoration:none}
+.logo img{width:32px;height:32px;border-radius:8px}
+.nav a.h{color:var(--text);text-decoration:none;font-size:.95rem}
+main{max-width:760px;margin:auto;padding:28px 16px 60px}
+h1{font-size:clamp(1.8rem,7vw,2.6rem);margin-bottom:6px}h1 span{color:var(--cyan)}
+.sub{color:var(--muted);margin-bottom:26px}
+.card{background:var(--card);border:1px solid #00eaff2a;border-radius:16px;padding:20px;margin-bottom:16px}
+.card time{font-size:.8rem;color:var(--cyan);letter-spacing:1px;text-transform:uppercase}
+.card h2{font-size:1.2rem;margin:4px 0 8px}
+.card ul{padding-left:20px;color:var(--muted)}.card li{margin:3px 0}
+.btn{display:inline-block;padding:11px 18px;border:1px solid var(--cyan);border-radius:10px;color:var(--cyan);background:transparent;font:inherit;cursor:pointer;text-decoration:none}
+.btn.primary{background:var(--cyan);color:#061018;font-weight:700}html[data-mode=light] .btn.primary{color:#fff}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px 16px 30px}
+</style></head><body>
+<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=3" alt="ASHIX logo">ASHIX</a><a class="h" href="index.html">← Home</a></div></header>
+<main>
+<h1>Share by <span>QR code</span></h1><p class="sub">Scan this with a phone camera to open my website. You can save the picture and share or print it.</p>
+<div class="card" style="text-align:center">
+<div id="qrbox" style="background:#fff;display:inline-block;padding:14px;border-radius:16px;line-height:0"></div>
+<p id="qrmsg" class="sub" style="margin:14px 0 0"></p>
+<div style="margin:16px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn primary" id="dl" type="button">Save picture</button><button class="btn" id="cp" type="button">Copy link</button></div>
+<label for="qt" class="sub" style="display:block;margin:8px 0 6px;text-align:left">Link or text for the code (up to 84 characters)</label>
+<input id="qt" maxlength="84" value="https://ashik-mangalan.github.io/" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #00eaff44;background:var(--bg);color:var(--text);font:inherit">
+</div></main>
+<script>
+/* Minimal QR Code encoder: byte mode, error correction M, versions 1-5 (up to 84 bytes). */
+var QR = (function () {
+  var EXP = [], LOG = [], i, x = 1;
+  for (i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11d; }
+  function mul(a, b) { return a && b ? EXP[(LOG[a] + LOG[b]) % 255] : 0; }
+  function gen(n) { var p = [1], k, j; for (k = 0; k < n; k++) { var q = new Array(p.length + 1).fill(0); for (j = 0; j < p.length; j++) { q[j] ^= p[j]; q[j + 1] ^= mul(p[j], EXP[k]); } p = q; } return p; }
+  function rs(data, n) { var g = gen(n), r = new Array(n).fill(0); data.forEach(function (d) { var f = d ^ r.shift(); r.push(0); for (var j = 0; j < n; j++) r[j] ^= mul(g[j + 1], f); }); return r; }
+  // [data codewords per block, blocks, ec per block]
+  var V = [null, [16, 1, 10], [28, 1, 16], [44, 1, 26], [32, 2, 18], [43, 2, 24]], ALIGN = [null, [], [6, 18], [6, 22], [6, 26], [6, 30]];
+  function utf8(s) { return Array.prototype.slice.call(new TextEncoder().encode(s)); }
+  function make(text) {
+    var bytes = utf8(text), v = 0, k;
+    for (k = 1; k <= 5; k++) if (bytes.length <= V[k][0] * V[k][1] - 2) { v = k; break; }
+    if (!v) return null;
+    var dc = V[v][0] * V[v][1], bits = [];
+    function put(val, n) { for (var b = n - 1; b >= 0; b--) bits.push((val >>> b) & 1); }
+    put(4, 4); put(bytes.length, 8); bytes.forEach(function (b) { put(b, 8); });
+    put(0, Math.min(4, dc * 8 - bits.length)); while (bits.length % 8) bits.push(0);
+    var cw = [], j; for (j = 0; j < bits.length; j += 8) { var byte = 0; for (k = 0; k < 8; k++) byte = (byte << 1) | bits[j + k]; cw.push(byte); }
+    for (j = 0; cw.length < dc; j++) cw.push(j % 2 ? 0x11 : 0xec);
+    var per = V[v][0], nb = V[v][1], ecn = V[v][2], blocks = [], ecs = [];
+    for (j = 0; j < nb; j++) { var d = cw.slice(j * per, (j + 1) * per); blocks.push(d); ecs.push(rs(d, ecn)); }
+    var all = []; for (j = 0; j < per; j++) blocks.forEach(function (b) { all.push(b[j]); }); for (j = 0; j < ecn; j++) ecs.forEach(function (e) { all.push(e[j]); });
+    var size = 17 + 4 * v, m = [], fn = [], r, c;
+    for (r = 0; r < size; r++) { m.push(new Array(size).fill(0)); fn.push(new Array(size).fill(false)); }
+    function set(x2, y2, val) { m[y2][x2] = val ? 1 : 0; fn[y2][x2] = true; }
+    function finder(cx, cy) { for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) { var xx = cx + dx, yy = cy + dy; if (xx < 0 || yy < 0 || xx >= size || yy >= size) continue; var dist = Math.max(Math.abs(dx), Math.abs(dy)); set(xx, yy, dist !== 2 && dist !== 4); } }
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    for (j = 8; j < size - 8; j++) { set(6, j, j % 2 === 0); set(j, 6, j % 2 === 0); }
+    var al = ALIGN[v]; al.forEach(function (ay) { al.forEach(function (ax) { if ((ax === 6 && ay === 6) || (ax === 6 && ay === al[al.length - 1]) || (ay === 6 && ax === al[al.length - 1])) return; for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) set(ax + dx, ay + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1); }); });
+    function fmt(mask) {
+      var data = (0 << 3) | mask, rem = data, q; for (q = 0; q < 10; q++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+      var b = ((data << 10) | rem) ^ 0x5412, g = function (n) { return ((b >>> n) & 1) === 1; };
+      for (q = 0; q <= 5; q++) set(8, q, g(q)); set(8, 7, g(6)); set(8, 8, g(7)); set(7, 8, g(8)); for (q = 9; q < 15; q++) set(14 - q, 8, g(q));
+      for (q = 0; q < 8; q++) set(size - 1 - q, 8, g(q)); for (q = 8; q < 15; q++) set(8, size - 15 + q, g(q)); set(8, size - 8, true);
+    }
+    fmt(0); // reserve the format areas
+    var db = []; all.forEach(function (b) { for (var q = 7; q >= 0; q--) db.push((b >>> q) & 1); });
+    var idx = 0, right, vert, jj;
+    for (right = size - 1; right >= 1; right -= 2) { if (right === 6) right = 5; for (vert = 0; vert < size; vert++) for (jj = 0; jj < 2; jj++) { var xx = right - jj, up = ((right + 1) & 2) === 0, yy = up ? size - 1 - vert : vert; if (!fn[yy][xx] && idx < db.length) m[yy][xx] = db[idx++]; } }
+    var MASKS = [function (a, b) { return (a + b) % 2 === 0; }, function (a, b) { return b % 2 === 0; }, function (a) { return a % 3 === 0; }, function (a, b) { return (a + b) % 3 === 0; }, function (a, b) { return (Math.floor(a / 3) + Math.floor(b / 2)) % 2 === 0; }, function (a, b) { return (a * b) % 2 + (a * b) % 3 === 0; }, function (a, b) { return ((a * b) % 2 + (a * b) % 3) % 2 === 0; }, function (a, b) { return ((a + b) % 2 + (a * b) % 3) % 2 === 0; }];
+    function applied(mask) { var o = m.map(function (row) { return row.slice(); }); for (var y2 = 0; y2 < size; y2++) for (var x2 = 0; x2 < size; x2++) if (!fn[y2][x2] && MASKS[mask](x2, y2)) o[y2][x2] ^= 1; return o; }
+    function penalty(g) {
+      var p = 0, y2, x2, run, dark = 0;
+      for (y2 = 0; y2 < size; y2++) { run = 1; for (x2 = 1; x2 < size; x2++) { if (g[y2][x2] === g[y2][x2 - 1]) { run++; if (run === 5) p += 3; else if (run > 5) p++; } else run = 1; } }
+      for (x2 = 0; x2 < size; x2++) { run = 1; for (y2 = 1; y2 < size; y2++) { if (g[y2][x2] === g[y2 - 1][x2]) { run++; if (run === 5) p += 3; else if (run > 5) p++; } else run = 1; } }
+      for (y2 = 0; y2 < size - 1; y2++) for (x2 = 0; x2 < size - 1; x2++) { var s = g[y2][x2]; if (s === g[y2][x2 + 1] && s === g[y2 + 1][x2] && s === g[y2 + 1][x2 + 1]) p += 3; }
+      g.forEach(function (row) { row.forEach(function (c) { dark += c; }); });
+      p += Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10; return p;
+    }
+    var best = 0, bp = 1e9, mk; for (mk = 0; mk < 8; mk++) { var pp = penalty(applied(mk)); if (pp < bp) { bp = pp; best = mk; } }
+    var out = applied(best); m = out; fmt(best); // fmt writes into m (function modules)
+    return { size: size, get: function (x2, y2) { return m[y2][x2] === 1; }, version: v, mask: best };
+  }
+  return { make: make };
+})();
+
+(function(){
+  var box=document.getElementById('qrbox'),msg=document.getElementById('qrmsg'),inp=document.getElementById('qt'),cur=null;
+  function draw(){
+    var t=inp.value.trim()||'https://ashik-mangalan.github.io/',q=QR.make(t);
+    if(!q){msg.textContent='Too long. Please use 84 characters or fewer.';return}
+    cur=q;msg.textContent='';var n=q.size,s=Math.floor(280/(n+8)),px=(n+8)*s,x,y,r='';
+    for(y=0;y<n;y++)for(x=0;x<n;x++)if(q.get(x,y))r+='<rect x="'+(x+4)*s+'" y="'+(y+4)*s+'" width="'+s+'" height="'+s+'"/>';
+    box.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges" role="img" aria-label="QR code for '+t.replace(/[<>&"]/g,'')+'"><rect width="100%" height="100%" fill="#fff"/><g fill="#0b1226">'+r+'</g></svg>';
+  }
+  inp.addEventListener('input',draw);draw();
+  document.getElementById('dl').addEventListener('click',function(){
+    if(!cur)return;var n=cur.size,s=Math.ceil(1000/(n+8)),c=document.createElement('canvas');c.width=c.height=(n+8)*s;var g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#0b1226';
+    for(var y=0;y<n;y++)for(var x=0;x<n;x++)if(cur.get(x,y))g.fillRect((x+4)*s,(y+4)*s,s,s);
+    c.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ashix-qr.png';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)},'image/png');
+  });
+  document.getElementById('cp').addEventListener('click',function(){var t=inp.value.trim();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){msg.textContent='Link copied'},function(){inp.select();msg.textContent='Press and hold the text to copy it'})});
+})();
+</script>
+<footer>© <span id="y"></span> ASHIX · All rights reserved</footer>
+<script>try{var m=localStorage.getItem('ashix_mode');if(m==='light'||(!m&&matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.setAttribute('data-mode','light')}catch(e){}document.getElementById('y').textContent=new Date().getFullYear();</script>
+</body></html>

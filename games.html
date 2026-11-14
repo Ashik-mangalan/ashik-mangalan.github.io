@@ -10,7 +10,7 @@
 <title>ASHIX Games</title>
 <meta name="description" content="ASHIX Games - Ludo, Chess, Snake, 2048 and more mini games.">
 <meta name="copyright" content="© ASHIX. All rights reserved.">
-<meta name="robots" content="noarchive"><meta property="og:title" content="ASHIX Games"><meta property="og:description" content="15 neon mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noarchive"><meta property="og:title" content="ASHIX Games"><meta property="og:description" content="16 free mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <style>
 :root{--bg:#050711;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4;--card:#0b1226}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -262,6 +262,13 @@ html[data-mode=light] footer{color:#5a6784}
 html[data-mode=light] .lbd,html[data-mode=light] .stt{background:#fff}
 html[data-mode=light] .wt{color:#10182f}html[data-mode=light] .wt.ok,html[data-mode=light] .wt.pr,html[data-mode=light] .wt.no{color:#fff}
 html[data-mode=light] .wkb{background:#dfe6f7;color:#10182f}html[data-mode=light] .wkb.ok{background:#1fa152;color:#fff}html[data-mode=light] .wkb.pr{background:#c9a21b;color:#fff}html[data-mode=light] .wkb.no{background:#aab3c8;color:#fff}
+.msg{display:grid;gap:3px;width:min(92vw,380px);margin:8px auto;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.mc{aspect-ratio:1;border:0;border-radius:6px;background:linear-gradient(145deg,#2c2a6b,#1b1850);color:#fff;font:800 clamp(14px,4.6vw,20px)/1 system-ui,sans-serif;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-touch-callout:none}
+.mc.o{background:#0e0b2e;cursor:default}.mc.boom{background:#c0233a}.mc.wrong{background:#7a2a2a}
+.mc.n1{color:#35a7ff}.mc.n2{color:#35e07a}.mc.n3{color:#ff6b6b}.mc.n4{color:#a855f7}.mc.n5{color:#ffb13d}.mc.n6{color:#00eaff}.mc.n7,.mc.n8{color:#fff}
+html[data-mode=light] .mc{background:linear-gradient(145deg,#c9d6ff,#aebdf5);color:#14204d}html[data-mode=light] .mc.o{background:#f4f7ff}
+.btn.on{outline:2px solid #ffd23f}
+.lbsel{width:100%;margin:6px 0;padding:8px;border-radius:8px;background:#1b1850;color:#fff;border:1px solid #3b3a8a}html[data-mode=light] .lbsel{background:#fff;color:#14204d}
 </style>
 </head>
 <body>
@@ -763,7 +770,18 @@ function rnd(n) { return Math.floor(Math.random() * n); }
 function store(k) { try { var v = localStorage.getItem('ashix_' + k); return v == null ? null : parseFloat(v); } catch (e) { return null; } }
 function put(k, v) { try { localStorage.setItem('ashix_' + k, String(v)); } catch (e) { } }
 function lbGet(k) { try { var a = JSON.parse(localStorage.getItem('ashix_lb_' + k) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
-function lbAdd(k, v, low) { var a = lbGet(k); a.push(v); a.sort(function (x, y) { return low ? x - y : y - x; }); a = a.slice(0, 5); try { localStorage.setItem('ashix_lb_' + k, JSON.stringify(a)); } catch (e) { } return a; }
+/* World leaderboard: paste your Firebase Realtime Database URL here (e.g. 'https://xxxx-default-rtdb.firebaseio.com'). Leave empty to hide it. */
+var WORLD_DB = '';
+function worldName() { var n = ''; try { n = localStorage.getItem('ashix_name') || ''; } catch (e) { } if (!n) { n = (prompt('Your name for the world leaderboard (max 12 letters):', '') || 'Player').replace(/[^\w \-\u0D00-\u0D7F]/g, '').slice(0, 12) || 'Player'; try { localStorage.setItem('ashix_name', n); } catch (e) { } } return n; }
+function worldPost(k, v, low) {
+  if (!WORLD_DB || !window.fetch) return;
+  try { fetch(WORLD_DB + '/lb/' + k + '.json', { method: 'POST', body: JSON.stringify({ n: worldName(), s: low ? -v : v, v: v, t: Date.now() }) }).catch(function () { }); } catch (e) { }
+}
+function worldGet(k, cb) {
+  if (!WORLD_DB || !window.fetch) return cb(null);
+  fetch(WORLD_DB + '/lb/' + k + '.json?orderBy="s"&limitToLast=10').then(function (r) { return r.json(); }).then(function (d) { var a = []; for (var x in (d || {})) a.push(d[x]); a.sort(function (p, q) { return q.s - p.s; }); cb(a); }).catch(function () { cb(null); });
+}
+function lbAdd(k, v, low) { worldPost(k, v, low); var a = lbGet(k); a.push(v); a.sort(function (x, y) { return low ? x - y : y - x; }); a = a.slice(0, 5); try { localStorage.setItem('ashix_lb_' + k, JSON.stringify(a)); } catch (e) { } return a; }
 function setBest(k, v, low) { var o = store(k); if (o == null || (low ? v < o : v > o)) { put(k, v); return v; } return o; }
 function bump(k) { var n = (store('wins_' + k) || 0) + 1; put('wins_' + k, n); return n; }
 function wins(k) { return store('wins_' + k) || 0; }
@@ -1808,13 +1826,16 @@ function rps(stage, ui) {
 
 /* ----------------------------------------------------------- Tic-Tac-Toe */
 function ttt(stage, ui) {
+  var getMode = ui.level('ttt_mode', ['vs Computer', '2 players'], 0, function () { sc = [0, 0, 0]; starter = 1; reset(); }, 'Mode');
   var getLvl = ui.level('ttt', ['Easy', 'Normal', 'Hard'], 1, function () { sc = [0, 0, 0]; reset(); }, 'Level');
+  function two() { return getMode() === 1; }
+  var turn = 'X';
   var LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
   var grid = h('div', 'tboard'), cells = [], b, done, sc = [0, 0, 0], timers = [], msg = h('div', 'rpsout', ''), starter = 0, wl = null, alive = true, i;
   for (i = 0; i < 9; i++) { (function (i) { var c = h('button', 'tc'); c.type = 'button'; c.addEventListener('click', function () { human(i); }); grid.appendChild(c); cells.push(c); })(i); }
   stage.appendChild(grid); stage.appendChild(msg); stage.appendChild(button('Next round', function () { reset(); }, 'btn small'));
   function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
-  function label() { ui.score('You ' + sc[0] + ' · CPU ' + sc[1] + ' · Draw ' + sc[2]); }
+  function label() { if (two()) { ui.score('X ' + sc[0] + ' · O ' + sc[1] + ' · Draw ' + sc[2]); return; } ui.score('You ' + sc[0] + ' · CPU ' + sc[1] + ' · Draw ' + sc[2]); }
   function winner(bb) { for (var k = 0; k < 8; k++) { var L = LINES[k]; if (bb[L[0]] && bb[L[0]] === bb[L[1]] && bb[L[0]] === bb[L[2]]) return { p: bb[L[0]], line: L }; } return null; }
   function mark(i, p) {
     cells[i].classList.add(p === 'X' ? 'x' : 'o');
@@ -1827,8 +1848,8 @@ function ttt(stage, ui) {
   function reset() {
     timers.forEach(clearTimeout); timers = []; b = ['', '', '', '', '', '', '', '', '']; done = false;
     cells.forEach(function (c) { c.className = 'tc'; c.innerHTML = ''; }); if (wl) { wl.remove(); wl = null; }
-    label(); starter = 1 - starter;
-    if (starter === 1) { msg.textContent = 'Computer starts this round'; later(ai, 500); } else msg.textContent = 'Your turn — you are X';
+    label(); starter = 1 - starter; turn = 'X';
+    if (two()) msg.textContent = 'X to move'; else if (starter === 1) { msg.textContent = 'Computer starts this round'; later(ai, 500); } else msg.textContent = 'Your turn — you are X';
   }
   function end() {
     var w = winner(b);
@@ -1837,7 +1858,7 @@ function ttt(stage, ui) {
       var a = w.line[0], c = w.line[2], ax = (a % 3) * 100 + 50, ay = Math.floor(a / 3) * 100 + 50, cx = (c % 3) * 100 + 50, cy = Math.floor(c / 3) * 100 + 50;
       wl = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); wl.setAttribute('class', 'wline'); wl.setAttribute('viewBox', '0 0 300 300');
       wl.innerHTML = '<line x1="' + ax + '" y1="' + ay + '" x2="' + cx + '" y2="' + cy + '"/>'; grid.appendChild(wl);
-      if (w.p === 'X') { sc[0]++; msg.textContent = 'You win! 🎉'; Snd.fx('win'); confetti(); bump('ttt'); } else { sc[1]++; msg.textContent = 'Computer wins'; Snd.fx('lose'); }
+      if (two()) { sc[w.p === 'X' ? 0 : 1]++; msg.textContent = w.p + ' wins! 🎉'; Snd.fx('win'); confetti(); } else if (w.p === 'X') { sc[0]++; msg.textContent = 'You win! 🎉'; Snd.fx('win'); confetti(); bump('ttt'); } else { sc[1]++; msg.textContent = 'Computer wins'; Snd.fx('lose'); }
     } else if (b.every(Boolean)) { done = true; sc[2]++; msg.textContent = 'Draw'; Snd.fx('draw'); }
     label(); return done;
   }
@@ -1862,6 +1883,11 @@ function ttt(stage, ui) {
     b[m] = 'O'; mark(m, 'O'); if (!end()) msg.textContent = 'Your turn';
   }
   function human(i) {
+    if (two()) {
+      if (done || b[i]) return;
+      b[i] = turn; mark(i, turn); if (end()) return;
+      turn = turn === 'X' ? 'O' : 'X'; msg.textContent = turn + ' to move'; return;
+    }
     if (done || b[i] || starter === 1 && b.every(function (v) { return !v; })) return;
     if (timers.length && msg.textContent === 'Computer…') return;
     b[i] = 'X'; mark(i, 'X'); if (end()) return;
@@ -2164,6 +2190,70 @@ function wordle(stage, ui) {
   return function () { alive = false; timers.forEach(clearTimeout); off(); };
 }
 
+/* ------------------------------------------------------------------ Minesweeper */
+function minesweeper(stage, ui) {
+  var getLvl = ui.level('mines', ['Easy', 'Normal', 'Hard'], 0, function () { reset(); }, 'Level');
+  var CF = [[9, 9, 10], [9, 12, 20], [9, 14, 30]];
+  var W, H, N, grid = h('div', 'msg'), cells = [], info = h('div', 'rpsout', ''), mine, open, flag, adj, started, over, flagMode = false, left, secs, clock = null, alive = true, fb;
+  function fmt(s) { return ((s / 60) | 0) + ':' + ('0' + (s % 60)).slice(-2); }
+  function status() { ui.score('💣 ' + left + ' · ' + fmt(secs)); }
+  fb = button('🚩 Flag mode: off', function () { flagMode = !flagMode; fb.textContent = '🚩 Flag mode: ' + (flagMode ? 'on' : 'off'); fb.classList.toggle('on', flagMode); }, 'btn small');
+  stage.appendChild(info); stage.appendChild(grid);
+  var tools = h('div', 'sdt'); tools.appendChild(fb); tools.appendChild(button('New game', function () { reset(); }, 'btn small')); stage.appendChild(tools);
+  stage.appendChild(h('p', 'hint', 'Tap a square to dig. Numbers show how many mines touch it. Use Flag mode (or press and hold) to mark mines. Clear every safe square to win.'));
+  function nb(k) { var r = (k / W) | 0, c = k % W, o = [], dr, dc; for (dr = -1; dr <= 1; dr++) for (dc = -1; dc <= 1; dc++) { if (!dr && !dc) continue; var rr = r + dr, cc = c + dc; if (rr >= 0 && rr < H && cc >= 0 && cc < W) o.push(rr * W + cc); } return o; }
+  function plant(safe) {
+    var n = 0, bad = {}; bad[safe] = 1; nb(safe).forEach(function (x) { bad[x] = 1; });
+    while (n < N) { var k = rnd(W * H); if (mine[k] || bad[k]) continue; mine[k] = 1; n++; }
+    for (var k2 = 0; k2 < W * H; k2++) adj[k2] = nb(k2).filter(function (x) { return mine[x]; }).length;
+  }
+  function render() {
+    cells.forEach(function (c, k) {
+      var cl = 'mc'; var t = '';
+      if (open[k]) { cl += ' o'; if (mine[k]) { cl += ' boom'; t = '💣'; } else if (adj[k]) { cl += ' n' + adj[k]; t = String(adj[k]); } }
+      else if (flag[k]) { t = '🚩'; if (over && !mine[k]) cl += ' wrong'; }
+      else if (over && mine[k]) { cl += ' o'; t = '💣'; }
+      c.className = cl; c.textContent = t;
+    });
+  }
+  function flood(k) {
+    var st = [k];
+    while (st.length) { var x = st.pop(); if (open[x] || flag[x]) continue; open[x] = 1; if (!adj[x]) nb(x).forEach(function (y) { if (!open[y]) st.push(y); }); }
+  }
+  function lose(k) { over = true; clearInterval(clock); open[k] = 1; Snd.fx('lose'); vib(120); info.textContent = 'Boom! 💥 Tap New game to try again.'; render(); }
+  function win() {
+    over = true; clearInterval(clock); Snd.fx('win'); confetti(); bump('mines');
+    for (var k = 0; k < W * H; k++) if (mine[k]) flag[k] = 1; left = 0; status();
+    lbAdd('mines_' + getLvl(), secs, true); setBest('mines_' + getLvl(), secs, true); info.textContent = 'Cleared in ' + fmt(secs) + '! 🎉'; render();
+  }
+  function toggleFlag(k) { if (over || open[k]) return; flag[k] = flag[k] ? 0 : 1; left += flag[k] ? -1 : 1; Snd.fx('tap'); vib(20); status(); render(); }
+  function dig(k) {
+    if (over || flag[k]) return;
+    if (open[k]) return;
+    if (!started) { started = true; plant(k); clock = setInterval(function () { if (!over) { secs++; status(); } }, 1000); }
+    if (mine[k]) return lose(k);
+    flood(k); Snd.fx('pop');
+    var o = 0; for (var j = 0; j < W * H; j++) if (open[j]) o++;
+    render(); if (o === W * H - N) win();
+  }
+  function reset() {
+    clearInterval(clock); var c = CF[getLvl()]; W = c[0]; H = c[1]; N = c[2]; left = N; secs = 0; started = false; over = false;
+    mine = []; open = []; flag = []; adj = []; for (var k = 0; k < W * H; k++) { mine.push(0); open.push(0); flag.push(0); adj.push(0); }
+    grid.innerHTML = ''; cells = []; grid.style.gridTemplateColumns = 'repeat(' + W + ',minmax(0,1fr))';
+    for (k = 0; k < W * H; k++) (function (k) {
+      var b = h('button', 'mc'); b.type = 'button'; var pt = null, lp = false;
+      b.addEventListener('pointerdown', function () { lp = false; pt = setTimeout(function () { lp = true; toggleFlag(k); }, 420); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { b.addEventListener(ev, function () { clearTimeout(pt); }); });
+      b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      b.addEventListener('click', function () { if (lp) { lp = false; return; } if (flagMode) toggleFlag(k); else dig(k); });
+      cells.push(b); grid.appendChild(b);
+    })(k);
+    var bst = store('mines_' + getLvl()); info.textContent = 'Best: ' + (bst ? fmt(bst) : 'not yet'); status(); render();
+  }
+  reset();
+  return function () { alive = false; clearInterval(clock); };
+}
+
 /* ---------------------------------------------------------------- Orbit Dash (original) */
 function orbit(stage, ui) {
   var W = 440, TAU = Math.PI * 2, R = [80, 140], cv = h('canvas', 'gcanvas'); cv.width = cv.height = W; stage.appendChild(cv);
@@ -2214,6 +2304,7 @@ var GAMES = [
   { name: 'Sudoku', icon: '🧩', ac: '#7cf0c9', desc: 'Classic number puzzle', start: sudoku, best: function () { var b = store('sudoku_0'); return b ? 'Easy best: ' + ((b / 60) | 0) + ':' + ('0' + (b % 60)).slice(-2) : 'Not played'; } },
   { name: 'Tetris', icon: '🧱', ac: '#a855f7', desc: 'Stack and clear lines', start: tetris, best: function () { return 'Best: ' + (store('tetris') || 0); } },
   { name: 'Word Guess', icon: '🔤', ac: '#35e07a', desc: '5 letters, 6 tries', start: wordle, best: function () { return 'Best streak: ' + (store('word') || 0); } },
+  { name: 'Minesweeper', icon: '💣', ac: '#ff6b6b', desc: 'Find the safe squares', start: minesweeper, best: function () { var b = store('mines_0'); return b ? 'Easy best: ' + ((b / 60) | 0) + ':' + ('0' + (b % 60)).slice(-2) : 'Not played'; } },
   { name: 'Rock Paper Scissors', icon: '✊', ac: '#7cf0c9', desc: 'First to 3 wins', start: rps, best: function () { return 'Streak: ' + (store('rps') || 0); } }
 ];
 var hub = $('hub'), view = $('view'), stage = $('stage'), titleEl = $('gtitle'), scoreEl = $('gscore'), bar = $('gbar'), list = $('glist'), cleanup = null;
@@ -2311,12 +2402,20 @@ sndLabel(); renderHub();
     var st = h('div', 'stats'); [[o, 'Orbit Dash best'], [q, '2048 best'], [W, 'Total wins'], [E.length + '/2', 'Secrets found']].forEach(function (a) { var d = h('div', 'stt'); d.appendChild(h('b', '', a[0])); d.appendChild(h('span', '', a[1])); st.appendChild(d); });
     var bd = h('div', 'bdg'); [['🪐 Orbit 100+', o >= 100], ['🏆 10 wins', W >= 10], ['🔢 2048: 1000+', q >= 1000], ['🥚 Secret hunter', E.length > 0], ['🕶️ Matrix mode', E.indexOf('matrix') > -1]].forEach(function (a) { bd.appendChild(h('span', 'bd' + (a[1] ? ' on' : ''), a[0])); });
     prof.appendChild(st); prof.appendChild(bd);
-    var LB = [['g2048', '🔢 2048', '', 0], ['snake_0', '🐍 Snake · Easy', '', 0], ['snake_1', '🐍 Snake · Normal', '', 0], ['snake_2', '🐍 Snake · Hard', '', 0], ['tetris', '🧱 Tetris', '', 0], ['orbit', '🪐 Orbit Dash', '', 0], ['whack_0', '🔨 Whack · Easy', '', 0], ['whack_1', '🔨 Whack · Normal', '', 0], ['whack_2', '🔨 Whack · Hard', '', 0], ['memory_0', '🧠 Memory · Easy', ' moves', 1], ['memory_1', '🧠 Memory · Normal', ' moves', 1], ['memory_2', '🧠 Memory · Hard', ' moves', 1], ['reaction', '⚡ Reaction (avg)', ' ms', 1], ['sudoku_0', '🔢 Sudoku · Easy', 's', 1], ['sudoku_1', '🧩 Sudoku · Medium', 's', 1], ['sudoku_2', '🧩 Sudoku · Hard', 's', 1]];
+    var LB = [['g2048', '🔢 2048', '', 0], ['snake_0', '🐍 Snake · Easy', '', 0], ['snake_1', '🐍 Snake · Normal', '', 0], ['snake_2', '🐍 Snake · Hard', '', 0], ['tetris', '🧱 Tetris', '', 0], ['orbit', '🪐 Orbit Dash', '', 0], ['whack_0', '🔨 Whack · Easy', '', 0], ['whack_1', '🔨 Whack · Normal', '', 0], ['whack_2', '🔨 Whack · Hard', '', 0], ['memory_0', '🧠 Memory · Easy', ' moves', 1], ['memory_1', '🧠 Memory · Normal', ' moves', 1], ['memory_2', '🧠 Memory · Hard', ' moves', 1], ['reaction', '⚡ Reaction (avg)', ' ms', 1], ['mines_0', '💣 Minesweeper · Easy', 's', 1], ['mines_1', '💣 Minesweeper · Normal', 's', 1], ['mines_2', '💣 Minesweeper · Hard', 's', 1], ['sudoku_0', '🔢 Sudoku · Easy', 's', 1], ['sudoku_1', '🧩 Sudoku · Medium', 's', 1], ['sudoku_2', '🧩 Sudoku · Hard', 's', 1]];
     var dt = h('details', 'lbd'), sm = h('summary', null, '🏆 My top scores (saved on this phone)'); dt.appendChild(sm);
     var any = false;
     LB.forEach(function (r) { var a = lbGet(r[0]); if (!a.length) return; any = true; var row = h('div', 'lbr'); row.appendChild(h('b', null, r[1])); row.appendChild(h('span', null, a.map(function (v, i) { return (i + 1) + '. ' + v + r[2]; }).join('   '))); dt.appendChild(row); });
     if (!any) dt.appendChild(h('p', 'hint', 'Play a game and your best 5 scores will appear here.'));
     prof.appendChild(dt);
+    if (typeof WORLD_DB !== 'undefined' && WORLD_DB) {
+      var wd = h('details', 'lbd'), ws = h('summary', null, '🌍 World top 10'); wd.appendChild(ws);
+      var sel = h('select', 'lbsel'); LB.forEach(function (r) { var o = h('option', null, r[1]); o.value = r[0]; sel.appendChild(o); });
+      var box = h('div', 'lbr'); wd.appendChild(sel); wd.appendChild(box);
+      function load() { var r = LB.filter(function (x) { return x[0] === sel.value; })[0]; box.textContent = 'Loading…'; worldGet(sel.value, function (a) { box.innerHTML = ''; if (!a) { box.textContent = 'Could not load. Check your internet.'; return; } if (!a.length) { box.textContent = 'No scores yet. Be the first!'; return; } a.forEach(function (x, i) { var d = h('div', null, (i + 1) + '. ' + x.n + ' — ' + x.v + r[2]); box.appendChild(d); }); }); }
+      sel.addEventListener('change', load); wd.addEventListener('toggle', function () { if (wd.open) load(); });
+      prof.appendChild(wd);
+    }
   }
   var _r = renderHub; renderHub = function () { _r(); drawProf(); }; drawProf();
   var cm = $('cmd'), cq = $('cq'), cl = $('cl');
@@ -2341,7 +2440,7 @@ sndLabel(); renderHub();
     'Ludo': ['ലൂഡോ', '2 അല്ലെങ്കിൽ 4 കളിക്കാർ'], 'Chess': ['ചെസ്സ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Snakes & Ladders': ['പാമ്പും കോണിയും', '100-ലേക്ക് ഓടൂ'], 'Snake': ['പാമ്പ് കളി', 'തിന്നൂ, വളരൂ'], '2048': ['2048', '2048 വരെ ചേർക്കൂ'],
     'Connect Four': ['കണക്ട് ഫോർ', 'നാലെണ്ണം ഒരു വരിയിൽ'], 'Tic-Tac-Toe': ['ടിക്-ടാക്-ടോ', 'എളുപ്പം മുതൽ കഠിനം വരെ'], 'Memory Match': ['ഓർമ്മ കളി', 'ജോഡികൾ കണ്ടെത്തൂ'], 'Reaction Test': ['റിയാക്ഷൻ ടെസ്റ്റ്', 'നിങ്ങൾ എത്ര വേഗം?'],
     'Whack-a-Mole': ['മോൾ അടി', '30 സെക്കൻഡ്, തുടങ്ങൂ!'], 'Orbit Dash': ['ഓർബിറ്റ് ഡാഷ്', 'വളയങ്ങൾ ചാടൂ'], 'Sudoku': ['സുഡോക്കു', 'ക്ലാസിക് നമ്പർ പസിൽ'], 'Tetris': ['ടെട്രിസ്', 'അടുക്കൂ, വരികൾ മായ്ക്കൂ'],
-    'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
+    'Minesweeper': ['മൈൻസ്വീപ്പർ', 'സുരക്ഷിത കളങ്ങൾ കണ്ടെത്തൂ'], 'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
   };
   var H1 = 'Game <span>Zone</span>', H1ML = 'ഗെയിം <span>സോൺ</span>';
   function setMode() { R.setAttribute('data-mode', mode); var m = document.querySelector('meta[name=theme-color]'); if (m) m.content = mode === 'light' ? '#f3f6ff' : '#080018'; if (mb) mb.textContent = mode === 'light' ? '☾ Dark' : '☀ Light'; }

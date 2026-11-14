@@ -1,6 +1,6 @@
 // ASHIX offline support: pages, games and icons are saved on first visit and work without internet.
-const CACHE = 'ashix-v5';
-const FILES = ['./', './index.html', './games.html', './manifest.json', './icon-192.png?v=3', './icon-512.png?v=3', './me.jpg'];
+const CACHE = 'ashix-v6';
+const FILES = ['./', './index.html', './games.html', './manifest.json', './icon-192.png?v=3', './icon-512.png?v=3', './me.jpg','./updates.html','./qr.html','./og-image.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
