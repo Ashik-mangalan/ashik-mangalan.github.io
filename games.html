@@ -759,20 +759,48 @@ var C4 = (function () {
   return { R: R, C: C, drop: drop, winAt: winAt, winCells: winCells, bestMove: bestMove };
 })();
 
-/* Snakes & Ladders rules (pure logic) */
+/* Snakes & Ladders rules (pure logic) + map library + random map generator */
 var SL = (function () {
-  var SNAKES = { 16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78 };
-  var LADDERS = { 1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100 };
+  var MAPS = [
+    { name: 'Classic', theme: 0, snakes: { 16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78 }, ladders: { 1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100 } },
+    { name: 'Jungle', theme: 1, snakes: { 17: 7, 33: 13, 48: 9, 54: 36, 66: 44, 79: 58, 88: 51, 95: 42, 99: 21 }, ladders: { 3: 22, 8: 29, 20: 41, 27: 46, 35: 56, 52: 72, 61: 81, 70: 91 } },
+    { name: 'Desert', theme: 2, snakes: { 14: 4, 31: 6, 44: 22, 59: 39, 67: 50, 74: 34, 84: 63, 92: 71, 97: 76 }, ladders: { 2: 23, 11: 32, 18: 37, 26: 47, 40: 60, 51: 73, 62: 83, 78: 98 } },
+    { name: 'Snow', theme: 3, snakes: { 19: 7, 38: 18, 52: 29, 68: 46, 76: 56, 89: 53, 93: 72, 98: 80 }, ladders: { 5: 25, 9: 27, 21: 43, 34: 55, 45: 66, 58: 79, 64: 85, 75: 96 } },
+    { name: 'Space', theme: 4, snakes: { 13: 3, 29: 9, 41: 23, 57: 37, 63: 24, 71: 49, 82: 61, 90: 51, 96: 77 }, ladders: { 6: 26, 12: 32, 22: 42, 36: 58, 47: 69, 53: 74, 60: 81, 72: 92, 80: 100 } }
+  ];
+  var SNAKES = MAPS[0].snakes, LADDERS = MAPS[0].ladders;
   function cell(n) { var i = n - 1, r = Math.floor(i / 10), c = i % 10; if (r % 2) c = 9 - c; return { r: r, c: c }; }
   // result of moving pos by roll: {to, land, kind} (land = square before slide)
-  function step(pos, roll) {
-    var t = pos + roll;
+  function step(pos, roll, mp) {
+    var S = mp ? mp.snakes : SNAKES, L = mp ? mp.ladders : LADDERS, t = pos + roll;
     if (t > 100) return { to: pos, land: pos, kind: 'bounce' };
-    if (SNAKES[t]) return { to: SNAKES[t], land: t, kind: 'snake' };
-    if (LADDERS[t]) return { to: LADDERS[t], land: t, kind: 'ladder', win: LADDERS[t] === 100 };
+    if (S[t]) return { to: S[t], land: t, kind: 'snake' };
+    if (L[t]) return { to: L[t], land: t, kind: 'ladder', win: L[t] === 100 };
     return { to: t, land: t, kind: t === 100 ? 'win' : 'plain', win: t === 100 };
   }
-  return { SNAKES: SNAKES, LADDERS: LADDERS, cell: cell, step: step };
+  function ok(m) {
+    var starts = {}, ends = {}, k;
+    for (k in m.snakes) { if (+k >= 100 || m.snakes[k] >= +k || m.snakes[k] < 1 || starts[k]) return false; starts[k] = 1; ends[m.snakes[k]] = 1; }
+    for (k in m.ladders) { if (+k < 1 || m.ladders[k] <= +k || m.ladders[k] > 100 || starts[k]) return false; starts[k] = 1; ends[m.ladders[k]] = 1; }
+    for (k in ends) if (starts[k]) return false;
+    return true;
+  }
+  /* random fair layout: 8-10 snakes, 7-9 ladders, no shared squares, no chains */
+  function gen(rnd) {
+    rnd = rnd || Math.random;
+    function ri(a, b) { return a + Math.floor(rnd() * (b - a + 1)); }
+    for (var tries = 0; tries < 400; tries++) {
+      var used = {}, S = {}, L = {}, nS = ri(8, 10), nL = ri(7, 9), i, a, b, g;
+      function free(n) { return !used[n]; }
+      for (i = 0, g = 0; i < nL && g < 400; g++) { a = ri(2, 78); b = a + ri(10, 46); if (b > 99 || !free(a) || !free(b)) continue; L[a] = b; used[a] = used[b] = 1; i++; }
+      if (rnd() < .5) { a = ri(70, 88); if (free(a) && free(100)) { L[a] = 100; used[a] = used[100] = 1; } }
+      for (i = 0, g = 0; i < nS && g < 600; g++) { a = ri(16, 99); b = a - ri(10, 56); if (b < 2 || !free(a) || !free(b)) continue; S[a] = b; used[a] = used[b] = 1; i++; }
+      var m = { snakes: S, ladders: L };
+      if (Object.keys(S).length >= 8 && Object.keys(L).length >= 7 && ok(m)) return m;
+    }
+    return { snakes: MAPS[0].snakes, ladders: MAPS[0].ladders };
+  }
+  return { SNAKES: SNAKES, LADDERS: LADDERS, MAPS: MAPS, cell: cell, step: step, ok: ok, gen: gen };
 })();
 
 
@@ -970,6 +998,56 @@ function confetti() {
 function floatText(parent, txt, x, y, color) {
   var e = h('div', 'ftxt', txt); e.style.left = x + 'px'; e.style.top = y + 'px'; if (color) e.style.color = color;
   parent.appendChild(e); setTimeout(function () { e.remove(); }, 800);
+}
+
+/* ---------- shared 3D helpers (used by Snakes & Ladders) ---------- */
+function makeTilt(W, dpr, deg, TH, padT) {
+  var TA = deg * Math.PI / 180, CA = Math.cos(TA), SA = Math.sin(TA), D = W * 2.4;
+  function pr(u, v) { var s = D / (D - v * SA); return { x: u * s, y: v * CA * s, s: s }; }
+  var pT = pr(-W / 2, -W / 2), pB = pr(-W / 2, W / 2);
+  var WC = Math.ceil(2 * Math.abs(pB.x) + 24), HC = Math.ceil((pB.y - pT.y) + padT + TH + 16), OX = WC / 2, OY = padT - pT.y;
+  function P(x, y) { var r = pr(x - W / 2, y - W / 2); return { x: OX + r.x, y: OY + r.y, s: r.s }; }
+  function warp(bg, view, side) {
+    var c = view.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, view.width, view.height); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var tl = P(0, 0), tr = P(W, 0), br = P(W, W), bl = P(0, W);
+    function poly(pts, fill) { c.beginPath(); pts.forEach(function (p, i) { i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); }); c.closePath(); c.fillStyle = fill; c.fill(); }
+    c.save(); c.shadowColor = 'rgba(0,0,0,.55)'; c.shadowBlur = 22; c.shadowOffsetY = 14; poly([[tl.x, tl.y + TH], [tr.x, tr.y + TH], [br.x, br.y + TH], [bl.x, bl.y + TH]], side[1]); c.restore();
+    var sg = c.createLinearGradient(0, bl.y, 0, bl.y + TH); sg.addColorStop(0, side[0]); sg.addColorStop(1, side[1]);
+    poly([[bl.x, bl.y], [br.x, br.y], [br.x, br.y + TH], [bl.x, bl.y + TH]], sg);
+    poly([[tl.x, tl.y], [bl.x, bl.y], [bl.x, bl.y + TH], [tl.x, tl.y + TH]], side[1]); poly([[tr.x, tr.y], [br.x, br.y], [br.x, br.y + TH], [tr.x, tr.y + TH]], side[0]);
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    for (var yd = 0; yd < view.height; yd++) {
+      var sy = (yd + .5) / dpr - OY, v = sy * D / (D * CA + sy * SA); if (v < -W / 2 || v > W / 2) continue;
+      var s = D / (D - v * SA), sy2 = sy + 1 / dpr, v2 = sy2 * D / (D * CA + sy2 * SA), sh = Math.max(1, Math.abs(v2 - v) * dpr), srcY = (v + W / 2) * dpr - sh / 2;
+      srcY = Math.max(0, Math.min(bg.height - sh, srcY)); var dw = W * s * dpr;
+      c.drawImage(bg, 0, srcY, bg.width, sh, OX * dpr - dw / 2, yd, dw, 1);
+    }
+  }
+  return { WC: WC, HC: HC, P: P, warp: warp };
+}
+function drawPawn(ctx, x, y, col, dark, r, lift, ring, pulse) {
+  ctx.save();
+  var sh = 1 - Math.min(1, lift / (r * 1.4)) * .35;
+  ctx.beginPath(); ctx.ellipse(x, y + r * .8, r * sh, r * .42 * sh, 0, 0, 6.283); ctx.fillStyle = 'rgba(0,0,0,' + (.32 * sh) + ')'; ctx.fill();
+  y -= lift;
+  if (ring) { var pr2 = r * 1.45 + Math.sin(pulse * 7) * r * .08; ctx.beginPath(); ctx.arc(x, y - r * .5, pr2, 0, 6.283); ctx.fillStyle = 'rgba(255,230,0,.22)'; ctx.fill(); ctx.strokeStyle = '#111'; ctx.lineWidth = r * .16; ctx.stroke(); ctx.strokeStyle = '#ffe600'; ctx.lineWidth = r * .09; ctx.stroke(); }
+  var bx = x, by = y + r * .78, tw = r;
+  var bd = ctx.createLinearGradient(bx - tw, 0, bx + tw, 0); bd.addColorStop(0, dark); bd.addColorStop(.38, col); bd.addColorStop(.6, col); bd.addColorStop(1, dark);
+  ctx.fillStyle = bd; ctx.strokeStyle = 'rgba(15,18,30,.85)'; ctx.lineWidth = Math.max(1.2, r * .09);
+  ctx.beginPath(); ctx.moveTo(bx - tw, by); ctx.quadraticCurveTo(bx - tw * 1.02, by - r * .42, bx - tw * .5, by - r * .5); ctx.quadraticCurveTo(bx - tw * .28, by - r, bx - tw * .3, by - r * 1.15);
+  ctx.lineTo(bx + tw * .3, by - r * 1.15); ctx.quadraticCurveTo(bx + tw * .28, by - r, bx + tw * .5, by - r * .5); ctx.quadraticCurveTo(bx + tw * 1.02, by - r * .42, bx + tw, by); ctx.closePath(); ctx.fill(); ctx.stroke();
+  var hy = by - r * 1.55, hr = r * .62;
+  var hg = ctx.createRadialGradient(bx - hr * .35, hy - hr * .4, hr * .1, bx, hy, hr * 1.05); hg.addColorStop(0, '#fff'); hg.addColorStop(.3, col); hg.addColorStop(1, dark);
+  ctx.beginPath(); ctx.arc(bx, hy, hr, 0, 6.283); ctx.fillStyle = hg; ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(bx - hr * .3, hy - hr * .38, hr * .26, hr * .16, -.6, 0, 6.283); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fill();
+  ctx.restore();
+}
+function winCard(title, sub, color, icon, again, reg) {
+  var ov = h('div', 'lwin'), card = h('div', 'lwcard'); card.style.setProperty('--wc', color || '#ffd23f');
+  card.appendChild(h('div', 'lwtr', icon || '🏆')); card.appendChild(h('div', 'lwt', title)); card.appendChild(h('div', 'lws', sub || ''));
+  var row = h('div', 'lwb'), kill = function () { if (ov.parentNode) ov.parentNode.removeChild(ov); };
+  row.appendChild(button('Play again', function () { kill(); again(); }, 'btn')); row.appendChild(button('Close', kill, 'btn small')); card.appendChild(row);
+  ov.appendChild(card); document.body.appendChild(ov); if (reg) reg.push(ov); return ov;
 }
 
 /* ------------------------------------------------------------------ Ludo */
@@ -1315,97 +1393,142 @@ function ludo(stage, ui) {
   return function () { alive = false; cancelAnimationFrame(raf); clearTimers(); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
-/* ------------------------------------------------------------------ Snakes & Ladders */
+/* ------------------------------------------------------------------ Snakes & Ladders (5 maps + shuffle, 3D board) */
 function snakesLadders(stage, ui) {
   var getMode = ui.level('sl_mode', ['vs Computer', '2 players'], 0, function () { restart(); }, 'Mode');
-  var SC = 60, W = 10 * SC, dpr = Math.min(window.devicePixelRatio || 1, 3);
+  var getMap = ui.level('sl_map', ['Shuffle', 'Classic', 'Jungle', 'Desert', 'Snow', 'Space'], 0, function () { restart(); }, 'Map');
+  var SC = 60, W = 10 * SC, TH = 16, dpr = Math.min(window.devicePixelRatio || 1, 3), tilt = makeTilt(W, dpr, 34, TH, 52), P = tilt.P;
   var COLS = ['#e8334a', '#1f7ae0'], DARKS = ['#8c1020', '#0b4690'];
+  var THEMES = [
+    { name: 'Classic', frame: ['#8a5a2b', '#b9824a', '#6e4520'], tiles: ['#fff3c9', '#cfeaff'], line: 'rgba(30,35,60,.22)', num: '#2a2f45', ns: 'rgba(255,255,255,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#2f5aa8 0,#17305f 55%,#0b1630 100%)', side: ['#7a4a22', '#3b200c'], deco: ['⭐', '🌸'] },
+    { name: 'Jungle', frame: ['#5b3d1e', '#7d5a2e', '#43290f'], tiles: ['#d6efb0', '#b4d98a'], line: 'rgba(20,60,20,.25)', num: '#1f3d1a', ns: 'rgba(240,255,225,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#2f8a4b 0,#16532e 55%,#08301a 100%)', side: ['#5b3d1e', '#2a1a08'], deco: ['🌴', '🍃', '🦜', '🌺'] },
+    { name: 'Desert', frame: ['#a8642a', '#d08a45', '#7a4318'], tiles: ['#f8e3b0', '#ecc987'], line: 'rgba(110,60,10,.25)', num: '#5a3410', ns: 'rgba(255,248,225,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#f1b66a 0,#d98b3e 55%,#a95e22 100%)', side: ['#9a5a24', '#5a3010'], deco: ['🌵', '🐪', '☀️', '🦂'] },
+    { name: 'Snow', frame: ['#7aa5d6', '#a8c9ec', '#4f7fb2'], tiles: ['#f5faff', '#d3e6f8'], line: 'rgba(40,80,130,.25)', num: '#1f3f66', ns: 'rgba(255,255,255,.95)', felt: 'radial-gradient(ellipse at 50% 35%,#6aa6dc 0,#3c78b4 55%,#1d4a7c 100%)', side: ['#4f7fb2', '#254a74'], deco: ['❄️', '⛄', '🐧', '🌨️'] },
+    { name: 'Space', frame: ['#3a3f63', '#2a2e4d', '#171a30'], tiles: ['#262e5a', '#1c2347'], line: 'rgba(140,170,255,.25)', num: '#bfe9ff', ns: 'rgba(5,8,25,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#1b2250 0,#0a0e24 60%,#04060f 100%)', side: ['#2a2e4d', '#10122a'], deco: ['🪐', '⭐', '🚀', '🌙'] }
+  ];
+  var SNCOL = [{ b: '#2fa84f', d: '#17622d', l: '#b8f08a' }, { b: '#e8851f', d: '#96500a', l: '#ffdf8a' }, { b: '#8b4fd6', d: '#52268c', l: '#dcbcff' }, { b: '#d93a8c', d: '#8c1659', l: '#ffb0d8' }, { b: '#139aa8', d: '#0a5a64', l: '#8aeef6' }, { b: '#c9302c', d: '#7d1512', l: '#ffb3a0' }];
   var chips = h('div', 'chips'), cv = h('canvas', 'gcanvas ludo'), ctx = cv.getContext('2d');
-  cv.width = W * dpr; cv.height = W * dpr;
+  cv.width = tilt.WC * dpr; cv.height = tilt.HC * dpr; cv.style.aspectRatio = tilt.WC + ' / ' + tilt.HC;
   var bg = document.createElement('canvas'); bg.width = W * dpr; bg.height = W * dpr;
+  var view = document.createElement('canvas'); view.width = tilt.WC * dpr; view.height = tilt.HC * dpr;
   var die = makeDie(), info = h('div', 'rpsout', ''), row = h('div', 'ludorow'); row.appendChild(die.el);
   stage.appendChild(chips); stage.appendChild(cv); stage.appendChild(row); stage.appendChild(info);
-  stage.appendChild(button('New game', function () { restart(); }, 'btn small'));
-  stage.appendChild(h('p', 'hint', 'Tap the dice. Ladders lift you up, snakes slide you down. A 6 gives another roll. You must land exactly on 100.'));
-  var pos, ti, over, busy, names, timers = [], tk = [], raf = 0, alive = true, chipEls = [];
+  stage.appendChild(button('New game (new map)', function () { restart(); }, 'btn small'));
+  stage.appendChild(h('p', 'hint', 'Tap the dice. Ladders lift you up, snakes slide you down. A 6 gives another roll. You must land exactly on 100. With Map = Shuffle, every game has a new layout.'));
+  var pos, ti, over, busy, names, timers = [], tk = [], raf = 0, alive = true, chipEls = [], pulse = 0, ovs = [];
+  var MAP = SL.MAPS[0], TI = 0, lastTheme = -1, shapes = {}, mapName = '';
 
   function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
   function ctr(n) { if (n < 1) n = 1; var c = SL.cell(n); return { x: (c.c + .5) * SC, y: W - (c.r + .5) * SC }; }
   function rr(c, x, y, w, hh, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + hh, r); c.arcTo(x + w, y + hh, x, y + hh, r); c.arcTo(x, y + hh, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  function seeded(n) { var s = n * 9301 + 49297; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 
-  /* ---- static board ---- */
-  var SNCOL = [['#2fa84f', '#a6e36a'], ['#e8851f', '#ffd36a'], ['#8b4fd6', '#d3b0ff'], ['#d93a8c', '#ff9fd0'], ['#139aa8', '#7fe6ee']];
-  function ladder(c, a, b) {
-    var p = ctr(a), q = ctr(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.sqrt(dx * dx + dy * dy), nx = -dy / L * 9, ny = dx / L * 9;
-    c.lineCap = 'round';
-    [[-1, '#8a5a2b'], [1, '#8a5a2b']].forEach(function (s) { c.strokeStyle = s[1]; c.lineWidth = 6; c.beginPath(); c.moveTo(p.x + nx * s[0], p.y + ny * s[0]); c.lineTo(q.x + nx * s[0], q.y + ny * s[0]); c.stroke(); });
-    c.strokeStyle = '#d9a35c'; c.lineWidth = 2.5;
-    [-1, 1].forEach(function (s) { c.beginPath(); c.moveTo(p.x + nx * s, p.y + ny * s); c.lineTo(q.x + nx * s, q.y + ny * s); c.stroke(); });
-    var n = Math.max(2, Math.floor(L / 22));
-    for (var i = 1; i < n; i++) { var t = i / n, x = p.x + dx * t, y = p.y + dy * t; c.strokeStyle = '#8a5a2b'; c.lineWidth = 5; c.beginPath(); c.moveTo(x + nx, y + ny); c.lineTo(x - nx, y - ny); c.stroke(); c.strokeStyle = '#d9a35c'; c.lineWidth = 2; c.stroke(); }
+  /* ---- shapes ---- */
+  function snakePts(a, b, k) {
+    var rnd2 = seeded(a * 131 + b * 7 + k), p = ctr(a), q = ctr(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.sqrt(dx * dx + dy * dy), nx = -dy / L, ny = dx / L;
+    var amp = Math.min(17, 6 + L * .06), waves = Math.max(1.2, L / 170 + .6 + rnd2() * .5), ph = rnd2() * 6.28, pts = [], N = 64;
+    for (var i = 0; i <= N; i++) { var t = i / N, o = Math.sin(t * Math.PI * waves * 2 + ph) * amp * Math.pow(Math.sin(Math.min(1, t * 1.15 + .02) * Math.PI * .5 + .0), 1) * (.45 + .55 * Math.sin(t * Math.PI)); var x = p.x + dx * t + nx * o, y = p.y + dy * t + ny * o; pts.push({ x: Math.max(10, Math.min(W - 10, x)), y: Math.max(10, Math.min(W - 10, y)), w: 3 + 8.5 * Math.pow(1 - t, .7) }); }
+    return pts;
   }
-  function snake(c, a, b, k) {
-    var p = ctr(a), q = ctr(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.sqrt(dx * dx + dy * dy), nx = -dy / L, ny = dx / L, amp = Math.min(26, L * .18), waves = Math.max(1.5, Math.round(L / 110) + 1), col = SNCOL[k % SNCOL.length], pts = [], i, N = 36;
-    for (i = 0; i <= N; i++) { var t = i / N, o = Math.sin(t * Math.PI * waves) * amp * (0.35 + .65 * Math.sin(t * Math.PI)); pts.push({ x: p.x + dx * t + nx * o, y: p.y + dy * t + ny * o, w: 13 - 9 * t }); }
+  function drawSnake(c, pts, col) {
+    var N = pts.length - 1, i;
     c.lineCap = 'round'; c.lineJoin = 'round';
-    for (i = 1; i <= N; i++) { c.strokeStyle = '#1b1f2e'; c.lineWidth = pts[i].w + 3; c.beginPath(); c.moveTo(pts[i - 1].x, pts[i - 1].y); c.lineTo(pts[i].x, pts[i].y); c.stroke(); }
-    for (i = 1; i <= N; i++) { c.strokeStyle = i % 4 < 2 ? col[0] : col[1]; c.lineWidth = pts[i].w; c.beginPath(); c.moveTo(pts[i - 1].x, pts[i - 1].y); c.lineTo(pts[i].x, pts[i].y); c.stroke(); }
-    var ang = Math.atan2(pts[0].y - pts[2].y, pts[0].x - pts[2].x), hx = p.x, hy = p.y;
-    c.save(); c.translate(hx, hy); c.rotate(ang);
-    c.strokeStyle = '#e8334a'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(11, 0); c.lineTo(20, 0); c.moveTo(20, 0); c.lineTo(25, -4); c.moveTo(20, 0); c.lineTo(25, 4); c.stroke();
-    c.fillStyle = col[0]; c.strokeStyle = '#1b1f2e'; c.lineWidth = 2; c.beginPath(); c.ellipse(2, 0, 14, 11, 0, 0, 6.283); c.fill(); c.stroke();
-    [-5.5, 5.5].forEach(function (y) { c.fillStyle = '#fff'; c.beginPath(); c.arc(6, y, 4, 0, 6.283); c.fill(); c.fillStyle = '#111'; c.beginPath(); c.arc(7, y, 1.9, 0, 6.283); c.fill(); });
+    function pass(dx, dy, wAdd, wMul, color, alpha) { c.globalAlpha = alpha || 1; c.strokeStyle = color; for (i = N; i >= 1; i--) { c.lineWidth = Math.max(1.5, pts[i].w * (wMul || 1) + (wAdd || 0)); c.beginPath(); c.moveTo(pts[i - 1].x + dx, pts[i - 1].y + dy); c.lineTo(pts[i].x + dx, pts[i].y + dy); c.stroke(); } c.globalAlpha = 1; }
+    pass(3, 5, 2, 1, '#000', .22);
+    pass(0, 0, 3.5, 1, '#151a28');
+    pass(0, 0, 0, 1, col.b);
+    pass(-1.2, -1.6, 0, .42, col.l, .55);
+    /* bands/spots along the back */
+    for (i = 3; i < N - 2; i += 3) {
+      var a = pts[i - 1], b = pts[i + 1], ang = Math.atan2(b.y - a.y, b.x - a.x), w = pts[i].w;
+      c.save(); c.translate(pts[i].x, pts[i].y); c.rotate(ang); c.fillStyle = col.d; c.globalAlpha = .55; c.beginPath(); c.ellipse(0, 0, w * .18 + 1, w * .36, 0, 0, 6.283); c.fill();
+      c.fillStyle = col.l; c.globalAlpha = .5; c.beginPath(); c.ellipse(0, 0, w * .08 + .5, w * .18, 0, 0, 6.283); c.fill(); c.restore();
+    }
+    c.globalAlpha = 1;
+    /* head */
+    var hd = Math.atan2(pts[0].y - pts[3].y, pts[0].x - pts[3].x);
+    c.save(); c.translate(pts[0].x, pts[0].y); c.rotate(hd); c.scale(.8, .8);
+    c.strokeStyle = '#d8203a'; c.lineWidth = 2; c.beginPath(); c.moveTo(14, 0); c.lineTo(24, 0); c.moveTo(24, 0); c.lineTo(29, -4); c.moveTo(24, 0); c.lineTo(29, 4); c.stroke();
+    var hg = c.createRadialGradient(-2, -5, 2, 2, 0, 17); hg.addColorStop(0, col.l); hg.addColorStop(.45, col.b); hg.addColorStop(1, col.d);
+    c.fillStyle = hg; c.strokeStyle = '#151a28'; c.lineWidth = 2.2; c.beginPath(); c.moveTo(-9, -9); c.quadraticCurveTo(8, -13, 17, -3); c.quadraticCurveTo(20, 0, 17, 3); c.quadraticCurveTo(8, 13, -9, 9); c.quadraticCurveTo(-14, 0, -9, -9); c.closePath(); c.fill(); c.stroke();
+    [-6, 6].forEach(function (y) { c.fillStyle = '#fff6c8'; c.beginPath(); c.ellipse(5, y, 4.2, 3.4, 0, 0, 6.283); c.fill(); c.strokeStyle = '#151a28'; c.lineWidth = 1; c.stroke(); c.fillStyle = '#111'; c.beginPath(); c.ellipse(5.6, y, 1.1, 2.7, 0, 0, 6.283); c.fill(); });
+    c.fillStyle = '#151a28'; c.beginPath(); c.arc(15, -1.8, 1, 0, 6.283); c.arc(15, 1.8, 1, 0, 6.283); c.fill();
     c.restore();
   }
+  function drawLadder(c, a, b) {
+    var p = ctr(a), q = ctr(b), dx = q.x - p.x, dy = q.y - p.y, L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L, nx = -uy * 8, ny = ux * 8;
+    c.lineCap = 'round';
+    function seg(x1, y1, x2, y2, w, col, off) { c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(x1 + (off || 0), y1 + (off || 0) * 1.4); c.lineTo(x2 + (off || 0), y2 + (off || 0) * 1.4); c.stroke(); }
+    var n = Math.max(2, Math.round(L / 24)), i, t, x, y;
+    c.globalAlpha = .25; [-1, 1].forEach(function (s) { seg(p.x + nx * s, p.y + ny * s, q.x + nx * s, q.y + ny * s, 8, '#000', 4); }); for (i = 1; i < n; i++) { t = i / n; x = p.x + dx * t; y = p.y + dy * t; seg(x + nx, y + ny, x - nx, y - ny, 6, '#000', 4); } c.globalAlpha = 1;
+    for (i = 1; i < n; i++) { t = i / n; x = p.x + dx * t; y = p.y + dy * t; seg(x + nx, y + ny, x - nx, y - ny, 6.5, '#3b210c'); seg(x + nx, y + ny, x - nx, y - ny, 4.6, '#a8742f'); seg(x + nx, y + ny, x - nx, y - ny, 1.6, '#e8c48a', -.8); }
+    [-1, 1].forEach(function (s) { seg(p.x + nx * s, p.y + ny * s, q.x + nx * s, q.y + ny * s, 7, '#3b210c'); seg(p.x + nx * s, p.y + ny * s, q.x + nx * s, q.y + ny * s, 4.8, '#b07a36'); seg(p.x + nx * s, p.y + ny * s, q.x + nx * s, q.y + ny * s, 2.2, '#efcf94', -1); });
+    [p, q].forEach(function (e) { [-1, 1].forEach(function (s) { c.fillStyle = '#6b4217'; c.beginPath(); c.arc(e.x + nx * s, e.y + ny * s, 4, 0, 6.283); c.fill(); c.fillStyle = '#d9b070'; c.beginPath(); c.arc(e.x + nx * s - 1, e.y + ny * s - 1, 1.6, 0, 6.283); c.fill(); }); });
+  }
+
+  /* ---- static board ---- */
   function drawBoard() {
-    var c = bg.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, W);
-    c.fillStyle = '#fffaf0'; rr(c, 0, 0, W, W, 18); c.fill();
-    var pal = ['#ffe9a8', '#bfe8ff', '#ffc9d6', '#cbf2c7', '#e2d4ff'];
-    for (var n = 1; n <= 100; n++) {
-      var q = SL.cell(n), x = q.c * SC, y = W - (q.r + 1) * SC;
-      c.fillStyle = n === 100 ? '#ffd23f' : pal[(q.r + q.c) % 2 ? (q.c % 5) : ((q.c + 2) % 5)]; if (n !== 100) c.fillStyle = (q.r + q.c) % 2 ? '#fff3c9' : '#cfeaff';
-      c.fillRect(x, y, SC, SC);
+    var T = THEMES[TI], c = bg.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, W);
+    var fg = c.createLinearGradient(0, 0, W, W); fg.addColorStop(0, T.frame[0]); fg.addColorStop(.5, T.frame[1]); fg.addColorStop(1, T.frame[2]); c.fillStyle = fg; rr(c, 0, 0, W, W, 20); c.fill();
+    c.save(); rr(c, 8, 8, W - 16, W - 16, 14); c.clip();
+    var n, q, x, y;
+    for (n = 1; n <= 100; n++) {
+      q = SL.cell(n); x = q.c * SC; y = W - (q.r + 1) * SC;
+      var g = c.createLinearGradient(x, y, x, y + SC); g.addColorStop(0, (q.r + q.c) % 2 ? T.tiles[0] : T.tiles[1]); g.addColorStop(1, (q.r + q.c) % 2 ? T.tiles[0] : T.tiles[1]);
+      c.fillStyle = g; c.fillRect(x, y, SC, SC);
+      var sh = c.createLinearGradient(x, y, x + SC, y + SC); sh.addColorStop(0, 'rgba(255,255,255,.22)'); sh.addColorStop(1, 'rgba(0,0,0,.1)'); c.fillStyle = sh; c.fillRect(x, y, SC, SC);
     }
-    c.strokeStyle = 'rgba(30,35,60,.25)'; c.lineWidth = 1;
-    for (var i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(i * SC, 0); c.lineTo(i * SC, W); c.moveTo(0, i * SC); c.lineTo(W, i * SC); c.stroke(); }
-    c.font = 'bold 13px sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top'; c.fillStyle = 'rgba(30,35,60,.65)';
-    c.font = 'bold 15px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#b36b00'; var e = ctr(100); c.fillText('FINISH', e.x, e.y + 8);
-    Object.keys(SL.LADDERS).forEach(function (a) { ladder(c, +a, SL.LADDERS[a]); });
-    Object.keys(SL.SNAKES).forEach(function (a, k) { snake(c, +a, SL.SNAKES[a], k); });
+    c.fillStyle = 'rgba(255,210,63,.9)'; var e = SL.cell(100); c.fillRect(e.c * SC, W - (e.r + 1) * SC, SC, SC);
+    c.strokeStyle = T.line; c.lineWidth = 1; for (var i = 0; i <= 10; i++) { c.beginPath(); c.moveTo(i * SC, 0); c.lineTo(i * SC, W); c.moveTo(0, i * SC); c.lineTo(W, i * SC); c.stroke(); }
+    /* decorations on free squares */
+    var used = {}; Object.keys(MAP.snakes).forEach(function (k) { used[k] = 1; used[MAP.snakes[k]] = 1; }); Object.keys(MAP.ladders).forEach(function (k) { used[k] = 1; used[MAP.ladders[k]] = 1; });
+    var rs = seeded(TI * 77 + 5), dn = 0; c.font = '24px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.globalAlpha = .55;
+    for (n = 2; n < 100 && dn < 16; n++) { if (used[n] || rs() > .22) continue; q = ctr(n); c.fillText(T.deco[dn % T.deco.length], q.x + 12, q.y + 12); dn++; }
+    c.globalAlpha = 1;
+    /* numbers */
     c.font = 'bold 13px sans-serif'; c.textAlign = 'left'; c.textBaseline = 'top'; c.lineJoin = 'round';
-    for (n = 1; n <= 100; n++) { q = SL.cell(n); var tx = q.c * SC + 4, ty = W - (q.r + 1) * SC + 3; c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 4; c.strokeText(n, tx, ty); c.fillStyle = '#2a2f45'; c.fillText(n, tx, ty); }
-    c.strokeStyle = '#2a2f45'; c.lineWidth = 3; rr(c, 1.5, 1.5, W - 3, W - 3, 18); c.stroke();
+    for (n = 1; n <= 100; n++) { q = SL.cell(n); var tx = q.c * SC + (q.c === 0 ? 12 : 5), ty = W - (q.r + 1) * SC + (q.r === 9 ? 12 : 4); c.strokeStyle = T.ns; c.lineWidth = 4; c.strokeText(n, tx, ty); c.fillStyle = T.num; c.fillText(n, tx, ty); }
+    var s1 = ctr(1), s100 = ctr(100); c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = 'bold 11px sans-serif'; c.fillStyle = T.num; c.fillText('START', s1.x + 4, s1.y + 16);
+    c.font = '22px serif'; c.fillText('🏆', s100.x + 4, s100.y + 8);
+    Object.keys(MAP.ladders).forEach(function (a) { drawLadder(c, +a, MAP.ladders[a]); });
+    Object.keys(MAP.snakes).forEach(function (a, k) { drawSnake(c, shapes[a], SNCOL[k % SNCOL.length]); });
+    c.restore();
+    c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 2.5; rr(c, 8, 8, W - 16, W - 16, 14); c.stroke();
+    c.strokeStyle = 'rgba(255,255,255,.3)'; c.lineWidth = 2; rr(c, 3, 3, W - 6, W - 6, 18); c.stroke();
+  }
+  function setMap() {
+    var sel = getMap(), m;
+    if (sel === 0) { m = SL.gen(); do { TI = rnd(THEMES.length); } while (TI === lastTheme); mapName = 'Shuffle · ' + THEMES[TI].name; }
+    else { m = SL.MAPS[sel - 1]; TI = m.theme; mapName = m.name; }
+    lastTheme = TI; MAP = m; shapes = {};
+    Object.keys(MAP.snakes).forEach(function (a, k) { shapes[a] = snakePts(+a, MAP.snakes[a], k); });
+    drawBoard(); tilt.warp(bg, view, THEMES[TI].side); cv.style.background = THEMES[TI].felt;
   }
 
   /* ---- tokens ---- */
-  function spot(p) { // display position for logical square, separated if both share a square
-    var o = ctr(p); return o;
-  }
-  function resetTokens() { tk = [0, 1].map(function (i) { var s = ctr(1); return { x: s.x, y: s.y, q: null, t0: 0, from: null, hop: 0, lift: 0 }; }); }
+  function resetTokens() { tk = [0, 1].map(function () { var s = ctr(1); return { x: s.x, y: s.y, q: null, lift: 0 }; }); }
   function animate(i, pts, dur, hop, done) {
     var t = tk[i], k = 0;
     function next() {
       if (!alive) return;
       if (k >= pts.length) { t.q = null; if (done) done(); return; }
-      var from = { x: t.x, y: t.y }, to = pts[k++], t0 = performance.now();
-      t.q = { from: from, to: to, t0: t0, dur: dur, hop: hop, next: next };
+      var from = { x: t.x, y: t.y }, to = pts[k++];
+      t.q = { from: from, to: to, t0: performance.now(), dur: dur, hop: hop, next: next };
     }
     next();
   }
   function frame(now) {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, W); ctx.drawImage(bg, 0, 0, W, W);
+    pulse = now / 1000;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, tilt.WC, tilt.HC); ctx.drawImage(view, 0, 0, tilt.WC, tilt.HC);
     tk.forEach(function (t) {
       var q = t.q;
-      if (q) { var u = Math.min(1, (now - q.t0) / q.dur); t.x = q.from.x + (q.to.x - q.from.x) * u; t.y = q.from.y + (q.to.y - q.from.y) * u; t.lift = q.hop ? Math.sin(u * Math.PI) * 14 : 0; if (u >= 1) { t.lift = 0; var nx = q.next; t.q = null; if (nx) nx(); } }
+      if (q) { var u = Math.min(1, (now - q.t0) / q.dur); t.x = q.from.x + (q.to.x - q.from.x) * u; t.y = q.from.y + (q.to.y - q.from.y) * u; t.lift = q.hop ? Math.sin(u * Math.PI) * 16 : 0; if (u >= 1) { t.lift = 0; var nx = q.next; t.q = null; if (nx) nx(); } }
     });
     var share = Math.abs(tk[0].x - tk[1].x) < 8 && Math.abs(tk[0].y - tk[1].y) < 8;
     var order = [0, 1]; if (tk[1].y < tk[0].y) order = [1, 0];
     order.forEach(function (i) {
-      var t = tk[i], x = t.x + (share ? (i ? 9 : -9) : 0), y = t.y - t.lift, r = 15;
-      ctx.beginPath(); ctx.ellipse(x, t.y + 11, 12, 5, 0, 0, 6.283); ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fill();
-      var g = ctx.createRadialGradient(x - 5, y - 6, 2, x, y, r); g.addColorStop(0, '#fff'); g.addColorStop(.3, COLS[i]); g.addColorStop(1, DARKS[i]);
-      ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#1b1f2e'; ctx.stroke();
-      if (!over && i === ti && !busy) { ctx.beginPath(); ctx.arc(x, y, r + 5 + Math.sin(now / 150) * 1.5, 0, 6.283); ctx.strokeStyle = '#ffe600'; ctx.lineWidth = 2.5; ctx.stroke(); }
+      var t = tk[i], p = P(t.x, t.y), x = p.x + (share ? (i ? 9 : -9) * p.s : 0);
+      drawPawn(ctx, x, p.y, COLS[i], DARKS[i], 15 * p.s, t.lift * p.s, !over && i === ti && !busy, pulse);
     });
     raf = requestAnimationFrame(frame);
   }
@@ -1420,32 +1543,40 @@ function snakesLadders(stage, ui) {
     chipEls.forEach(function (c, i) { c.sp.textContent = pos[i]; c.el.classList.toggle('on', ti === i && !over); });
     var ready = !over && !busy && (ti === 0 || getMode() === 1);
     die.el.disabled = !ready; die.el.classList.toggle('ready', ready); die.el.style.setProperty('--dc', COLS[ti]);
-    ui.score('Wins so far: ' + wins('sl'));
+    ui.score('Map: ' + mapName + ' · Wins so far: ' + wins('sl'));
   }
   function restart() {
-    timers.forEach(clearTimeout); timers = []; die.stop();
+    timers.forEach(clearTimeout); timers = []; die.stop(); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); ovs = [];
     names = getMode() === 0 ? ['You', 'Computer'] : ['Player 1', 'Player 2'];
-    pos = [0, 0]; ti = 0; over = false; busy = false; resetTokens(); buildChips(); info.textContent = names[0] + ', roll the dice.'; refresh();
-    if (getMode() === 0) { /* human starts */ }
+    setMap(); pos = [0, 0]; ti = 0; over = false; busy = false; resetTokens(); buildChips(); info.textContent = names[0] + ', roll the dice.'; refresh();
   }
   function roll() {
     if (over || busy) return; busy = true; refresh();
     var v = 1 + rnd(6);
     die.roll(v, function () { move(v); });
   }
+  function ladderPath(a, b) { var p = ctr(a), q = ctr(b), L = Math.hypot(q.x - p.x, q.y - p.y), n = Math.max(3, Math.round(L / 28)), o = []; for (var k = 1; k <= n; k++) o.push({ x: p.x + (q.x - p.x) * k / n, y: p.y + (q.y - p.y) * k / n }); return o; }
+  function snakePath(a) { var s = shapes[a], o = []; for (var k = 2; k < s.length; k += 2) o.push({ x: s[k].x, y: s[k].y }); o.push(ctr(MAP.snakes[a])); return o; }
   function move(v) {
-    var i = ti, r = SL.step(pos[i], v), path = [], n;
+    var i = ti, r = SL.step(pos[i], v, MAP), path = [], n;
     if (r.kind === 'bounce') { info.textContent = nameOf(i) + ' rolled ' + v + ' — needs exactly ' + (100 - pos[i]); Snd.fx('bad'); return later(function () { endTurn(v); }, 900); }
     for (n = pos[i] + 1; n <= r.land; n++) path.push(ctr(n));
     info.textContent = nameOf(i) + ' rolled ' + v;
     animate(i, path, 190, true, function () {
-      if (r.kind === 'ladder') { info.textContent = '🪜 ' + nameOf(i) + ' climbs a ladder!'; Snd.fx('match'); vib(30); animate(i, [ctr(r.to)], 750, false, fin); }
-      else if (r.kind === 'snake') { info.textContent = '🐍 Snake! ' + nameOf(i) + ' slides down'; Snd.fx('bad'); vib([40, 30, 40]); animate(i, [ctr(r.to)], 750, false, fin); }
+      if (r.kind === 'ladder') { info.textContent = '🪜 ' + nameOf(i) + ' climbs a ladder!'; Snd.fx('six'); vib(30); animate(i, ladderPath(r.land, r.to), 85, true, fin); }
+      else if (r.kind === 'snake') { info.textContent = '🐍 Snake! ' + nameOf(i) + ' slides down'; Snd.fx('capture'); vib([40, 30, 40]); animate(i, snakePath(r.land), 22, false, fin); }
       else fin();
     });
     function fin() {
       pos[i] = r.to; Snd.fx('hop');
-      if (r.win) { over = true; busy = false; die.el.disabled = true; refresh(); info.textContent = '🏆 ' + nameOf(i) + (getMode() === 0 && i === 0 ? ' win!' : ' wins!'); if (getMode() === 1 || i === 0) { confetti(); Snd.fx('win'); if (i === 0 || getMode() === 1) bump('sl'); } else Snd.fx('lose'); return; }
+      if (r.win) {
+        over = true; busy = false; die.el.disabled = true; refresh();
+        var me = getMode() === 0 && i === 0, two = getMode() === 1;
+        info.textContent = '🏆 ' + nameOf(i) + (me ? ' win!' : ' wins!');
+        if (me || two) { confetti(); Snd.fx('win'); if (me) bump('sl'); } else Snd.fx('lose');
+        refresh(); later(function () { ovs.push(winCard(me ? 'You win!' : nameOf(i) + ' wins!', 'Map: ' + mapName, COLS[i], me || two ? '🏆' : '🤖', restart)); }, 900);
+        return;
+      }
       later(function () { endTurn(v); }, 500);
     }
   }
@@ -1456,8 +1587,8 @@ function snakesLadders(stage, ui) {
   }
   die.el.addEventListener('click', function () { if (!over && !busy && (ti === 0 || getMode() === 1)) roll(); });
 
-  drawBoard(); restart(); raf = requestAnimationFrame(frame);
-  return function () { alive = false; cancelAnimationFrame(raf); timers.forEach(clearTimeout); die.stop(); };
+  restart(); raf = requestAnimationFrame(frame);
+  return function () { alive = false; cancelAnimationFrame(raf); timers.forEach(clearTimeout); die.stop(); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
 /* ----------------------------------------------------------------- Chess */
