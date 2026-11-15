@@ -1,6 +1,6 @@
 # Anvix
 
-Personal website and app by Ashik Mangalan, with 16 free games you can play online or offline.
+Personal website and app by Ashik Mangalan, with 24 free games you can play online or offline.
 
 Website: https://ashik-mangalan.github.io/
 
