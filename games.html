@@ -192,9 +192,9 @@ h1 span{color:var(--cyan);text-shadow:0 0 24px #00eaff55}
 .wline line{stroke:#fff;stroke-width:7;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw .4s ease-out forwards;filter:drop-shadow(0 0 8px #fff)}
 
 /* connect four */
-.c4wrap{position:relative;width:min(96vw,440px);padding:10px;background:linear-gradient(160deg,#1a3bb0,#0d2270);border:2px solid #3a63ff;border-radius:18px;box-shadow:0 0 34px #3a6bff44}
+.c4wrap{position:relative;width:min(96vw,440px);padding:12px;background:linear-gradient(160deg,#2a55e0,#0d2270 70%);border:2px solid #3a63ff;border-radius:18px;box-shadow:0 0 34px #3a6bff44}
 .c4grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;position:relative}
-.c4c{aspect-ratio:1;border-radius:50%;background:#060a1c;border:0;cursor:pointer;padding:0;box-shadow:inset 0 4px 8px rgba(0,0,0,.7);touch-action:manipulation;position:relative}
+.c4c{aspect-ratio:1;border-radius:50%;background:#060a1c;border:0;cursor:pointer;padding:0;box-shadow:inset 0 5px 9px rgba(0,0,0,.8),0 0 0 3px #2a4fd8,0 2px 0 3px #6f93ff55;touch-action:manipulation;position:relative}
 .c4c.p1,.c4fall.p1{background:radial-gradient(circle at 35% 30%,#ffd0d0,#ff4d5a 50%,#b3162a);box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 0 0 5px rgba(255,255,255,.18),inset 0 -4px 6px rgba(0,0,0,.35)}
 .c4c.p2,.c4fall.p2{background:radial-gradient(circle at 35% 30%,#fff6bf,#ffd23f 50%,#c28a00);box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 0 0 5px rgba(255,255,255,.2),inset 0 -4px 6px rgba(0,0,0,.35)}
 .c4c.win{animation:wp .6s ease-in-out infinite alternate;outline:3px solid #fff}
@@ -2046,11 +2046,11 @@ function memory(stage, ui) {
   var getLvl = ui.level('memory', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Level');
   var grid = h('div', 'mgrid'); stage.appendChild(grid);
   stage.appendChild(button('New game', function () { reset(); }, 'btn small'));
-  var deck, open, moves, matched, lock, timers = [], t0, clock = null, secs, alive = true;
+  var deck, open, moves, matched, lock, timers = [], t0, clock = null, secs, alive = true, ovs = [];
   function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
   function label(extra) { var b = store('memory_' + getLvl()); ui.score((extra || '') + 'Moves ' + moves + ' · Time ' + secs + 's' + (b ? ' · Best ' + b + ' moves' : '')); }
   function reset() {
-    timers.forEach(clearTimeout); timers = []; clearInterval(clock); clock = null;
+    timers.forEach(clearTimeout); timers = []; clearInterval(clock); clock = null; ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); ovs = [];
     var lv = LV[getLvl()], pool = ICONS.slice(0, lv.pairs); deck = pool.concat(pool);
     for (var i = deck.length - 1; i > 0; i--) { var j = rnd(i + 1), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
     open = []; moves = 0; matched = 0; lock = false; secs = 0; t0 = 0;
@@ -2077,10 +2077,10 @@ function memory(stage, ui) {
   function win() {
     clearInterval(clock); clock = null; secs = Math.round((Date.now() - t0) / 1000);
     var best = setBest('memory_' + getLvl(), moves, true); lbAdd('memory_' + getLvl(), moves, true);
-    Snd.fx('win'); confetti(); label('You won! 🎉 '); ui.score('You won in ' + moves + ' moves, ' + secs + 's · Best ' + best + ' moves');
+    Snd.fx('win'); confetti(); label('You won! 🎉 '); ui.score('You won in ' + moves + ' moves, ' + secs + 's · Best ' + best + ' moves'); later(function () { ovs.push(winCard('You win!', moves + ' moves · ' + secs + 's · Best ' + best, '#35e07a', '🧠', function () { reset(); })); }, 700);
   }
   reset();
-  return function () { alive = false; timers.forEach(clearTimeout); clearInterval(clock); };
+  return function () { alive = false; timers.forEach(clearTimeout); clearInterval(clock); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
 /* ------------------------------------------------------------- Reaction */
@@ -2210,7 +2210,7 @@ function rps(stage, ui) {
     }, 1000);
   }
   label();
-  return function () { alive = false; timers.forEach(clearTimeout); };
+  return function () { alive = false; timers.forEach(clearTimeout); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
 /* ----------------------------------------------------------- Tic-Tac-Toe */
@@ -2224,7 +2224,7 @@ function ttt(stage, ui) {
   for (i = 0; i < 9; i++) { (function (i) { var c = h('button', 'tc'); c.type = 'button'; c.addEventListener('click', function () { human(i); }); grid.appendChild(c); cells.push(c); })(i); }
   stage.appendChild(grid); stage.appendChild(msg); stage.appendChild(button('Next round', function () { reset(); }, 'btn small'));
   function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
-  function label() { if (two()) { ui.score('X ' + sc[0] + ' · O ' + sc[1] + ' · Draw ' + sc[2]); return; } ui.score('You ' + sc[0] + ' · CPU ' + sc[1] + ' · Draw ' + sc[2]); }
+  function label() { if (two()) { ui.score('X ' + sc[0] + ' · O ' + sc[1] + ' · Draw ' + sc[2]); return; } ui.score((getMode() === 1 ? 'Red ' : 'You ') + sc[0] + ' · ' + (getMode() === 1 ? 'Yellow ' : 'CPU ') + sc[1] + ' · Draw ' + sc[2]); }
   function winner(bb) { for (var k = 0; k < 8; k++) { var L = LINES[k]; if (bb[L[0]] && bb[L[0]] === bb[L[1]] && bb[L[0]] === bb[L[2]]) return { p: bb[L[0]], line: L }; } return null; }
   function mark(i, p) {
     cells[i].classList.add(p === 'X' ? 'x' : 'o');
@@ -2289,6 +2289,7 @@ function ttt(stage, ui) {
 /* ----------------------------------------------------------- Connect Four */
 function connect4(stage, ui) {
   var getLvl = ui.level('c4', ['Easy', 'Normal', 'Hard'], 1, function () { sc = [0, 0, 0]; reset(); }, 'Level');
+  var getMode = ui.level('c4_mode', ['vs Computer', '2 players'], 0, function () { sc = [0, 0, 0]; reset(); }, 'Mode'), turn = 1, ovs = [];
   var DEPTH = [1, 4, 6], R = 6, C = 7;
   var wrap = h('div', 'c4wrap'), grid = h('div', 'c4grid'), cells = [], msg = h('div', 'rpsout', ''), b, done, busy, sc = [0, 0, 0], timers = [], alive = true;
   for (var r = 0; r < R; r++) for (var c = 0; c < C; c++) {
@@ -2300,7 +2301,7 @@ function connect4(stage, ui) {
   function label() { ui.score('You ' + sc[0] + ' · CPU ' + sc[1] + ' · Draw ' + sc[2]); }
   function reset() {
     timers.forEach(clearTimeout); timers = []; b = []; for (var i = 0; i < R * C; i++) b.push(0);
-    done = false; busy = false; cells.forEach(function (x) { x.className = 'c4c'; }); msg.textContent = 'Your turn — tap a column'; label();
+    done = false; busy = false; cells.forEach(function (x) { x.className = 'c4c'; }); turn = 1; ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); ovs = []; msg.textContent = getMode() === 1 ? 'Red’s turn — tap a column' : 'Your turn — tap a column'; label();
     [].slice.call(wrap.querySelectorAll('.c4fall')).forEach(function (e) { e.remove(); });
   }
   function dropAnim(col, p, cb) {
@@ -2318,7 +2319,8 @@ function connect4(stage, ui) {
     var w = C4.winCells(b, p);
     if (w) {
       done = true; w.forEach(function (q) { cells[q[0] * C + q[1]].classList.add('win'); });
-      if (p === 1) { sc[0]++; msg.textContent = 'You win! 🎉'; Snd.fx('win'); confetti(); bump('c4'); } else { sc[1]++; msg.textContent = 'Computer wins'; Snd.fx('lose'); }
+      var two = getMode() === 1; if (p === 1) { sc[0]++; msg.textContent = two ? 'Red wins! 🎉' : 'You win! 🎉'; Snd.fx('win'); confetti(); if (!two) bump('c4'); } else { sc[1]++; msg.textContent = two ? 'Yellow wins! 🎉' : 'Computer wins'; Snd.fx(two ? 'win' : 'lose'); if (two) confetti(); }
+      later(function () { ovs.push(winCard(p === 1 ? (two ? 'Red wins!' : 'You win!') : (two ? 'Yellow wins!' : 'Computer wins'), 'Connect Four', p === 1 ? '#ff4d5a' : '#ffd23f', p === 1 || two ? '🏆' : '🤖', function () { reset(); })); }, 900);
       label(); return true;
     }
     if (b.every(Boolean)) { done = true; sc[2]++; msg.textContent = 'Draw'; Snd.fx('draw'); label(); return true; }
@@ -2326,6 +2328,7 @@ function connect4(stage, ui) {
   }
   function human(col) {
     if (done || busy || b[col]) return; busy = true;
+    if (getMode() === 1) { var pp = turn; return dropAnim(col, pp, function (row) { busy = false; if (check(pp, row, col)) return; turn = 3 - pp; msg.textContent = turn === 1 ? 'Red’s turn' : 'Yellow’s turn'; }); }
     dropAnim(col, 1, function (row) {
       if (check(1, row, col)) { busy = false; return; }
       msg.textContent = 'Computer…';
