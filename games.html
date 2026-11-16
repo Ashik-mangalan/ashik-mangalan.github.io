@@ -339,6 +339,7 @@ html[data-mode=light] .pz-pl{background:#0001}
 .pz-aim{position:absolute;border:0;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,#ff4d6d 13% 38%,#fff 39% 52%,#ff4d6d 53%);box-shadow:0 0 14px #ff4d6d;cursor:pointer;animation:pzpop .15s;touch-action:manipulation}
 .pz-hand{display:flex;gap:6px;justify-content:center;min-height:98px;flex-wrap:wrap}.pz-pc{width:62px;height:90px;border-radius:9px;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px;font-family:Georgia,serif;box-shadow:0 4px 8px rgba(0,0,0,.5);animation:pzpop .2s}.pz-pc.red{color:#d6182f}.pz-pc b{font-size:1.3rem;align-self:flex-start}.pz-pc i{font-style:normal;font-size:2rem}.pz-pc.back{background:repeating-linear-gradient(45deg,#3a46a8 0 6px,#2a357f 6px 12px);border:3px solid #fff}
 .pz-tap{display:block;width:min(70vw,260px);height:min(70vw,260px);margin:16px auto;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#ff9f43,#e0501f 70%);color:#fff;font:900 clamp(40px,14vw,64px) system-ui;box-shadow:0 10px 0 #8c2d10,0 16px 24px rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .05s,box-shadow .05s}.pz-tap.p{transform:translateY(7px);box-shadow:0 3px 0 #8c2d10,0 6px 12px rgba(0,0,0,.5)}
+.namerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.namerow .pz-in{width:180px}
 </style>
 </head>
 <body>
@@ -870,7 +871,8 @@ function put(k, v) { try { localStorage.setItem('ashix_' + k, String(v)); } catc
 function lbGet(k) { try { var a = JSON.parse(localStorage.getItem('ashix_lb_' + k) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
 /* World leaderboard: paste your Firebase Realtime Database URL here (e.g. 'https://xxxx-default-rtdb.firebaseio.com'). Leave empty to hide it. */
 var WORLD_DB = 'https://anvix-fe1b9-default-rtdb.asia-southeast1.firebasedatabase.app';
-function worldName() { var n = ''; try { n = localStorage.getItem('ashix_name') || ''; } catch (e) { } if (!n) { n = (prompt('Your name for the world leaderboard (max 12 letters):', '') || 'Player').replace(/[^\w \-\u0D00-\u0D7F]/g, '').slice(0, 12) || 'Player'; try { localStorage.setItem('ashix_name', n); } catch (e) { } } return n; }
+function cleanName(s) { return (s || '').replace(/[^\w \-\u0D00-\u0D7F]/g, '').trim().slice(0, 12); }
+function worldName() { var n = ''; try { n = localStorage.getItem('ashix_name') || ''; } catch (e) { } return cleanName(n) || 'Player'; }
 function worldPost(k, v, low) {
   if (!WORLD_DB || !window.fetch) return;
   try { fetch(WORLD_DB + '/lb/' + k + '.json', { method: 'POST', body: JSON.stringify({ n: worldName(), s: low ? -v : v, v: v, t: Date.now() }) }).catch(function () { }); } catch (e) { }
@@ -2234,7 +2236,9 @@ function ttt(stage, ui) {
     if (p === 'O') { var c = cells[i].querySelector('circle'); c.style.animation = 'draw .3s ease-out forwards'; }
     Snd.fx(p === 'X' ? 'tap' : 'move');
   }
+  var ovs = [];
   function reset() {
+    ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); ovs = [];
     timers.forEach(clearTimeout); timers = []; b = ['', '', '', '', '', '', '', '', '']; done = false;
     cells.forEach(function (c) { c.className = 'tc'; c.innerHTML = ''; }); if (wl) { wl.remove(); wl = null; }
     label(); starter = 1 - starter; turn = 'X';
@@ -2249,7 +2253,8 @@ function ttt(stage, ui) {
       wl.innerHTML = '<line x1="' + ax + '" y1="' + ay + '" x2="' + cx + '" y2="' + cy + '"/>'; grid.appendChild(wl);
       if (two()) { sc[w.p === 'X' ? 0 : 1]++; msg.textContent = w.p + ' wins! 🎉'; Snd.fx('win'); confetti(); } else if (w.p === 'X') { sc[0]++; msg.textContent = 'You win! 🎉'; Snd.fx('win'); confetti(); bump('ttt'); } else { sc[1]++; msg.textContent = 'Computer wins'; Snd.fx('lose'); }
     } else if (b.every(Boolean)) { done = true; sc[2]++; msg.textContent = 'Draw'; Snd.fx('draw'); }
-    label(); return done;
+    label(); if (done) { var tt = w ? (two() ? w.p + ' wins!' : w.p === 'X' ? 'You win!' : 'Computer wins') : 'Draw', ic = w ? (two() || w.p === 'X' ? '🏆' : '🤖') : '🤝'; later(function () { ovs.push(winCard(tt, 'Tic-Tac-Toe', w ? (w.p === 'X' ? '#00eaff' : '#ff4dc4') : '#9ba9c4', ic, function () { reset(); })); }, 800); }
+    return done;
   }
   function minimax(bb, p, d) {
     var w = winner(bb); if (w) return w.p === 'O' ? 10 - d : d - 10;
@@ -2283,7 +2288,7 @@ function ttt(stage, ui) {
     msg.textContent = 'Computer…'; later(ai, 450);
   }
   reset(); starter = 0; reset();
-  return function () { alive = false; timers.forEach(clearTimeout); };
+  return function () { alive = false; timers.forEach(clearTimeout); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
 /* ----------------------------------------------------------- Connect Four */
@@ -3947,6 +3952,9 @@ musLabel(); sndLabel(); renderHub();
     prof.appendChild(dt);
     if (typeof WORLD_DB !== 'undefined' && WORLD_DB) {
       var wd = h('details', 'lbd'), ws = h('summary', null, '🌍 World top 10'); wd.appendChild(ws);
+      var nr = h('div', 'namerow'), ni = h('input', 'pz-in'); ni.type = 'text'; ni.maxLength = 12; ni.placeholder = 'Your name (max 12)'; ni.value = (function () { try { return localStorage.getItem('ashix_name') || ''; } catch (e) { return ''; } })();
+      var nb = button('Save name', function () { var n = cleanName(ni.value); ni.value = n; try { localStorage.setItem('ashix_name', n); } catch (e) { } nb.textContent = n ? 'Saved ✓' : 'Name cleared'; setTimeout(function () { nb.textContent = 'Save name'; }, 1500); }, 'btn small');
+      nr.appendChild(ni); nr.appendChild(nb); wd.appendChild(nr); nr.insertAdjacentHTML('beforebegin', '<p class="hint">Your name appears next to your score on the world leaderboard.</p>');
       var sel = h('select', 'lbsel'); LB.forEach(function (r) { var o = h('option', null, r[1]); o.value = r[0]; sel.appendChild(o); });
       var box = h('div', 'lbr'); wd.appendChild(sel); wd.appendChild(box);
       function load() { var r = LB.filter(function (x) { return x[0] === sel.value; })[0]; box.textContent = 'Loading…'; worldGet(sel.value, function (a) { box.innerHTML = ''; if (!a) { box.textContent = 'Could not load. Check your internet.'; return; } if (!a.length) { box.textContent = 'No scores yet. Be the first!'; return; } a.forEach(function (x, i) { var d = h('div', null, (i + 1) + '. ' + x.n + ' — ' + x.v + r[2]); box.appendChild(d); }); }); }
