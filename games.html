@@ -10,7 +10,7 @@
 <title>Anvix Games</title>
 <meta name="description" content="Anvix Games - Ludo, Chess, Snake, 2048 and more mini games.">
 <meta name="copyright" content="© Anvix. All rights reserved.">
-<meta name="robots" content="noarchive"><meta property="og:title" content="Anvix Games"><meta property="og:description" content="24 free mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noarchive"><meta property="og:title" content="Anvix Games"><meta property="og:description" content="50 free mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <style>
 :root{--bg:#050711;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4;--card:#0b1226}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -284,6 +284,61 @@ html[data-mode=light] .mc{background:linear-gradient(145deg,#c9d6ff,#aebdf5);col
 .lwcard{width:min(86vw,340px);padding:28px 22px;border-radius:26px;text-align:center;background:linear-gradient(160deg,#1a2350,#0c1230);border:2px solid var(--wc,#ffd23f);box-shadow:0 0 40px var(--wc,#ffd23f),0 20px 50px rgba(0,0,0,.6);color:#fff;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
 .lwtr{font-size:4.2rem;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}.lwt{font:800 2rem system-ui;margin:6px 0}.lws{opacity:.8;margin-bottom:18px}.lwb{display:flex;gap:10px;justify-content:center}
 @keyframes fadein{from{opacity:0}}@keyframes pop{from{transform:scale(.6);opacity:0}}
+
+.pz-slide,.pz-lights,.pz-flood,.pz-odd{display:grid;gap:6px;width:min(94vw,400px);margin:8px auto}
+.pz-t{aspect-ratio:1;border:0;border-radius:12px;color:#fff;font:800 clamp(20px,7vw,34px) system-ui;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -4px 0 rgba(0,0,0,.25),0 4px 8px rgba(0,0,0,.35);cursor:pointer;text-shadow:0 2px 3px rgba(0,0,0,.4);touch-action:manipulation}
+.pz-t.ok{outline:3px solid rgba(255,255,255,.55)}.pz-t.empty{background:rgba(255,255,255,.05)!important;box-shadow:inset 0 2px 8px rgba(0,0,0,.5);cursor:default;outline:0}
+.pz-l{aspect-ratio:1;border:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3a4270,#1a2048);box-shadow:inset 0 -4px 6px rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.4);cursor:pointer;transition:.15s;touch-action:manipulation}
+.pz-l.on{background:radial-gradient(circle at 35% 30%,#fff7b0,#ffc61a 55%,#e08a00);box-shadow:0 0 22px #ffcc33,inset 0 -4px 6px rgba(160,80,0,.4)}
+.pz-flood{gap:1px;background:#0006;padding:3px;border-radius:10px}.pz-fc{aspect-ratio:1;transition:background .2s}
+.pz-pal{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0}.pz-c{width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.7);box-shadow:inset 0 -4px 6px rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.4);cursor:pointer;touch-action:manipulation}
+.pz-mm{display:flex;flex-direction:column;gap:6px;align-items:center;margin:8px 0}.pz-mrow{display:flex;gap:10px;align-items:center;padding:5px 12px;border-radius:30px;background:rgba(255,255,255,.05)}.pz-mrow.cur{background:rgba(0,234,255,.14);outline:2px solid #00eaff66}.pz-mrow.secret{background:rgba(255,210,63,.15)}
+.pz-peg{width:30px;height:30px;border-radius:50%;display:inline-block;box-shadow:inset 0 -3px 4px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.4)}.pz-peg.empty{background:rgba(255,255,255,.1);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.pz-fb{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:30px}.pz-fb b{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.12)}.pz-fb b.k{background:#111;box-shadow:0 0 0 1px #fff8}.pz-fb b.w{background:#fff}.pz-lbl{font-size:.75rem;opacity:.8}
+.pz-hpic{width:150px;margin:0 auto}.pz-gal{width:100%}.pz-gal .p{opacity:0;transition:opacity .25s}
+.pz-word{font:800 clamp(24px,8vw,38px) ui-monospace,monospace;letter-spacing:3px;text-align:center;margin:8px 0;color:var(--cyan);min-height:1.3em}
+.pz-keys{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;width:min(96vw,420px);margin:6px auto}.pz-k{width:36px;height:42px;border:0;border-radius:8px;background:#1b2350;color:#fff;font:700 1rem system-ui;cursor:pointer;touch-action:manipulation}.pz-k.good{background:#17a45a}.pz-k.bad{background:#8c1d33;opacity:.6}.pz-k:disabled{cursor:default}
+.pz-simon{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(80vw,320px);margin:12px auto;padding:14px;border-radius:50%;background:#10152e;box-shadow:inset 0 0 20px #000a}
+.pz-sp{aspect-ratio:1;border:0;background:var(--c);opacity:.45;border-radius:28px;box-shadow:inset 0 -6px 8px rgba(0,0,0,.35);cursor:pointer;transition:.12s;touch-action:manipulation}.pz-sp:nth-child(1){border-radius:100% 22px 22px 22px}.pz-sp:nth-child(2){border-radius:22px 100% 22px 22px}.pz-sp:nth-child(3){border-radius:22px 22px 22px 100%}.pz-sp:nth-child(4){border-radius:22px 22px 100% 22px}.pz-sp.lit{opacity:1;box-shadow:0 0 30px var(--c),inset 0 -6px 8px rgba(0,0,0,.2);transform:scale(.97)}
+.pz-dpad{display:grid;grid-template-areas:". u ." "l . r" ". d .";gap:6px;justify-content:center;margin:8px auto;width:fit-content}
+.pz-hanoi{display:flex;gap:8px;width:min(96vw,440px);margin:10px auto;height:230px}.pz-peg{position:relative}.pz-hanoi .pz-peg{flex:1;border:0;background:rgba(255,255,255,.05);border-radius:12px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;height:auto;width:auto;box-shadow:none;border-radius:12px;padding:0 0 6px}
+.pz-hanoi .pz-peg.sel{background:rgba(0,234,255,.15);outline:2px solid #00eaff}.pz-hanoi .rod{position:absolute;bottom:0;width:8px;top:12px;background:linear-gradient(90deg,#8a6a3a,#c9a35f,#8a6a3a);border-radius:4px}
+.pz-hanoi .stk{position:relative;display:flex;flex-direction:column-reverse;align-items:center;width:100%;gap:3px}.pz-hanoi .disc{height:22px;border-radius:11px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 2px 4px rgba(0,0,0,.4);display:block;transition:transform .15s}.pz-hanoi .disc.up{transform:translateY(-14px)}
+.pz-o{aspect-ratio:1;border:0;border-radius:10px;cursor:pointer;touch-action:manipulation;box-shadow:inset 0 -3px 4px rgba(0,0,0,.18)}
+.pz-time{width:min(94vw,400px);height:10px;margin:6px auto;background:#ffffff1a;border-radius:6px;overflow:hidden}.pz-time i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#35e07a,#ffd23f,#ff4d6d)}
+.pz-range{width:min(90vw,380px);margin:8px auto;text-align:center}.pz-range .bar{height:14px;border-radius:8px;background:#ffffff1a;position:relative;overflow:hidden}.pz-range .bar i{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,#00eaff,#a855f7);border-radius:8px}.pz-range .lab{margin-top:6px;font-weight:700;color:var(--cyan)}
+.pz-in{width:150px;padding:10px 12px;border-radius:12px;border:2px solid #00eaff66;background:#0b1226;color:#fff;font:700 1.1rem system-ui;text-align:center}.pz-hist{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:min(94vw,400px);margin:8px auto}.pz-chip{padding:5px 10px;border-radius:14px;background:#ffffff14;font-weight:700}.pz-chip.ok{background:#17a45a}
+html[data-mode=light] .pz-in{background:#fff;color:#14204d}html[data-mode=light] .pz-k{background:#c9d6ff;color:#14204d}html[data-mode=light] .pz-mrow{background:rgba(0,0,40,.06)}html[data-mode=light] .pz-simon{background:#cfd8f5}html[data-mode=light] .pz-chip{background:#0001}
+.pz-rev{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;width:min(94vw,400px);margin:8px auto;padding:6px;border-radius:14px;background:#0b5a33;box-shadow:0 6px 16px rgba(0,0,0,.45),inset 0 0 0 3px #063a21}
+.pz-rc{aspect-ratio:1;border:0;background:#13803f;border-radius:4px;position:relative;padding:0;cursor:pointer;touch-action:manipulation}
+.pz-rc .dk{position:absolute;inset:9%;border-radius:50%;box-shadow:0 3px 5px rgba(0,0,0,.5);animation:pzpop .25s}.pz-rc .dk.b{background:radial-gradient(circle at 35% 30%,#666,#050505)}.pz-rc .dk.w{background:radial-gradient(circle at 35% 30%,#fff,#bcbcbc)}.pz-rc .dk.last{outline:2px solid #ffd23f}
+.pz-rc .hint{position:absolute;left:38%;top:38%;width:24%;height:24%;border-radius:50%;background:rgba(255,255,255,.35)}
+@keyframes pzpop{from{transform:scale(.3);opacity:.3}}
+.pz-chk{display:grid;grid-template-columns:repeat(8,1fr);width:min(94vw,400px);margin:8px auto;border:6px solid #5a3a1a;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
+.pz-sq{aspect-ratio:1;border:0;padding:0;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}.pz-sq.lt{background:#f1d9a8}.pz-sq.dk{background:#a0693a}.pz-sq.sel{background:#e0b030!important}.pz-sq.to::after{content:'';width:30%;height:30%;border-radius:50%;background:rgba(40,200,120,.85);position:absolute}
+.pz-sq .pc{width:78%;height:78%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(14px,5vw,22px);box-shadow:0 3px 5px rgba(0,0,0,.55),inset 0 -4px 5px rgba(0,0,0,.3),inset 0 3px 4px rgba(255,255,255,.35)}.pz-sq .pc.r{background:radial-gradient(circle at 35% 30%,#ff6b7d,#b3162e);color:#ffe28a}.pz-sq .pc.k{background:radial-gradient(circle at 35% 30%,#666,#111);color:#ffe28a}.pz-sq .pc.last{outline:2px solid #fff8}
+.pz-man{width:min(96vw,440px);margin:8px auto;padding:10px;border-radius:24px;background:linear-gradient(145deg,#8a5a2b,#5a3512);box-shadow:0 6px 16px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.2)}
+.pz-man .midp{display:flex;gap:6px;align-items:stretch}.pz-man .rowsp{flex:1;display:flex;flex-direction:column;gap:8px}.pz-man .rowp{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.pz-man .pit,.pz-man .store{border:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3a2210,#1f1006);box-shadow:inset 0 4px 8px rgba(0,0,0,.7);color:#ffe9b8;font:800 clamp(14px,4.4vw,20px) system-ui;cursor:pointer;aspect-ratio:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.pz-man .pit.act{box-shadow:inset 0 4px 8px rgba(0,0,0,.7),0 0 0 3px #ffd23f88}.pz-man .store{border-radius:24px;aspect-ratio:auto;width:clamp(36px,11vw,52px);cursor:default;font-size:clamp(18px,5vw,26px)}
+.pz-lbl2{text-align:center;font-weight:700;opacity:.85;margin:8px 0 2px}
+.pz-bs{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;width:min(94vw,380px);margin:4px auto;background:#0a2a52;padding:3px;border-radius:10px}.pz-bs.small{width:min(62vw,250px)}
+.pz-bc{aspect-ratio:1;border:0;padding:0;background:linear-gradient(145deg,#2a78c8,#1a4f94);font-size:clamp(9px,3vw,15px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;border-radius:2px}
+.pz-bc.mine{cursor:default;background:#17406f}.pz-bc.ship{background:#8a9db3}.pz-bc.miss{color:#bcd}.pz-bc.hit{background:#a8283c}.pz-bc.sunk{background:#4a0f1a}
+.pz-pig{display:flex;gap:12px;justify-content:center;margin:10px 0}.pz-pl{min-width:120px;padding:12px;border-radius:16px;background:#ffffff12;text-align:center;border:2px solid transparent}.pz-pl.on{border-color:#00eaff;background:rgba(0,234,255,.12)}.pz-pl b{display:block}.pz-pl span{font:800 2.2rem system-ui}.pz-pl em{display:block;font-style:normal;color:#ffd23f;font-weight:700}
+.pz-face{font-size:5rem;text-align:center;line-height:1.1;margin:4px 0;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.pz-nim{display:flex;flex-direction:column;gap:12px;align-items:center;margin:12px 0}.pz-nrow{display:flex;gap:8px}.pz-stick{width:22px;height:54px;border:0;border-radius:6px;background:linear-gradient(90deg,#e8c27a,#b58a3e,#8a6228);box-shadow:0 3px 5px rgba(0,0,0,.45);cursor:pointer;touch-action:manipulation}.pz-stick.sel{background:linear-gradient(90deg,#ff8f9f,#e0344f);transform:translateY(-6px)}
+html[data-mode=light] .pz-pl{background:#0001}
+.pz-q{font:800 clamp(28px,9vw,44px) system-ui;text-align:center;margin:14px 0;color:var(--cyan)}.pz-q.small{font-size:clamp(18px,5.2vw,24px);padding:0 10px;color:var(--text)}
+.pz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(94vw,400px);margin:8px auto}.pz-opts.one{grid-template-columns:1fr}
+.pz-opt{padding:16px 8px;border:0;border-radius:14px;background:linear-gradient(145deg,#27306b,#1a2050);color:#fff;font:700 clamp(16px,4.6vw,20px) system-ui;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.15);touch-action:manipulation}.pz-opt.good{background:linear-gradient(145deg,#1fb866,#0f7a40)}.pz-opt.bad{background:linear-gradient(145deg,#d6304a,#8c1d33)}
+.pz-stroop{font:900 clamp(40px,14vw,68px) system-ui;text-align:center;margin:18px 0;min-height:1.2em;text-shadow:0 3px 8px rgba(0,0,0,.5)}
+.pz-text{width:min(94vw,440px);margin:10px auto;padding:14px;border-radius:14px;background:#ffffff10;font:600 clamp(16px,4.6vw,20px)/1.6 ui-monospace,monospace;white-space:pre-wrap}.pz-text .ok{color:#35e07a}.pz-text .bad{color:#fff;background:#d6304a;border-radius:3px}.pz-text .cur{border-bottom:3px solid #00eaff}.pz-in.wide{width:min(94vw,440px);text-align:left;display:block;margin:6px auto}
+.pz-card{width:150px;height:210px;margin:12px auto;border-radius:16px;background:#fff;color:#111;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:10px;box-shadow:0 8px 18px rgba(0,0,0,.5);font-family:Georgia,serif;animation:pzpop .25s}.pz-card.red{color:#d6182f}.pz-card b{font:800 2rem Georgia,serif;align-self:flex-start}.pz-card b.bt{align-self:flex-end;transform:rotate(180deg)}.pz-card i{font-style:normal;font-size:4rem;line-height:1}
+.pz-aimarea{position:relative;width:min(94vw,400px);height:min(80vw,340px);margin:8px auto;border-radius:16px;background:radial-gradient(circle at 50% 40%,#1c2552,#0b0f2a);overflow:hidden;touch-action:manipulation;box-shadow:inset 0 0 0 2px #00eaff44}
+.pz-aim{position:absolute;border:0;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,#ff4d6d 13% 38%,#fff 39% 52%,#ff4d6d 53%);box-shadow:0 0 14px #ff4d6d;cursor:pointer;animation:pzpop .15s;touch-action:manipulation}
+.pz-hand{display:flex;gap:6px;justify-content:center;min-height:98px;flex-wrap:wrap}.pz-pc{width:62px;height:90px;border-radius:9px;background:#fff;color:#111;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px;font-family:Georgia,serif;box-shadow:0 4px 8px rgba(0,0,0,.5);animation:pzpop .2s}.pz-pc.red{color:#d6182f}.pz-pc b{font-size:1.3rem;align-self:flex-start}.pz-pc i{font-style:normal;font-size:2rem}.pz-pc.back{background:repeating-linear-gradient(45deg,#3a46a8 0 6px,#2a357f 6px 12px);border:3px solid #fff}
+.pz-tap{display:block;width:min(70vw,260px);height:min(70vw,260px);margin:16px auto;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#ff9f43,#e0501f 70%);color:#fff;font:900 clamp(40px,14vw,64px) system-ui;box-shadow:0 10px 0 #8c2d10,0 16px 24px rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .05s,box-shadow .05s}.pz-tap.p{transform:translateY(7px);box-shadow:0 3px 0 #8c2d10,0 6px 12px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
@@ -973,6 +1028,7 @@ var Snd = (function () {
   };
   document.addEventListener('visibilitychange', function () { if (!ctx) return; try { if (document.hidden) ctx.suspend(); else ctx.resume(); } catch (e) { } });
   return {
+    note: function (f, d) { try { if (on && ac()) { gk = 1; mar(f, ctx.currentTime, .22, d || .4); } } catch (e) { } },
     fx: function (n) { if (FX[n]) { try { gk = TRIM[n] || 1; FX[n](); } catch (e) { } gk = 1; } },
     music: Music,
     on: function () { return on; },
@@ -2587,6 +2643,871 @@ function minesweeper(stage, ui) {
   return function () { alive = false; clearInterval(clock); };
 }
 
+/* ------------------------------------------------------------------ Puzzle batch 2 */
+var PZC = ['#ff4d6d', '#ffb13d', '#ffe14a', '#35e07a', '#35a7ff', '#a855f7'];
+function fmtT(s) { return ((s / 60) | 0) + ':' + ('0' + (s % 60)).slice(-2); }
+function pzTools(stage, hint, fn) {
+  var t = h('div', 'sdt'); t.appendChild(button('New game', fn, 'btn small')); stage.appendChild(t);
+  if (hint) stage.appendChild(h('p', 'hint', hint)); return t;
+}
+
+/* ---- Slide 15 ---- */
+function slide15(stage, ui) {
+  var getLvl = ui.level('slide', ['3×3', '4×4', '5×5'], 1, function () { reset(); }, 'Size');
+  var info = h('div', 'rpsout', ''), board = h('div', 'pz-slide'); stage.appendChild(info); stage.appendChild(board);
+  pzTools(stage, 'Tap a tile next to the empty space to slide it. Put the numbers in order, 1 at the top left.', function () { reset(); });
+  var n, t, moves, secs, clock, started, done, alive = true, off;
+  function solved() { for (var i = 0; i < n * n - 1; i++) if (t[i] !== i + 1) return false; return true; }
+  function reset() {
+    clearInterval(clock); clock = null; n = 3 + getLvl(); t = []; for (var i = 0; i < n * n - 1; i++) t.push(i + 1); t.push(0);
+    var b = n * n - 1, prev = -1;
+    do {
+      for (var k = 0; k < n * n * 40; k++) {
+        var r = (b / n) | 0, c = b % n, nb = []; if (r > 0) nb.push(b - n); if (r < n - 1) nb.push(b + n); if (c > 0) nb.push(b - 1); if (c < n - 1) nb.push(b + 1);
+        nb = nb.filter(function (x) { return x !== prev; }); var m = nb[rnd(nb.length)]; t[b] = t[m]; t[m] = 0; prev = b; b = m;
+      }
+    } while (solved());
+    moves = 0; secs = 0; started = false; done = false; info.textContent = ''; draw(); st();
+  }
+  function st() { var b = store('slide_' + getLvl()); ui.score('Moves ' + moves + ' · ' + fmtT(secs) + (b ? ' · Best ' + b : '')); }
+  function draw() {
+    board.innerHTML = ''; board.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+    t.forEach(function (v, i) {
+      var b = h('button', 'pz-t' + (v ? '' : ' empty'), v ? String(v) : ''); b.type = 'button';
+      if (v) { var hue = 200 + (v - 1) * (160 / (n * n)); b.style.background = 'linear-gradient(145deg,hsl(' + hue + ',75%,56%),hsl(' + hue + ',70%,38%))'; if (v === i + 1) b.classList.add('ok'); }
+      b.addEventListener('click', function () { tap(i); }); board.appendChild(b);
+    });
+  }
+  function tap(i) {
+    if (done || !t[i]) return; var b = t.indexOf(0), r = (i / n) | 0, c = i % n, br = (b / n) | 0, bc = b % n, dir;
+    if (r === br) dir = c < bc ? -1 : 1; else if (c === bc) dir = r < br ? -n : n; else { Snd.fx('bad'); return; }
+    var pos = b; while (pos !== i) { var from = pos + dir; t[pos] = t[from]; pos = from; } t[i] = 0;
+    moves++; Snd.fx('tick'); vib(8);
+    if (!started) { started = true; var t0 = Date.now(); clock = setInterval(function () { secs = Math.round((Date.now() - t0) / 1000); st(); }, 500); }
+    draw(); st();
+    if (solved()) { done = true; clearInterval(clock); var best = setBest('slide_' + getLvl(), moves, true); lbAdd('slide_' + getLvl(), moves, true); Snd.fx('win'); confetti(); info.textContent = '🎉 Solved in ' + moves + ' moves! Best ' + best; ui.score('Solved in ' + moves + ' moves · ' + fmtT(secs)); }
+  }
+  off = onKeys(function (e) {
+    var k = e.key, b = t.indexOf(0), r = (b / n) | 0, c = b % n, i = -1;
+    if (k === 'ArrowUp' && r < n - 1) i = b + n; else if (k === 'ArrowDown' && r > 0) i = b - n; else if (k === 'ArrowLeft' && c < n - 1) i = b + 1; else if (k === 'ArrowRight' && c > 0) i = b - 1;
+    if (i >= 0) { e.preventDefault(); tap(i); }
+  });
+  reset(); return function () { alive = false; clearInterval(clock); off(); };
+}
+
+/* ---- Lights Out ---- */
+function lightsOut(stage, ui) {
+  var getLvl = ui.level('lights', ['4×4', '5×5', '6×6'], 1, function () { reset(); }, 'Size');
+  var info = h('div', 'rpsout', ''), board = h('div', 'pz-lights'); stage.appendChild(info); stage.appendChild(board);
+  pzTools(stage, 'Tapping a light flips it and its four neighbours. Turn every light off to win.', function () { reset(); });
+  var n, g, moves, done;
+  function reset() {
+    n = 4 + getLvl(); g = []; for (var i = 0; i < n * n; i++) g.push(0);
+    do { for (var k = 0; k < n * n; k++) if (Math.random() < .5) press(k, true); } while (g.every(function (v) { return !v; }));
+    moves = 0; done = false; info.textContent = ''; draw(); st();
+  }
+  function st() { var b = store('lights_' + getLvl()); ui.score('Moves ' + moves + ' · Lights on ' + g.filter(Boolean).length + (b ? ' · Best ' + b : '')); }
+  function press(i, quiet) {
+    var r = (i / n) | 0, c = i % n; g[i] ^= 1; if (r > 0) g[i - n] ^= 1; if (r < n - 1) g[i + n] ^= 1; if (c > 0) g[i - 1] ^= 1; if (c < n - 1) g[i + 1] ^= 1;
+  }
+  function draw() {
+    board.innerHTML = ''; board.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+    g.forEach(function (v, i) { var b = h('button', 'pz-l' + (v ? ' on' : '')); b.type = 'button'; b.addEventListener('click', function () { tap(i); }); board.appendChild(b); });
+  }
+  function tap(i) {
+    if (done) return; press(i); moves++; Snd.fx('flip'); vib(8); draw(); st();
+    if (g.every(function (v) { return !v; })) { done = true; var best = setBest('lights_' + getLvl(), moves, true); lbAdd('lights_' + getLvl(), moves, true); Snd.fx('win'); confetti(); info.textContent = '🎉 All off in ' + moves + ' moves! Best ' + best; }
+  }
+  reset(); return function () { };
+}
+
+/* ---- Flood-It ---- */
+function floodIt(stage, ui) {
+  var CF = [[10, 18], [14, 25], [18, 32]];
+  var getLvl = ui.level('flood', ['Small', 'Normal', 'Big'], 1, function () { reset(); }, 'Size');
+  var info = h('div', 'rpsout', ''), board = h('div', 'pz-flood'), pal = h('div', 'pz-pal'); stage.appendChild(info); stage.appendChild(board); stage.appendChild(pal);
+  pzTools(stage, 'Pick a colour to flood from the top-left corner. Fill the whole board with one colour before you run out of moves.', function () { reset(); });
+  var n, max, g, moves, done, cells = [];
+  PZC.forEach(function (c, i) { var b = h('button', 'pz-c'); b.type = 'button'; b.style.background = c; b.addEventListener('click', function () { pick(i); }); pal.appendChild(b); });
+  function reset() {
+    n = CF[getLvl()][0]; max = CF[getLvl()][1]; g = []; for (var i = 0; i < n * n; i++) g.push(rnd(6));
+    moves = 0; done = false; info.textContent = ''; board.innerHTML = ''; cells = []; board.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+    for (i = 0; i < n * n; i++) { var d = h('div', 'pz-fc'); cells.push(d); board.appendChild(d); }
+    draw(); st();
+  }
+  function st() { ui.score('Moves ' + moves + ' / ' + max); }
+  function draw() { g.forEach(function (v, i) { cells[i].style.background = PZC[v]; }); }
+  function pick(c) {
+    if (done || g[0] === c) return; var from = g[0], seen = {}, st2 = [0]; seen[0] = 1;
+    while (st2.length) { var x = st2.pop(); g[x] = c; var r = (x / n) | 0, cc = x % n, nb = []; if (r > 0) nb.push(x - n); if (r < n - 1) nb.push(x + n); if (cc > 0) nb.push(x - 1); if (cc < n - 1) nb.push(x + 1); nb.forEach(function (y) { if (!seen[y] && g[y] === from) { seen[y] = 1; st2.push(y); } }); }
+    moves++; Snd.fx('pop'); vib(8); draw(); st();
+    if (g.every(function (v) { return v === g[0]; })) { done = true; var best = setBest('flood_' + getLvl(), moves, true); lbAdd('flood_' + getLvl(), moves, true); Snd.fx('win'); confetti(); info.textContent = '🎉 Flooded in ' + moves + ' moves! Best ' + best; }
+    else if (moves >= max) { done = true; Snd.fx('lose'); info.textContent = 'Out of moves. Tap New game to try again.'; }
+  }
+  reset(); return function () { };
+}
+
+/* ---- Mastermind ---- */
+function mastermind(stage, ui) {
+  var getLvl = ui.level('mm', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Level');
+  var TR = [12, 10, 8], info = h('div', 'rpsout', ''), rows = h('div', 'pz-mm'), pal = h('div', 'pz-pal'), act = h('div', 'sdt');
+  stage.appendChild(info); stage.appendChild(rows); stage.appendChild(pal); stage.appendChild(act);
+  stage.appendChild(h('p', 'hint', 'Crack the secret code of 4 colours (colours can repeat). A black pin means the right colour in the right place; a white pin means the right colour in the wrong place.'));
+  var code, cur, hist, done;
+  PZC.forEach(function (c, i) { var b = h('button', 'pz-c'); b.type = 'button'; b.style.background = c; b.addEventListener('click', function () { if (!done && cur.length < 4) { cur.push(i); Snd.fx('tick'); draw(); } }); pal.appendChild(b); });
+  act.appendChild(button('⌫ Undo', function () { cur.pop(); draw(); }, 'btn small'));
+  act.appendChild(button('✔ Check', function () { check(); }, 'btn small'));
+  act.appendChild(button('New game', function () { reset(); }, 'btn small'));
+  function reset() { code = [rnd(6), rnd(6), rnd(6), rnd(6)]; cur = []; hist = []; done = false; info.textContent = ''; draw(); }
+  function fb(g) {
+    var b = 0, w = 0, cc = {}, gc = {}, i;
+    for (i = 0; i < 4; i++) { if (g[i] === code[i]) b++; else { cc[code[i]] = (cc[code[i]] || 0) + 1; gc[g[i]] = (gc[g[i]] || 0) + 1; } }
+    for (var k in gc) w += Math.min(gc[k], cc[k] || 0); return [b, w];
+  }
+  function peg(v) { var p = h('i', 'pz-peg' + (v == null ? ' empty' : '')); if (v != null) p.style.background = PZC[v]; return p; }
+  function draw() {
+    rows.innerHTML = ''; var mx = TR[getLvl()];
+    for (var r = 0; r < mx; r++) {
+      var row = h('div', 'pz-mrow'), g = hist[r] ? hist[r].g : (r === hist.length && !done ? cur : []), i;
+      for (i = 0; i < 4; i++) row.appendChild(peg(g[i] != null ? g[i] : null));
+      var f = h('div', 'pz-fb'); if (hist[r]) { for (i = 0; i < 4; i++) { var d = h('b', i < hist[r].f[0] ? 'k' : i < hist[r].f[0] + hist[r].f[1] ? 'w' : ''); f.appendChild(d); } }
+      row.appendChild(f); if (r === hist.length && !done) row.classList.add('cur'); rows.appendChild(row);
+    }
+    if (done) { var s = h('div', 'pz-mrow secret'); for (i = 0; i < 4; i++) s.appendChild(peg(code[i])); s.appendChild(h('span', 'pz-lbl', 'Secret')); rows.appendChild(s); }
+    ui.score('Try ' + Math.min(hist.length + 1, mx) + ' / ' + mx + ' · Wins ' + wins('mm'));
+  }
+  function check() {
+    if (done || cur.length < 4) { if (!done) Snd.fx('bad'); return; }
+    var f = fb(cur); hist.push({ g: cur.slice(), f: f }); cur = [];
+    if (f[0] === 4) { done = true; bump('mm'); Snd.fx('win'); confetti(); info.textContent = '🎉 Cracked it in ' + hist.length + ' tries!'; }
+    else if (hist.length >= TR[getLvl()]) { done = true; Snd.fx('lose'); info.textContent = 'Out of tries. The code is shown below.'; }
+    else Snd.fx('move');
+    draw();
+  }
+  reset(); return function () { };
+}
+
+/* ---- Hangman ---- */
+var HWORDS = [
+  'cat dog sun moon fish bird tree star rain wind snow lion bear frog duck milk cake rice corn book door ship rock lamp hand foot nose'.split(' '),
+  'planet garden rocket purple monkey winter summer pirate castle dragon jungle bridge guitar pencil basket window flower orange yellow silver forest island'.split(' '),
+  'elephant mountain computer umbrella notebook sandwich football airplane treasure squirrel dinosaur chocolate telescope waterfall adventure keyboard pineapple crocodile hurricane'.split(' ')
+];
+function hangman(stage, ui) {
+  var getLvl = ui.level('hang', ['Short', 'Medium', 'Long'], 1, function () { reset(); }, 'Words');
+  var svg = '<svg viewBox="0 0 120 130" class="pz-gal"><g stroke="#9ba9c4" stroke-width="4" fill="none" stroke-linecap="round"><path d="M10 124H80M30 124V8H85V22"/></g><g id="hm" stroke="#ff6b8a" stroke-width="4" fill="none" stroke-linecap="round"><circle cx="85" cy="32" r="10" class="p"/><path d="M85 42V80" class="p"/><path d="M85 52L70 68" class="p"/><path d="M85 52L100 68" class="p"/><path d="M85 80L72 102" class="p"/><path d="M85 80L98 102" class="p"/><path d="M80 29L82 31M88 29L90 31" class="p" stroke-width="2"/></g></svg>';
+  var info = h('div', 'rpsout', ''), pic = h('div', 'pz-hpic'), word = h('div', 'pz-word'), keys = h('div', 'pz-keys');
+  pic.innerHTML = svg; stage.appendChild(pic); stage.appendChild(word); stage.appendChild(info); stage.appendChild(keys);
+  pzTools(stage, 'Guess the word one letter at a time. 7 wrong guesses and the drawing is complete. You can also use your keyboard.', function () { reset(); });
+  var w, got, wrong, done, btns = {}, off, streak = 0;
+  'abcdefghijklmnopqrstuvwxyz'.split('').forEach(function (ch) { var b = h('button', 'pz-k', ch.toUpperCase()); b.type = 'button'; b.addEventListener('click', function () { guess(ch); }); keys.appendChild(b); btns[ch] = b; });
+  function reset() {
+    var L = HWORDS[getLvl()]; w = L[rnd(L.length)]; got = {}; wrong = 0; done = false; info.textContent = '';
+    for (var k in btns) { btns[k].disabled = false; btns[k].className = 'pz-k'; } draw();
+  }
+  function draw() {
+    word.textContent = w.split('').map(function (c) { return got[c] || done && wrong >= 7 ? c.toUpperCase() : '_'; }).join(' ');
+    [].forEach.call(pic.querySelectorAll('.p'), function (p, i) { p.style.opacity = i < wrong ? 1 : 0; });
+    ui.score('Wrong ' + wrong + ' / 7 · Wins ' + wins('hang'));
+  }
+  function guess(ch) {
+    if (done || btns[ch].disabled) return; btns[ch].disabled = true;
+    if (w.indexOf(ch) >= 0) { got[ch] = 1; btns[ch].classList.add('good'); Snd.fx('match'); }
+    else { wrong++; btns[ch].classList.add('bad'); Snd.fx('bad'); vib(20); }
+    if (w.split('').every(function (c) { return got[c]; })) { done = true; bump('hang'); Snd.fx('win'); confetti(); info.textContent = '🎉 You got it!'; }
+    else if (wrong >= 7) { done = true; Snd.fx('lose'); info.textContent = 'The word was ' + w.toUpperCase(); }
+    draw();
+  }
+  off = onKeys(function (e) { if (e.key.length === 1 && /[a-z]/i.test(e.key) && !e.ctrlKey && !e.metaKey) guess(e.key.toLowerCase()); });
+  reset(); return function () { off(); };
+}
+
+/* ---- Simon ---- */
+function simon(stage, ui) {
+  var getLvl = ui.level('simon', ['Slow', 'Normal', 'Fast'], 1, function () { reset(); }, 'Speed');
+  var SP = [650, 480, 330], FR = [261.6, 329.6, 392, 523.3], CL = ['#35e07a', '#ff4d6d', '#ffd23f', '#35a7ff'];
+  var info = h('div', 'rpsout', 'Press Start'), pad = h('div', 'pz-simon'), pads = []; stage.appendChild(info); stage.appendChild(pad);
+  var sb = button('▶ Start', function () { start(); }, 'btn small'); var tl = h('div', 'sdt'); tl.appendChild(sb); stage.appendChild(tl);
+  stage.appendChild(h('p', 'hint', 'Watch the pattern, then repeat it. It gets one step longer every round.'));
+  var seq, idx, accept, round, timers = [], alive = true;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  [0, 1, 2, 3].forEach(function (i) {
+    var b = h('button', 'pz-sp'); b.type = 'button'; b.style.setProperty('--c', CL[i]); b.addEventListener('click', function () { press(i); }); pad.appendChild(b); pads.push(b);
+  });
+  function flash(i, ms) { pads[i].classList.add('lit'); Snd.note(FR[i], .5); later(function () { pads[i].classList.remove('lit'); }, ms * .6); }
+  function reset() { timers.forEach(clearTimeout); timers = []; seq = []; idx = 0; accept = false; round = 0; info.textContent = 'Press Start'; st(); }
+  function st() { ui.score('Round ' + round + ' · Best ' + (store('simon_' + getLvl()) || 0)); }
+  function start() { reset(); next(); }
+  function next() { seq.push(rnd(4)); round = seq.length; idx = 0; accept = false; info.textContent = 'Watch…'; st(); var sp = SP[getLvl()]; seq.forEach(function (s, k) { later(function () { flash(s, sp); }, 700 + k * sp); }); later(function () { accept = true; info.textContent = 'Your turn!'; }, 700 + seq.length * sp); }
+  function press(i) {
+    if (!accept) return; flash(i, 300); vib(8);
+    if (i !== seq[idx]) { accept = false; Snd.fx('lose'); var b = setBest('simon_' + getLvl(), round - 1); lbAdd('simon_' + getLvl(), round - 1); info.textContent = 'Wrong! You reached round ' + (round - 1) + '. Best ' + b; st(); return; }
+    idx++; if (idx === seq.length) { accept = false; later(function () { Snd.fx('chime'); next(); }, 700); }
+  }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Maze ---- */
+function maze(stage, ui) {
+  var getLvl = ui.level('maze', ['Small', 'Medium', 'Large'], 0, function () { reset(); }, 'Size');
+  var S = 480, cv = h('canvas', 'gcanvas'), c2 = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 3);
+  cv.width = S * dpr; cv.height = S * dpr; cv.style.aspectRatio = '1 / 1'; var info = h('div', 'rpsout', ''); stage.appendChild(info); stage.appendChild(cv);
+  var dp = h('div', 'pz-dpad'); [['▲', 0, -1], ['◀', -1, 0], ['▶', 1, 0], ['▼', 0, 1]].forEach(function (d) { var b = h('button', 'btn small', d[0]); b.type = 'button'; b.style.gridArea = { '▲': 'u', '◀': 'l', '▶': 'r', '▼': 'd' }[d[0]]; b.addEventListener('click', function () { step(d[1], d[2], false); }); dp.appendChild(b); }); stage.appendChild(dp);
+  pzTools(stage, 'Get the ball 🟢 to the flag 🚩. Swipe to glide along a corridor, or use the arrows. Your trail is drawn so you can see where you have been.', function () { reset(); });
+  var n, wall, px, py, trail, t0, secs, clock, done, off, alive = true;
+  function reset() {
+    clearInterval(clock); clock = null; n = [9, 13, 18][getLvl()]; wall = []; for (var i = 0; i < n * n; i++) wall.push(15);
+    var seen = {}, st = [0]; seen[0] = 1;
+    while (st.length) {
+      var x = st[st.length - 1], r = (x / n) | 0, c = x % n, nb = [];
+      if (r > 0 && !seen[x - n]) nb.push([x - n, 1, 4]); if (c < n - 1 && !seen[x + 1]) nb.push([x + 1, 2, 8]); if (r < n - 1 && !seen[x + n]) nb.push([x + n, 4, 1]); if (c > 0 && !seen[x - 1]) nb.push([x - 1, 8, 2]);
+      if (!nb.length) { st.pop(); continue; } var m = nb[rnd(nb.length)]; wall[x] &= ~m[1]; wall[m[0]] &= ~m[2]; seen[m[0]] = 1; st.push(m[0]);
+    }
+    px = 0; py = 0; trail = [[0, 0]]; done = false; secs = 0; t0 = 0; info.textContent = ''; draw(); st2();
+  }
+  function st2() { var b = store('maze_' + getLvl()); ui.score(fmtT(secs) + (b ? ' · Best ' + fmtT(b) : '')); }
+  function can(x, y, dx, dy) { var w = wall[y * n + x]; return dx === 1 ? !(w & 2) : dx === -1 ? !(w & 8) : dy === 1 ? !(w & 4) : !(w & 1); }
+  var DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  function step(dx, dy, glide) {
+    if (done || !can(px, py, dx, dy)) return;
+    while (true) {
+      px += dx; py += dy; trail.push([px, py]);
+      if (px === n - 1 && py === n - 1 || !glide) break;
+      var cx = dx, cy = dy, opts = DIRS.filter(function (d) { return !(d[0] === -cx && d[1] === -cy) && can(px, py, d[0], d[1]); });
+      if (opts.length !== 1) break; dx = opts[0][0]; dy = opts[0][1];
+    }
+    if (!t0) { t0 = Date.now(); clock = setInterval(function () { secs = Math.round((Date.now() - t0) / 1000); st2(); }, 500); }
+    Snd.fx('tick'); draw();
+    if (px === n - 1 && py === n - 1) { done = true; clearInterval(clock); secs = Math.max(1, Math.round((Date.now() - t0) / 1000)); var best = setBest('maze_' + getLvl(), secs, true); lbAdd('maze_' + getLvl(), secs, true); Snd.fx('win'); confetti(); info.textContent = '🎉 Escaped in ' + fmtT(secs) + '! Best ' + fmtT(best); st2(); }
+  }
+  function draw() {
+    var u = S / n; c2.setTransform(dpr, 0, 0, dpr, 0, 0); c2.fillStyle = '#0c1230'; c2.fillRect(0, 0, S, S);
+    c2.strokeStyle = 'rgba(0,234,255,.35)'; c2.lineWidth = 5;
+    c2.lineCap = 'round'; c2.beginPath(); trail.forEach(function (p, k) { var x = (p[0] + .5) * u, y = (p[1] + .5) * u; k ? c2.lineTo(x, y) : c2.moveTo(x, y); }); c2.stroke();
+    c2.strokeStyle = '#7cf0c9'; c2.lineWidth = Math.max(2.5, u / 9); c2.beginPath();
+    for (var i = 0; i < n * n; i++) { var x0 = (i % n) * u, y0 = ((i / n) | 0) * u, w = wall[i]; if (w & 1) { c2.moveTo(x0, y0); c2.lineTo(x0 + u, y0); } if (w & 2) { c2.moveTo(x0 + u, y0); c2.lineTo(x0 + u, y0 + u); } if (w & 4) { c2.moveTo(x0, y0 + u); c2.lineTo(x0 + u, y0 + u); } if (w & 8) { c2.moveTo(x0, y0); c2.lineTo(x0, y0 + u); } }
+    c2.stroke();
+    c2.font = Math.floor(u * .7) + 'px serif'; c2.textAlign = 'center'; c2.textBaseline = 'middle'; c2.fillText('🚩', (n - .5) * u, (n - .5) * u + 1);
+    var g = c2.createRadialGradient((px + .4) * u, (py + .4) * u, 1, (px + .5) * u, (py + .5) * u, u * .38); g.addColorStop(0, '#d8ffe0'); g.addColorStop(1, '#17b45a'); c2.fillStyle = g; c2.beginPath(); c2.arc((px + .5) * u, (py + .5) * u, u * .3, 0, 6.283); c2.fill();
+  }
+  swipe(cv, function (d) { var m = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[d]; if (m) step(m[0], m[1], true); });
+  off = onKeys(function (e) { var m = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key]; if (m) { e.preventDefault(); step(m[0], m[1], false); } });
+  reset(); return function () { alive = false; clearInterval(clock); off(); };
+}
+
+/* ---- Tower of Hanoi ---- */
+function hanoi(stage, ui) {
+  var getLvl = ui.level('hanoi', ['3 discs', '5 discs', '7 discs'], 0, function () { reset(); }, 'Discs');
+  var info = h('div', 'rpsout', ''), area = h('div', 'pz-hanoi'); stage.appendChild(info); stage.appendChild(area);
+  pzTools(stage, 'Move the whole stack to the last peg. Only one disc at a time, and never put a bigger disc on a smaller one. Tap a peg to pick up its top disc, then tap where it should go.', function () { reset(); });
+  var N, pegs, sel, moves, done, ds = [];
+  function reset() { N = [3, 5, 7][getLvl()]; pegs = [[], [], []]; for (var i = N; i >= 1; i--) pegs[0].push(i); sel = -1; moves = 0; done = false; info.textContent = ''; draw(); st(); }
+  function st() { var b = store('hanoi_' + getLvl()); ui.score('Moves ' + moves + ' (best possible ' + (Math.pow(2, N) - 1) + ')' + (b ? ' · Your best ' + b : '')); }
+  function draw() {
+    area.innerHTML = '';
+    pegs.forEach(function (p, i) {
+      var col = h('button', 'pz-peg' + (sel === i ? ' sel' : '')); col.type = 'button'; col.appendChild(h('i', 'rod'));
+      var stack = h('div', 'stk'); p.forEach(function (d, k) { var e = h('b', 'disc' + (sel === i && k === p.length - 1 ? ' up' : '')); e.style.width = (22 + d * (68 / N)) + '%'; e.style.background = 'linear-gradient(180deg,hsl(' + (d * 300 / N) + ',80%,62%),hsl(' + (d * 300 / N) + ',75%,42%))'; stack.appendChild(e); });
+      col.appendChild(stack); col.addEventListener('click', function () { tap(i); }); area.appendChild(col);
+    });
+  }
+  function tap(i) {
+    if (done) return;
+    if (sel < 0) { if (!pegs[i].length) { Snd.fx('bad'); return; } sel = i; Snd.fx('tick'); draw(); return; }
+    if (sel === i) { sel = -1; draw(); return; }
+    var d = pegs[sel][pegs[sel].length - 1], top = pegs[i][pegs[i].length - 1];
+    if (top && top < d) { Snd.fx('bad'); vib(30); info.textContent = 'A bigger disc cannot go on a smaller one.'; sel = -1; draw(); return; }
+    pegs[sel].pop(); pegs[i].push(d); sel = -1; moves++; info.textContent = ''; Snd.fx('land'); draw(); st();
+    if (pegs[2].length === N) { done = true; var best = setBest('hanoi_' + getLvl(), moves, true); lbAdd('hanoi_' + getLvl(), moves, true); Snd.fx('win'); confetti(); info.textContent = '🎉 Solved in ' + moves + ' moves' + (moves === Math.pow(2, N) - 1 ? ' — perfect!' : '!'); }
+  }
+  reset(); return function () { };
+}
+
+/* ---- Odd Colour ---- */
+function oddColour(stage, ui) {
+  var info = h('div', 'rpsout', 'Tap the tile with a different colour'), board = h('div', 'pz-odd'), bar = h('div', 'pz-time'), fill = h('i'); bar.appendChild(fill);
+  stage.appendChild(bar); stage.appendChild(info); stage.appendChild(board);
+  pzTools(stage, 'One tile is a slightly different shade. Find it before the time runs out. A wrong tap costs 3 seconds. The grid grows and the difference shrinks as you go.', function () { reset(); });
+  var score, tleft, last, clock, over, n, alive = true, odd;
+  function reset() { clearInterval(clock); score = 0; tleft = 30; over = false; last = Date.now(); round(); info.textContent = 'Tap the tile with a different colour'; clock = setInterval(tickT, 100); st(); }
+  function st() { ui.score('Score ' + score + ' · Best ' + (store('odd') || 0)); }
+  function tickT() { var now = Date.now(); tleft -= (now - last) / 1000; last = now; if (tleft <= 0) { tleft = 0; end(); } fill.style.width = (tleft / 30 * 100) + '%'; }
+  function round() {
+    n = Math.min(8, 2 + Math.floor(score / 3) + 1); var hue = rnd(360), sat = 55 + rnd(30), l = 45 + rnd(15), d = Math.max(3, 16 - score * .6) * (rnd(2) ? 1 : -1);
+    odd = rnd(n * n); board.innerHTML = ''; board.style.gridTemplateColumns = 'repeat(' + n + ',1fr)';
+    for (var i = 0; i < n * n; i++) { var b = h('button', 'pz-o'); b.type = 'button'; b.style.background = 'hsl(' + hue + ',' + sat + '%,' + (i === odd ? l + d : l) + '%)'; (function (k) { b.addEventListener('click', function () { pick(k); }); })(i); board.appendChild(b); }
+  }
+  function pick(k) {
+    if (over) return;
+    if (k === odd) { score++; Snd.fx('pop'); tleft = Math.min(30, tleft + .5); round(); } else { tleft -= 3; Snd.fx('bad'); vib(30); if (tleft <= 0) { tleft = 0; end(); } }
+    st();
+  }
+  function end() { over = true; clearInterval(clock); var b = setBest('odd', score); lbAdd('odd', score); Snd.fx(score > 0 ? 'win' : 'lose'); info.textContent = 'Time up! Score ' + score + ' · Best ' + b; st(); }
+  reset(); return function () { alive = false; clearInterval(clock); };
+}
+
+/* ---- Number Guess ---- */
+function numGuess(stage, ui) {
+  var CF = [[50, 6], [100, 7], [1000, 10]];
+  var getLvl = ui.level('guess', ['1–50', '1–100', '1–1000'], 1, function () { reset(); }, 'Range');
+  var info = h('div', 'rpsout', ''), rng = h('div', 'pz-range'), inp = h('input', 'pz-in'), hist = h('div', 'pz-hist'), row = h('div', 'sdt');
+  inp.type = 'number'; inp.inputMode = 'numeric'; inp.placeholder = 'Your guess';
+  row.appendChild(inp); row.appendChild(button('Guess', function () { go(); }, 'btn small')); row.appendChild(button('New game', function () { reset(); }, 'btn small'));
+  stage.appendChild(info); stage.appendChild(rng); stage.appendChild(row); stage.appendChild(hist);
+  stage.appendChild(h('p', 'hint', 'I picked a secret number. Guess it in as few tries as you can. After each guess I tell you higher or lower.'));
+  var secret, lo, hi, tries, done, off;
+  function reset() { var m = CF[getLvl()][0]; secret = 1 + rnd(m); lo = 1; hi = m; tries = []; done = false; inp.value = ''; inp.disabled = false; info.textContent = 'Guess a number from 1 to ' + m; draw(); }
+  function draw() {
+    var m = CF[getLvl()][0]; rng.innerHTML = ''; var bar = h('div', 'bar'), seg = h('i'); seg.style.left = ((lo - 1) / m * 100) + '%'; seg.style.width = ((hi - lo + 1) / m * 100) + '%'; bar.appendChild(seg); rng.appendChild(bar); rng.appendChild(h('div', 'lab', lo + '  –  ' + hi));
+    hist.innerHTML = ''; tries.forEach(function (t) { hist.appendChild(h('span', 'pz-chip ' + (t.v === secret ? 'ok' : ''), t.v + (t.v < secret ? ' ↑' : t.v > secret ? ' ↓' : ' ✓'))); });
+    var b = store('guess_' + getLvl()); ui.score('Tries ' + tries.length + ' / ' + CF[getLvl()][1] + (b ? ' · Best ' + b : ''));
+  }
+  function go() {
+    if (done) return; var v = parseInt(inp.value, 10), m = CF[getLvl()][0];
+    if (isNaN(v) || v < 1 || v > m) { Snd.fx('bad'); info.textContent = 'Enter a number from 1 to ' + m; return; }
+    tries.push({ v: v }); inp.value = '';
+    if (v === secret) { done = true; var best = setBest('guess_' + getLvl(), tries.length, true); lbAdd('guess_' + getLvl(), tries.length, true); Snd.fx('win'); confetti(); info.textContent = '🎉 Yes, it was ' + secret + '! ' + tries.length + ' tries'; }
+    else { if (v < secret) { lo = Math.max(lo, v + 1); info.textContent = v + ' is too low ↑'; } else { hi = Math.min(hi, v - 1); info.textContent = v + ' is too high ↓'; } Snd.fx('tick'); if (tries.length >= CF[getLvl()][1]) { done = true; Snd.fx('lose'); info.textContent = 'Out of tries. It was ' + secret; } }
+    draw();
+  }
+  off = onKeys(function (e) { if (e.key === 'Enter' && document.activeElement === inp) go(); });
+  reset(); return function () { off(); };
+}
+
+/* ------------------------------------------------------------------ Board batch 3 */
+function modeLvl(ui, key, redo, lv) {
+  var m = ui.level(key + '_mode', ['vs Computer', '2 players'], 0, redo, 'Mode');
+  var l = lv === false ? function () { return 1; } : ui.level(key, ['Easy', 'Normal', 'Hard'], 1, redo, 'Level');
+  return { mode: m, lvl: l };
+}
+
+/* ---- Reversi ---- */
+function reversi(stage, ui) {
+  var ML = modeLvl(ui, 'rev', function () { reset(); });
+  var info = h('div', 'rpsout', ''), grid = h('div', 'pz-rev'); stage.appendChild(info); stage.appendChild(grid);
+  pzTools(stage, 'Black moves first (you). Place a disc so it traps a line of opponent discs between two of yours — they flip. Most discs at the end wins. Corners are powerful!', function () { reset(); });
+  var DR = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]], WT4 = [[100, -20, 10, 5], [-20, -50, -2, -2], [10, -2, -1, -1], [5, -2, -1, -1]];
+  var B, turn, over, timers = [], alive = true, last = -1;
+  function wt(i) { var r = (i / 8) | 0, c = i % 8; return WT4[Math.min(r, 7 - r)][Math.min(c, 7 - c)]; }
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function flips(b, i, p) {
+    if (b[i]) return []; var r = (i / 8) | 0, c = i % 8, out = [];
+    DR.forEach(function (d) { var rr = r + d[0], cc = c + d[1], tmp = []; while (rr >= 0 && rr < 8 && cc >= 0 && cc < 8 && b[rr * 8 + cc] === 3 - p) { tmp.push(rr * 8 + cc); rr += d[0]; cc += d[1]; } if (tmp.length && rr >= 0 && rr < 8 && cc >= 0 && cc < 8 && b[rr * 8 + cc] === p) out = out.concat(tmp); });
+    return out;
+  }
+  function moves(b, p) { var o = []; for (var i = 0; i < 64; i++) { var f = flips(b, i, p); if (f.length) o.push({ i: i, f: f }); } return o; }
+  function play(b, m, p) { var n = b.slice(); n[m.i] = p; m.f.forEach(function (x) { n[x] = p; }); return n; }
+  function count(b) { var a = 0, c = 0; b.forEach(function (v) { if (v === 1) a++; else if (v === 2) c++; }); return [a, c]; }
+  function evalB(b, p) { var s = 0; for (var i = 0; i < 64; i++) if (b[i]) s += (b[i] === p ? 1 : -1) * wt(i); s += (moves(b, p).length - moves(b, 3 - p).length) * 6; return s; }
+  function ab(b, p, me, d, a, be) {
+    var ms = moves(b, p); if (!ms.length) { var o = moves(b, 3 - p); if (!o.length) { var cn = count(b), df = (me === 1 ? cn[0] - cn[1] : cn[1] - cn[0]); return df * 1000; } return ab(b, 3 - p, me, d, a, be); }
+    if (!d) return evalB(b, me);
+    var i, v;
+    if (p === me) { v = -1e9; for (i = 0; i < ms.length; i++) { v = Math.max(v, ab(play(b, ms[i], p), 3 - p, me, d - 1, a, be)); a = Math.max(a, v); if (a >= be) break; } return v; }
+    v = 1e9; for (i = 0; i < ms.length; i++) { v = Math.min(v, ab(play(b, ms[i], p), 3 - p, me, d - 1, a, be)); be = Math.min(be, v); if (a >= be) break; } return v;
+  }
+  function aiPick() {
+    var ms = moves(B, 2), L = ML.lvl(); if (L === 0) return ms[rnd(ms.length)];
+    var best = null, bv = -1e9; ms.forEach(function (m) { var v = L === 1 ? wt(m.i) * 2 + m.f.length : ab(play(B, m, 2), 1, 2, 3, -1e9, 1e9); v += Math.random() * .1; if (v > bv) { bv = v; best = m; } }); return best;
+  }
+  function reset() { timers.forEach(clearTimeout); timers = []; B = []; for (var i = 0; i < 64; i++) B.push(0); B[27] = 2; B[36] = 2; B[28] = 1; B[35] = 1; turn = 1; over = false; last = -1; draw(); status(); }
+  function draw() {
+    grid.innerHTML = ''; var ms = (!over && (turn === 1 || ML.mode() === 1)) ? moves(B, turn) : [], ok = {}; ms.forEach(function (m) { ok[m.i] = 1; });
+    for (var i = 0; i < 64; i++) {
+      var b = h('button', 'pz-rc'); b.type = 'button'; if (B[i]) { var d = h('i', 'dk ' + (B[i] === 1 ? 'b' : 'w') + (i === last ? ' last' : '')); b.appendChild(d); } else if (ok[i]) b.appendChild(h('i', 'hint'));
+      (function (k) { b.addEventListener('click', function () { human(k); }); })(i); grid.appendChild(b);
+    }
+    var c = count(B); ui.score('⚫ ' + c[0] + '  vs  ⚪ ' + c[1]);
+  }
+  function status() { if (over) return; var two = ML.mode() === 1; info.textContent = turn === 1 ? (two ? 'Black’s turn' : 'Your turn (black)') : (two ? 'White’s turn' : 'Computer is thinking…'); }
+  function human(i) {
+    if (over || (turn === 2 && ML.mode() === 0)) return; var m = moves(B, turn).filter(function (x) { return x.i === i; })[0]; if (!m) { Snd.fx('bad'); return; }
+    do1(m);
+  }
+  function do1(m) { B = play(B, m, turn); last = m.i; Snd.fx('move'); vib(8); next(); }
+  function next() {
+    var p = 3 - turn; draw();
+    if (moves(B, p).length) turn = p; else if (!moves(B, turn).length) return end(); else info.textContent = (p === 1 ? 'Black' : 'White') + ' has no move — passes';
+    draw(); status();
+    if (!over && turn === 2 && ML.mode() === 0) later(function () { var m = aiPick(); if (m) do1(m); }, 650);
+  }
+  function end() { over = true; draw(); var c = count(B), two = ML.mode() === 1; if (c[0] === c[1]) { info.textContent = 'Draw!'; Snd.fx('draw'); return; }
+    var w = c[0] > c[1] ? 1 : 2; info.textContent = w === 1 ? (two ? '🏆 Black wins!' : '🎉 You win!') : (two ? '🏆 White wins!' : 'Computer wins.');
+    if (w === 1 || two) { Snd.fx('win'); confetti(); if (!two) bump('rev'); } else Snd.fx('lose'); }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Gomoku ---- */
+function gomoku(stage, ui) {
+  var ML = modeLvl(ui, 'gomoku', function () { reset(); });
+  var N = 15, S = 450, cv = h('canvas', 'gcanvas'), c = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 3), info = h('div', 'rpsout', '');
+  cv.width = S * dpr; cv.height = S * dpr; cv.style.aspectRatio = '1 / 1'; stage.appendChild(info); stage.appendChild(cv);
+  pzTools(stage, 'Take turns placing stones. Get five in a row — across, down or diagonally — to win. You play black and go first.', function () { reset(); });
+  var B, turn, over, last, timers = [], alive = true, U = S / (N + 1);
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function reset() { timers.forEach(clearTimeout); timers = []; B = []; for (var i = 0; i < N * N; i++) B.push(0); turn = 1; over = false; last = -1; draw(); status(); }
+  function status() { if (over) return; var two = ML.mode() === 1; info.textContent = turn === 1 ? (two ? 'Black’s turn' : 'Your turn') : (two ? 'White’s turn' : 'Computer is thinking…'); ui.score('Wins: ' + wins('gomoku')); }
+  function draw() {
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); var g = c.createLinearGradient(0, 0, S, S); g.addColorStop(0, '#e6b66b'); g.addColorStop(1, '#c98f45'); c.fillStyle = g; c.fillRect(0, 0, S, S);
+    c.strokeStyle = 'rgba(70,40,10,.8)'; c.lineWidth = 1; c.beginPath(); for (var i = 1; i <= N; i++) { c.moveTo(U, i * U); c.lineTo(N * U, i * U); c.moveTo(i * U, U); c.lineTo(i * U, N * U); } c.stroke();
+    c.fillStyle = 'rgba(70,40,10,.9)'; [4, 8, 12].forEach(function (a) { [4, 8, 12].forEach(function (b) { c.beginPath(); c.arc(a * U, b * U, 3.5, 0, 6.283); c.fill(); }); });
+    for (var k = 0; k < N * N; k++) if (B[k]) { var x = ((k % N) + 1) * U, y = (((k / N) | 0) + 1) * U, r = U * .43;
+      c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.arc(x + 2, y + 3, r, 0, 6.283); c.fill();
+      var rg = c.createRadialGradient(x - r * .35, y - r * .35, r * .1, x, y, r); if (B[k] === 1) { rg.addColorStop(0, '#6a6a6a'); rg.addColorStop(1, '#050505'); } else { rg.addColorStop(0, '#ffffff'); rg.addColorStop(1, '#c4c4c4'); }
+      c.fillStyle = rg; c.beginPath(); c.arc(x, y, r, 0, 6.283); c.fill();
+      if (k === last) { c.strokeStyle = '#ff3d5a'; c.lineWidth = 2.5; c.beginPath(); c.arc(x, y, r * .45, 0, 6.283); c.stroke(); } }
+  }
+  function line(b, i, dx, dy, p) { var r = (i / N) | 0, cc = i % N, n = 1, a, x, y; for (a = 1; a < 5; a++) { x = cc + dx * a; y = r + dy * a; if (x < 0 || y < 0 || x >= N || y >= N || b[y * N + x] !== p) break; n++; } for (a = 1; a < 5; a++) { x = cc - dx * a; y = r - dy * a; if (x < 0 || y < 0 || x >= N || y >= N || b[y * N + x] !== p) break; n++; } return n; }
+  function won(i, p) { return [[1, 0], [0, 1], [1, 1], [1, -1]].some(function (d) { return line(B, i, d[0], d[1], p) >= 5; }); }
+  function score(i, p) {
+    var s = 0, r = (i / N) | 0, cc = i % N;
+    [[1, 0], [0, 1], [1, 1], [1, -1]].forEach(function (d) {
+      var n = 1, open = 0, a, x, y;
+      for (a = 1; a < 5; a++) { x = cc + d[0] * a; y = r + d[1] * a; if (x < 0 || y < 0 || x >= N || y >= N) break; if (B[y * N + x] === p) n++; else { if (!B[y * N + x]) open++; break; } }
+      for (a = 1; a < 5; a++) { x = cc - d[0] * a; y = r - d[1] * a; if (x < 0 || y < 0 || x >= N || y >= N) break; if (B[y * N + x] === p) n++; else { if (!B[y * N + x]) open++; break; } }
+      s += n >= 5 ? 100000 : n === 4 ? (open === 2 ? 10000 : open === 1 ? 1500 : 0) : n === 3 ? (open === 2 ? 900 : open === 1 ? 90 : 0) : n === 2 ? (open === 2 ? 70 : open === 1 ? 10 : 0) : 2;
+    }); return s;
+  }
+  function aiMove() {
+    var L = ML.lvl(), cand = [], i, any = false, def = L === 2 ? 1.15 : 1;
+    for (i = 0; i < N * N; i++) if (B[i]) any = true;
+    if (!any) return 7 * N + 7;
+    for (i = 0; i < N * N; i++) { if (B[i]) continue; var near = false, r = (i / N) | 0, cc = i % N; for (var dr = -2; dr <= 2 && !near; dr++) for (var dc = -2; dc <= 2; dc++) { var y = r + dr, x = cc + dc; if (y >= 0 && y < N && x >= 0 && x < N && B[y * N + x]) { near = true; break; } } if (near) cand.push({ i: i, s: score(i, 2) + score(i, 1) * def * (L === 0 ? .5 : 1) + Math.random() * 3 }); }
+    cand.sort(function (a, b) { return b.s - a.s; }); if (L === 0 && Math.random() < .35) return cand[Math.min(cand.length - 1, 1 + rnd(4))].i; return cand[0].i;
+  }
+  function place(i) {
+    B[i] = turn; last = i; Snd.fx('land'); vib(8); draw();
+    if (won(i, turn)) { over = true; var two = ML.mode() === 1; info.textContent = turn === 1 ? (two ? '🏆 Black wins!' : '🎉 You win!') : (two ? '🏆 White wins!' : 'Computer wins.'); if (turn === 1 || two) { Snd.fx('win'); confetti(); if (!two) bump('gomoku'); } else Snd.fx('lose'); ui.score('Wins: ' + wins('gomoku')); return; }
+    if (B.every(Boolean)) { over = true; info.textContent = 'Draw!'; return; }
+    turn = 3 - turn; status(); if (turn === 2 && ML.mode() === 0) later(function () { place(aiMove()); }, 500);
+  }
+  cv.addEventListener('click', function (e) {
+    if (over || (turn === 2 && ML.mode() === 0)) return; var r = cv.getBoundingClientRect(), x = Math.round((e.clientX - r.left) / r.width * S / U) - 1, y = Math.round((e.clientY - r.top) / r.height * S / U) - 1;
+    if (x < 0 || y < 0 || x >= N || y >= N || B[y * N + x]) return; place(y * N + x);
+  });
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Checkers ---- */
+function checkers(stage, ui) {
+  var ML = modeLvl(ui, 'chk', function () { reset(); });
+  var info = h('div', 'rpsout', ''), grid = h('div', 'pz-chk'); stage.appendChild(info); stage.appendChild(grid);
+  pzTools(stage, 'You are red and move up. Pieces move diagonally forward; jumping is compulsory and you can chain jumps. Reach the far side to become a king (moves both ways).', function () { reset(); });
+  var B, turn, sel, over, list, timers = [], alive = true, lastTo = -1;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function dirsFor(v) { var s = v > 0 ? 1 : -1; return Math.abs(v) === 2 ? [[-1, -1], [-1, 1], [1, -1], [1, 1]] : (s === 1 ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]]); }
+  function gen(b, s) {
+    var caps = [], simple = [], i;
+    function jump(pos, v, bd, got, from) {
+      var any = false, r = (pos / 8) | 0, c = pos % 8;
+      dirsFor(v).forEach(function (d) {
+        var r1 = r + d[0], c1 = c + d[1], r2 = r + 2 * d[0], c2 = c + 2 * d[1]; if (r2 < 0 || r2 > 7 || c2 < 0 || c2 > 7) return;
+        var m = r1 * 8 + c1, t = r2 * 8 + c2; if (bd[m] && (bd[m] > 0) !== (v > 0) && !bd[t]) {
+          any = true; var nb = bd.slice(); nb[m] = 0; nb[pos] = 0; var nv = v; var promoted = Math.abs(v) === 1 && (v > 0 ? r2 === 0 : r2 === 7); if (promoted) nv = v * 2; nb[t] = nv;
+          if (promoted) caps.push({ from: from, to: t, cap: got.concat([m]) }); else jump(t, nv, nb, got.concat([m]), from);
+        }
+      });
+      if (!any && got.length) caps.push({ from: from, to: pos, cap: got });
+    }
+    for (i = 0; i < 64; i++) if (b[i] && (b[i] > 0) === (s > 0)) jump(i, b[i], b, [], i);
+    if (caps.length) return caps;
+    for (i = 0; i < 64; i++) if (b[i] && (b[i] > 0) === (s > 0)) { var r = (i / 8) | 0, c = i % 8; dirsFor(b[i]).forEach(function (d) { var r1 = r + d[0], c1 = c + d[1]; if (r1 >= 0 && r1 < 8 && c1 >= 0 && c1 < 8 && !b[r1 * 8 + c1]) simple.push({ from: i, to: r1 * 8 + c1, cap: [] }); }); }
+    return simple;
+  }
+  function apply(b, m) { var n = b.slice(), v = n[m.from]; n[m.from] = 0; m.cap.forEach(function (x) { n[x] = 0; }); var r = (m.to / 8) | 0; if (Math.abs(v) === 1 && (v > 0 ? r === 0 : r === 7)) v *= 2; n[m.to] = v; return n; }
+  function ev(b) { var s = 0; for (var i = 0; i < 64; i++) { var v = b[i]; if (!v) continue; var r = (i / 8) | 0, a = Math.abs(v) === 2 ? 160 : 100 + (v > 0 ? 7 - r : r) * 3; s += v > 0 ? a : -a; } return s; }
+  function ab(b, s, d, a, be) {
+    var ms = gen(b, s); if (!ms.length) return s > 0 ? -1e5 - d : 1e5 + d; if (!d) return ev(b);
+    var v, i; if (s < 0) { v = -1e9; for (i = 0; i < ms.length; i++) { v = Math.max(v, ab(apply(b, ms[i]), 1, d - 1, a, be)); a = Math.max(a, v); if (a >= be) break; } return v; }
+    v = 1e9; for (i = 0; i < ms.length; i++) { v = Math.min(v, ab(apply(b, ms[i]), -1, d - 1, a, be)); be = Math.min(be, v); if (a >= be) break; } return v;
+  }
+  function aiMove() { var ms = gen(B, -1), L = ML.lvl(), dep = [2, 4, 6][L], best = [], bv = -1e9; if (L === 0 && Math.random() < .3) return ms[rnd(ms.length)]; ms.forEach(function (m) { var v = ab(apply(B, m), 1, dep - 1, -1e9, 1e9); if (v > bv + .1) { bv = v; best = [m]; } else if (Math.abs(v - bv) <= .1) best.push(m); }); return best[rnd(best.length)]; }
+  function reset() { timers.forEach(clearTimeout); timers = []; B = []; for (var i = 0; i < 64; i++) { var r = (i / 8) | 0, c = i % 8; B.push((r + c) % 2 === 1 ? (r < 3 ? -1 : r > 4 ? 1 : 0) : 0); } turn = 1; sel = -1; over = false; lastTo = -1; list = gen(B, 1); draw(); status(); }
+  function status() { if (over) return; var two = ML.mode() === 1; info.textContent = turn === 1 ? (two ? 'Red’s turn' : 'Your turn') : (two ? 'Black’s turn' : 'Computer is thinking…'); var a = 0, b = 0; B.forEach(function (v) { if (v > 0) a++; else if (v < 0) b++; }); ui.score('🔴 ' + a + '  vs  ⚫ ' + b); }
+  function draw() {
+    grid.innerHTML = ''; var from = {}; list.forEach(function (m) { from[m.from] = 1; }); var tos = {}; if (sel >= 0) list.forEach(function (m) { if (m.from === sel) tos[m.to] = 1; });
+    for (var i = 0; i < 64; i++) {
+      var r = (i / 8) | 0, c = i % 8, dark = (r + c) % 2 === 1, b = h('button', 'pz-sq ' + (dark ? 'dk' : 'lt') + (i === sel ? ' sel' : '') + (tos[i] ? ' to' : '')); b.type = 'button';
+      if (B[i]) { var p = h('i', 'pc ' + (B[i] > 0 ? 'r' : 'k') + (Math.abs(B[i]) === 2 ? ' king' : '') + (!over && from[i] && !sel < 0 ? '' : '') + (i === lastTo ? ' last' : '')); if (Math.abs(B[i]) === 2) p.textContent = '♛'; b.appendChild(p); }
+      (function (k) { b.addEventListener('click', function () { tap(k); }); })(i); grid.appendChild(b);
+    }
+  }
+  function tap(i) {
+    if (over || (turn === -1 && ML.mode() === 0)) return;
+    var mv = list.filter(function (m) { return m.from === sel && m.to === i; })[0]; if (mv) return doMove(mv);
+    if (B[i] && list.some(function (m) { return m.from === i; })) { sel = i; Snd.fx('tick'); draw(); } else { if (B[i] && (B[i] > 0) === (turn > 0)) { info.textContent = 'You must jump when you can, or that piece is blocked.'; Snd.fx('bad'); } sel = -1; draw(); }
+  }
+  function doMove(m) {
+    var cap = m.cap.length; B = apply(B, m); lastTo = m.to; sel = -1; Snd.fx(cap ? 'capture' : 'move'); vib(cap ? 25 : 8);
+    turn = -turn; list = gen(B, turn); draw();
+    if (!list.length) { over = true; var two = ML.mode() === 1, humanWon = turn === -1; info.textContent = humanWon ? (two ? '🏆 Red wins!' : '🎉 You win!') : (two ? '🏆 Black wins!' : 'Computer wins.'); if (humanWon || two) { Snd.fx('win'); confetti(); if (!two) bump('chk'); } else Snd.fx('lose'); status(); return; }
+    status(); if (turn === -1 && ML.mode() === 0) later(function () { doMove(aiMove()); }, 700);
+  }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Mancala ---- */
+function mancala(stage, ui) {
+  var ML = modeLvl(ui, 'man', function () { reset(); });
+  var info = h('div', 'rpsout', ''), bd = h('div', 'pz-man'); stage.appendChild(info); stage.appendChild(bd);
+  pzTools(stage, 'Tap one of your pits (bottom row) to sow its stones anticlockwise. Land the last stone in your store (right) for another turn. Land in an empty pit of yours to capture the stones opposite. Most stones in your store wins.', function () { reset(); });
+  var S, turn, busy, over, timers = [], alive = true;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function newS() { return [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0]; }
+  function sow(s, i, p) {
+    var n = s.slice(), k = n[i], frames = [], pos = i, store = p === 0 ? 6 : 13, skip = p === 0 ? 13 : 6; n[i] = 0; frames.push(n.slice());
+    while (k > 0) { pos = (pos + 1) % 14; if (pos === skip) continue; n[pos]++; k--; frames.push(n.slice()); }
+    var extra = pos === store, own = p === 0 ? pos >= 0 && pos <= 5 : pos >= 7 && pos <= 12;
+    if (!extra && own && n[pos] === 1 && n[12 - pos] > 0) { n[store] += n[12 - pos] + 1; n[pos] = 0; n[12 - pos] = 0; frames.push(n.slice()); }
+    var e0 = n.slice(0, 6).every(function (x) { return !x; }), e1 = n.slice(7, 13).every(function (x) { return !x; });
+    if (e0 || e1) { for (var j = 0; j < 6; j++) { n[6] += n[j]; n[j] = 0; n[13] += n[7 + j]; n[7 + j] = 0; } frames.push(n.slice()); return { frames: frames, end: n, extra: false, over: true }; }
+    return { frames: frames, end: n, extra: extra, over: false };
+  }
+  function legal(s, p) { var o = []; for (var j = 0; j < 6; j++) { var i = p === 0 ? j : 7 + j; if (s[i]) o.push(i); } return o; }
+  function mm(s, p, d, a, b) {
+    var ms = legal(s, p); if (!ms.length || d === 0) return s[13] - s[6]; var v, i;
+    if (p === 1) { v = -1e9; for (i = 0; i < ms.length; i++) { var r = sow(s, ms[i], 1); v = Math.max(v, r.over ? r.end[13] - r.end[6] : mm(r.end, r.extra ? 1 : 0, d - 1, a, b)); a = Math.max(a, v); if (a >= b) break; } return v; }
+    v = 1e9; for (i = 0; i < ms.length; i++) { var r2 = sow(s, ms[i], 0); v = Math.min(v, r2.over ? r2.end[13] - r2.end[6] : mm(r2.end, r2.extra ? 0 : 1, d - 1, a, b)); b = Math.min(b, v); if (a >= b) break; } return v;
+  }
+  function aiPick() { var ms = legal(S, 1), L = ML.lvl(); if (L === 0) return ms[rnd(ms.length)]; var best = ms[0], bv = -1e9, dep = L === 1 ? 4 : 8; ms.forEach(function (i) { var r = sow(S, i, 1), v = r.over ? r.end[13] - r.end[6] : mm(r.end, r.extra ? 1 : 0, dep, -1e9, 1e9); v += Math.random() * .01; if (v > bv) { bv = v; best = i; } }); return best; }
+  function reset() { timers.forEach(clearTimeout); timers = []; S = newS(); turn = 0; busy = false; over = false; draw(S); status(); }
+  function status() { if (over) return; var two = ML.mode() === 1; info.textContent = turn === 0 ? (two ? 'Bottom player’s turn' : 'Your turn') : (two ? 'Top player’s turn' : 'Computer is thinking…'); ui.score('Store: ' + S[6] + '  ·  ' + S[13]); }
+  function draw(s) {
+    bd.innerHTML = ''; var top = h('div', 'rowp'), bot = h('div', 'rowp'), l = h('button', 'store', String(s[13])), r = h('button', 'store', String(s[6])); l.type = r.type = 'button'; l.disabled = r.disabled = true;
+    for (var j = 5; j >= 0; j--) { var i = 7 + j, b = h('button', 'pit' + (turn === 1 && !busy && !over && (ML.mode() === 1) && s[i] ? ' act' : ''), '<b>' + s[i] + '</b>'); b.type = 'button'; b.innerHTML = '<b>' + s[i] + '</b>'; (function (k) { b.addEventListener('click', function () { tap(k); }); })(i); top.appendChild(b); }
+    for (j = 0; j < 6; j++) { var b2 = h('button', 'pit' + (turn === 0 && !busy && !over && s[j] ? ' act' : '')); b2.type = 'button'; b2.innerHTML = '<b>' + s[j] + '</b>'; (function (k) { b2.addEventListener('click', function () { tap(k); }); })(j); bot.appendChild(b2); }
+    var mid = h('div', 'midp'); mid.appendChild(l); var rows = h('div', 'rowsp'); rows.appendChild(top); rows.appendChild(bot); mid.appendChild(rows); mid.appendChild(r); bd.appendChild(mid);
+  }
+  function tap(i) {
+    if (busy || over) return; var p = turn; if (p === 1 && ML.mode() === 0) return; if ((p === 0 && i > 5) || (p === 1 && i < 7) || !S[i]) { Snd.fx('bad'); return; } run(i, p);
+  }
+  function run(i, p) {
+    busy = true; var r = sow(S, i, p), k = 0;
+    (function stepf() { if (!alive) return; if (k >= r.frames.length) { S = r.end; busy = false; fin(r, p); return; } draw(r.frames[k]); if (k) Snd.fx('tick'); k++; later(stepf, 190); })();
+  }
+  function fin(r, p) {
+    if (r.over) { over = true; draw(S); var a = S[6], b = S[13], two = ML.mode() === 1; if (a === b) info.textContent = 'Draw!'; else if (a > b) { info.textContent = two ? '🏆 Bottom wins!' : '🎉 You win!'; Snd.fx('win'); confetti(); if (!two) bump('man'); } else { info.textContent = two ? '🏆 Top wins!' : 'Computer wins.'; Snd.fx(two ? 'win' : 'lose'); } ui.score('Final: ' + a + ' – ' + b); return; }
+    if (r.extra) { info.textContent = (p === 0 ? 'You' : 'Opponent') + ' get another turn!'; Snd.fx('chime'); } else turn = 1 - p;
+    draw(S); if (!r.extra) status(); if (turn === 1 && ML.mode() === 0) later(function () { run(aiPick(), 1); }, 600);
+  }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Battleship ---- */
+function battleship(stage, ui) {
+  var getLvl = ui.level('bship', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Level');
+  var info = h('div', 'rpsout', ''), lbl1 = h('div', 'pz-lbl2', 'Enemy waters — tap to fire'), g1 = h('div', 'pz-bs'), lbl2 = h('div', 'pz-lbl2', 'Your fleet'), g2 = h('div', 'pz-bs small');
+  stage.appendChild(info); stage.appendChild(lbl1); stage.appendChild(g1); stage.appendChild(lbl2); stage.appendChild(g2);
+  var tl = pzTools(stage, 'Sink all 5 enemy ships before they sink yours. Tap a square in the enemy waters to fire. Hits let you see the ship; sink all of a ship’s squares to destroy it.', function () { reset(); });
+  var SZ = [5, 4, 3, 3, 2], mine, theirs, myShots, aiShots, turn, over, aiHits, timers = [], alive = true;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function place() { var b = [], ships = [], i; for (i = 0; i < 100; i++) b.push(0);
+    SZ.forEach(function (n, id) { for (var t = 0; t < 500; t++) { var hz = rnd(2), r = rnd(hz ? 10 : 11 - n), c = rnd(hz ? 11 - n : 10), cells = [], ok = true; for (var k = 0; k < n; k++) { var x = hz ? r * 10 + c + k : (r + k) * 10 + c; if (b[x]) { ok = false; break; } cells.push(x); } if (ok) { cells.forEach(function (x) { b[x] = id + 1; }); ships.push(cells); break; } } });
+    return { b: b, ships: ships }; }
+  function reset() { timers.forEach(clearTimeout); timers = []; mine = place(); theirs = place(); myShots = {}; aiShots = {}; aiHits = []; turn = 0; over = false; draw(); info.textContent = 'Your move — fire!'; stat(); }
+  function sunk(f, shots) { return f.ships.filter(function (s) { return s.every(function (x) { return shots[x]; }); }).length; }
+  function stat() { ui.score('Enemy ships sunk ' + sunk(theirs, myShots) + '/5  ·  Yours lost ' + sunk(mine, aiShots) + '/5  ·  Wins ' + wins('bship')); }
+  function draw() {
+    g1.innerHTML = ''; g2.innerHTML = '';
+    for (var i = 0; i < 100; i++) {
+      var a = h('button', 'pz-bc'); a.type = 'button'; var s = myShots[i]; if (s) { a.classList.add(theirs.b[i] ? 'hit' : 'miss'); a.textContent = theirs.b[i] ? '💥' : '•'; }
+      theirs.ships.forEach(function (sh) { if (sh.indexOf(i) >= 0 && sh.every(function (x) { return myShots[x]; })) { a.classList.add('sunk'); } });
+      (function (k) { a.addEventListener('click', function () { fire(k); }); })(i); g1.appendChild(a);
+      var b = h('div', 'pz-bc mine' + (mine.b[i] ? ' ship' : '')); if (aiShots[i]) { b.classList.add(mine.b[i] ? 'hit' : 'miss'); b.textContent = mine.b[i] ? '💥' : '•'; } g2.appendChild(b);
+    }
+  }
+  function fire(i) {
+    if (over || turn !== 0 || myShots[i]) return; myShots[i] = 1; var hit = !!theirs.b[i], ship = hit ? theirs.ships.filter(function (s) { return s.indexOf(i) >= 0; })[0] : null, sk = ship && ship.every(function (x) { return myShots[x]; });
+    Snd.fx(hit ? 'capture' : 'tick'); vib(hit ? 25 : 8); draw(); stat();
+    if (sunk(theirs, myShots) === 5) { over = true; bump('bship'); Snd.fx('win'); confetti(); info.textContent = '🎉 You sank the whole enemy fleet!'; stat(); return; }
+    info.textContent = sk ? '💥 You sank a ship!' : hit ? '💥 Hit! The enemy fires…' : 'Miss. The enemy fires…'; turn = 1; later(aiFire, 800);
+  }
+  function aiFire() {
+    var L = getLvl(), i, c = [], t;
+    if (L > 0 && aiHits.length) { aiHits.forEach(function (h0) { [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { var r = ((h0 / 10) | 0) + d[0], cc = h0 % 10 + d[1]; if (r >= 0 && r < 10 && cc >= 0 && cc < 10 && !aiShots[r * 10 + cc]) c.push(r * 10 + cc); }); }); }
+    if (aiHits.length > 1 && L === 2) { var a0 = aiHits[0], a1 = aiHits[1], dd = a1 - a0; var line = c.filter(function (x) { return Math.abs(x - a0) % dd === 0 || ((aiHits.every(function (y) { return ((y / 10) | 0) === ((a0 / 10) | 0); })) ? ((x / 10) | 0) === ((a0 / 10) | 0) : (x % 10) === (a0 % 10)); }); if (line.length) c = line; }
+    if (c.length) t = c[rnd(c.length)]; else { var pool = []; for (i = 0; i < 100; i++) if (!aiShots[i] && (L < 2 || ((((i / 10) | 0) + i % 10) % 2 === 0))) pool.push(i); if (!pool.length) for (i = 0; i < 100; i++) if (!aiShots[i]) pool.push(i); t = pool[rnd(pool.length)]; }
+    aiShots[t] = 1; var hit = !!mine.b[t]; if (hit) aiHits.push(t); var ship = hit ? mine.ships.filter(function (s) { return s.indexOf(t) >= 0; })[0] : null;
+    if (ship && ship.every(function (x) { return aiShots[x]; })) aiHits = aiHits.filter(function (x) { return ship.indexOf(x) < 0; });
+    Snd.fx(hit ? 'bad' : 'tick'); vib(hit ? [30, 20, 30] : 8); draw(); stat();
+    if (sunk(mine, aiShots) === 5) { over = true; Snd.fx('lose'); info.textContent = 'Your fleet was sunk. Tap New game.'; return; }
+    turn = 0; info.textContent = hit ? 'The enemy hit your ship! Your move.' : 'The enemy missed. Your move.';
+  }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Dots & Boxes ---- */
+function dotsBoxes(stage, ui) {
+  var ML = modeLvl(ui, 'dots', function () { reset(); }, false);
+  var N = 5, S = 420, cv = h('canvas', 'gcanvas'), c = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 3), info = h('div', 'rpsout', '');
+  cv.width = S * dpr; cv.height = S * dpr; cv.style.aspectRatio = '1 / 1'; stage.appendChild(info); stage.appendChild(cv);
+  pzTools(stage, 'Tap between two dots to draw a line. Close the fourth side of a box to claim it and play again. Most boxes wins.', function () { reset(); });
+  var M = 40, U = (S - 2 * M) / N, H, V, own, turn, over, timers = [], alive = true, COL = ['#ff4d6d', '#35a7ff'];
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function reset() { timers.forEach(clearTimeout); timers = []; H = []; V = []; own = []; var i; for (i = 0; i < N * (N + 1); i++) { H.push(0); V.push(0); } for (i = 0; i < N * N; i++) own.push(-1); turn = 0; over = false; draw(); status(); }
+  function sides(b) { var r = (b / N) | 0, cc = b % N; return (H[r * N + cc] ? 1 : 0) + (H[(r + 1) * N + cc] ? 1 : 0) + (V[r * (N + 1) + cc] ? 1 : 0) + (V[r * (N + 1) + cc + 1] ? 1 : 0); }
+  function status() { if (over) return; var two = ML.mode() === 1, a = own.filter(function (x) { return x === 0; }).length, b = own.filter(function (x) { return x === 1; }).length; info.textContent = turn === 0 ? (two ? 'Red’s turn' : 'Your turn') : (two ? 'Blue’s turn' : 'Computer’s turn'); ui.score('🔴 ' + a + '  vs  🔵 ' + b); }
+  function draw() {
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.fillStyle = '#10163a'; c.fillRect(0, 0, S, S); var i, r, cc;
+    for (i = 0; i < N * N; i++) if (own[i] >= 0) { r = (i / N) | 0; cc = i % N; c.fillStyle = COL[own[i]] + '66'; c.fillRect(M + cc * U + 4, M + r * U + 4, U - 8, U - 8); c.fillStyle = COL[own[i]]; c.font = 'bold ' + (U * .45) + 'px system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(own[i] === 0 ? (ML.mode() ? 'R' : 'Y') : (ML.mode() ? 'B' : 'C'), M + (cc + .5) * U, M + (r + .5) * U); }
+    c.lineCap = 'round'; for (r = 0; r <= N; r++) for (cc = 0; cc < N; cc++) { c.strokeStyle = H[r * N + cc] ? (H[r * N + cc] === 1 ? COL[0] : COL[1]) : 'rgba(255,255,255,.12)'; c.lineWidth = H[r * N + cc] ? 7 : 3; c.beginPath(); c.moveTo(M + cc * U + 8, M + r * U); c.lineTo(M + (cc + 1) * U - 8, M + r * U); c.stroke(); }
+    for (r = 0; r < N; r++) for (cc = 0; cc <= N; cc++) { c.strokeStyle = V[r * (N + 1) + cc] ? (V[r * (N + 1) + cc] === 1 ? COL[0] : COL[1]) : 'rgba(255,255,255,.12)'; c.lineWidth = V[r * (N + 1) + cc] ? 7 : 3; c.beginPath(); c.moveTo(M + cc * U, M + r * U + 8); c.lineTo(M + cc * U, M + (r + 1) * U - 8); c.stroke(); }
+    c.fillStyle = '#e8f1ff'; for (r = 0; r <= N; r++) for (cc = 0; cc <= N; cc++) { c.beginPath(); c.arc(M + cc * U, M + r * U, 6, 0, 6.283); c.fill(); }
+  }
+  function edges() { var o = [], i; for (i = 0; i < H.length; i++) if (!H[i]) o.push({ t: 'H', i: i }); for (i = 0; i < V.length; i++) if (!V[i]) o.push({ t: 'V', i: i }); return o; }
+  function adjBoxes(e) { var o = []; if (e.t === 'H') { var r = (e.i / N) | 0, cc = e.i % N; if (r > 0) o.push((r - 1) * N + cc); if (r < N) o.push(r * N + cc); } else { var r2 = (e.i / (N + 1)) | 0, c2 = e.i % (N + 1); if (c2 > 0) o.push(r2 * N + c2 - 1); if (c2 < N) o.push(r2 * N + c2); } return o; }
+  function take(e) {
+    if (over) return; (e.t === 'H' ? H : V)[e.i] = turn + 1; var got = 0; adjBoxes(e).forEach(function (b) { if (own[b] < 0 && sides(b) === 4) { own[b] = turn; got++; } });
+    Snd.fx(got ? 'match' : 'tick'); vib(got ? 25 : 8); draw();
+    if (own.every(function (x) { return x >= 0; })) { over = true; var a = own.filter(function (x) { return x === 0; }).length, b = N * N - a, two = ML.mode() === 1; info.textContent = a === b ? 'Draw!' : a > b ? (two ? '🏆 Red wins!' : '🎉 You win!') : (two ? '🏆 Blue wins!' : 'Computer wins.'); if (a > b || two && a !== b) { Snd.fx('win'); confetti(); if (a > b && !two) bump('dots'); } else if (a < b) Snd.fx('lose'); ui.score('🔴 ' + a + '  vs  🔵 ' + b); return; }
+    if (!got) turn = 1 - turn; status(); if (turn === 1 && ML.mode() === 0) later(ai, 550);
+  }
+  function ai() {
+    var es = edges(), cl = es.filter(function (e) { return adjBoxes(e).some(function (b) { return own[b] < 0 && sides(b) === 3; }); });
+    if (cl.length) return take(cl[rnd(cl.length)]);
+    var safe = es.filter(function (e) { return adjBoxes(e).every(function (b) { return sides(b) < 2; }); }); if (safe.length) return take(safe[rnd(safe.length)]);
+    var best = es[0], bv = 99; es.forEach(function (e) { var v = adjBoxes(e).filter(function (b) { return sides(b) === 2; }).length; if (v < bv) { bv = v; best = e; } }); take(best);
+  }
+  cv.addEventListener('click', function (e) {
+    if (over || (turn === 1 && ML.mode() === 0)) return; var r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * S, y = (e.clientY - r.top) / r.height * S, best = null, bd = 1e9, rr, cc;
+    for (rr = 0; rr <= N; rr++) for (cc = 0; cc < N; cc++) { var d = Math.hypot(x - (M + (cc + .5) * U), y - (M + rr * U)); if (d < bd && !H[rr * N + cc]) { bd = d; best = { t: 'H', i: rr * N + cc }; } }
+    for (rr = 0; rr < N; rr++) for (cc = 0; cc <= N; cc++) { var d2 = Math.hypot(x - (M + cc * U), y - (M + (rr + .5) * U)); if (d2 < bd && !V[rr * (N + 1) + cc]) { bd = d2; best = { t: 'V', i: rr * (N + 1) + cc }; } }
+    if (best && bd < U * .5) take(best);
+  });
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Pig ---- */
+function pig(stage, ui) {
+  var ML = modeLvl(ui, 'pig', function () { reset(); });
+  var info = h('div', 'rpsout', ''), board = h('div', 'pz-pig'), face = h('div', 'pz-face', '🎲'), acts = h('div', 'sdt');
+  stage.appendChild(info); stage.appendChild(board); stage.appendChild(face); stage.appendChild(acts);
+  var rb = button('🎲 Roll', function () { roll(); }, 'btn small'), hb = button('✋ Hold', function () { hold(); }, 'btn small'); acts.appendChild(rb); acts.appendChild(hb); acts.appendChild(button('New game', function () { reset(); }, 'btn small'));
+  stage.appendChild(h('p', 'hint', 'Roll as many times as you like to build up your turn total. Roll a 1 and you lose it all and your turn ends. Hold to bank it. First to 100 wins.'));
+  var tot, turn, run, over, timers = [], alive = true, busy;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  var FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+  function reset() { timers.forEach(clearTimeout); timers = []; tot = [0, 0]; turn = 0; run = 0; over = false; busy = false; face.textContent = '🎲'; draw(); }
+  function names() { return ML.mode() === 1 ? ['Player 1', 'Player 2'] : ['You', 'Computer']; }
+  function draw() {
+    var nm = names(); board.innerHTML = ''; [0, 1].forEach(function (i) { var d = h('div', 'pz-pl' + (turn === i && !over ? ' on' : '')); d.innerHTML = '<b>' + nm[i] + '</b><span>' + tot[i] + '</span>'; if (turn === i && !over && run) d.innerHTML += '<em>+' + run + '</em>'; board.appendChild(d); });
+    var mine = !over && !busy && (turn === 0 || ML.mode() === 1); rb.disabled = hb.disabled = !mine; hb.disabled = !mine || !run;
+    info.textContent = over ? info.textContent : (mine ? nm[turn] + ': roll or hold?' : nm[turn] + ' is playing…'); ui.score('Wins: ' + wins('pig'));
+  }
+  function roll() {
+    if (over || busy) return; busy = true; draw(); var k = 0, v = 1 + rnd(6);
+    (function anim() { if (!alive) return; if (k < 7) { face.textContent = FACES[rnd(6)]; Snd.fx('rattle'); k++; later(anim, 70); } else { face.textContent = FACES[v - 1]; busy = false; res(v); } })();
+  }
+  function res(v) {
+    if (v === 1) { run = 0; Snd.fx('bad'); vib(40); info.textContent = '💥 Rolled a 1! Turn over.'; turn = 1 - turn; draw(); info.textContent = '💥 Rolled a 1! ' + names()[turn] + ' is up.'; if (turn === 1 && ML.mode() === 0) later(aiTurn, 900); return; }
+    run += v; Snd.fx('tick'); draw(); if (tot[turn] + run >= 100) hold(); else if (turn === 1 && ML.mode() === 0) later(aiTurn, 700);
+  }
+  function hold() {
+    if (over || busy) return; tot[turn] += run; run = 0; Snd.fx('coin');
+    if (tot[turn] >= 100) { over = true; var two = ML.mode() === 1, me = turn === 0; info.textContent = me ? (two ? '🏆 Player 1 wins!' : '🎉 You win!') : (two ? '🏆 Player 2 wins!' : 'Computer wins.'); if (me || two) { confetti(); Snd.fx('win'); if (!two && me) bump('pig'); } else Snd.fx('lose'); draw(); return; }
+    turn = 1 - turn; draw(); if (turn === 1 && ML.mode() === 0) later(aiTurn, 800);
+  }
+  function aiTurn() { if (over || busy) return; var lim = [14, 20, 26][ML.lvl()]; if (run >= lim || tot[1] + run >= 100 || (tot[0] > 80 && run >= 10 && ML.lvl() === 2 && false)) hold(); else roll(); }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Nim ---- */
+function nim(stage, ui) {
+  var ML = modeLvl(ui, 'nim', function () { reset(); });
+  var info = h('div', 'rpsout', ''), board = h('div', 'pz-nim'), acts = h('div', 'sdt'); stage.appendChild(info); stage.appendChild(board); stage.appendChild(acts);
+  var tb = button('Take selected', function () { take(); }, 'btn small'); acts.appendChild(tb); acts.appendChild(button('New game', function () { reset(); }, 'btn small'));
+  stage.appendChild(h('p', 'hint', 'Tap a stick to select it and the sticks to its right in the same row, then press Take. You can only take from one row at a time. Whoever takes the last stick wins.'));
+  var P, turn, sel, over, timers = [], alive = true;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function reset() { timers.forEach(clearTimeout); timers = []; P = [3, 5, 7, 9]; turn = 0; sel = null; over = false; draw(); }
+  function draw() {
+    board.innerHTML = ''; P.forEach(function (n, r) { var row = h('div', 'pz-nrow'); for (var k = 0; k < n; k++) { var s = h('button', 'pz-stick' + (sel && sel.r === r && k >= sel.k ? ' sel' : '')); s.type = 'button'; (function (rr, kk) { s.addEventListener('click', function () { pick(rr, kk); }); })(r, k); row.appendChild(s); } board.appendChild(row); });
+    var mine = !over && (turn === 0 || ML.mode() === 1); tb.disabled = !mine || !sel; var nm = ML.mode() === 1 ? ['Player 1', 'Player 2'] : ['You', 'Computer'];
+    if (!over) info.textContent = mine ? nm[turn] + ': pick sticks to take' : nm[turn] + ' is thinking…'; ui.score('Sticks left: ' + P.reduce(function (a, b) { return a + b; }, 0) + ' · Wins ' + wins('nim'));
+  }
+  function pick(r, k) { if (over || (turn === 1 && ML.mode() === 0)) return; sel = { r: r, k: k }; Snd.fx('tick'); draw(); }
+  function take() {
+    if (!sel || over) return; var cnt = P[sel.r] - sel.k; P[sel.r] = sel.k; sel = null; Snd.fx('move'); vib(10);
+    if (P.every(function (x) { return !x; })) { over = true; var two = ML.mode() === 1, me = turn === 0; info.textContent = me ? (two ? '🏆 Player 1 wins!' : '🎉 You win!') : (two ? '🏆 Player 2 wins!' : 'Computer wins.'); if (me || two) { confetti(); Snd.fx('win'); if (!two) bump('nim'); } else Snd.fx('lose'); draw(); return; }
+    turn = 1 - turn; draw(); if (turn === 1 && ML.mode() === 0) later(ai, 800);
+  }
+  function ai() {
+    var L = ML.lvl(), x = P.reduce(function (a, b) { return a ^ b; }, 0), r, mv = null;
+    if (L > 0 && (L === 2 || Math.random() < .7) && x) { for (r = 0; r < P.length; r++) { var t = P[r] ^ x; if (t < P[r]) { mv = { r: r, k: t }; break; } } }
+    if (!mv) { var rows = P.map(function (n, i) { return i; }).filter(function (i) { return P[i] > 0; }); r = rows[rnd(rows.length)]; mv = { r: r, k: rnd(P[r]) }; }
+    sel = mv; draw(); later(function () { take(); }, 500);
+  }
+  reset(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ------------------------------------------------------------------ Quick batch 4 */
+function timerBar(stage) { var bar = h('div', 'pz-time'), fill = h('i'); bar.appendChild(fill); stage.appendChild(bar); return function (f) { fill.style.width = Math.max(0, f * 100) + '%'; }; }
+
+/* ---- Math Quiz ---- */
+function mathQuiz(stage, ui) {
+  var getLvl = ui.level('math', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Level');
+  var setBar = timerBar(stage), q = h('div', 'pz-q', ''), opts = h('div', 'pz-opts'), info = h('div', 'rpsout', ''); stage.appendChild(q); stage.appendChild(opts); stage.appendChild(info);
+  pzTools(stage, 'Answer as many sums as you can in 30 seconds. A wrong answer costs 2 seconds.', function () { reset(); });
+  var score, tleft, last, clock, over, ans, alive = true, combo;
+  function mk() {
+    var L = getLvl(), a, b, op, ops = L === 0 ? ['+', '−'] : ['+', '−', '×'], mx = [20, 50, 99][L];
+    op = ops[rnd(ops.length)]; a = 2 + rnd(mx - 1); b = 2 + rnd(mx - 1);
+    if (op === '×') { a = 2 + rnd(L === 2 ? 14 : 11); b = 2 + rnd(L === 2 ? 14 : 11); ans = a * b; } else if (op === '−') { if (b > a) { var t = a; a = b; b = t; } ans = a - b; } else ans = a + b;
+    q.textContent = a + ' ' + op + ' ' + b + ' = ?'; var set = [ans], d;
+    while (set.length < 4) { d = ans + (rnd(2) ? 1 : -1) * (1 + rnd(Math.max(3, Math.round(ans * .2) + 3))); if (d >= 0 && set.indexOf(d) < 0) set.push(d); }
+    for (var i = set.length - 1; i > 0; i--) { var j = rnd(i + 1), tt = set[i]; set[i] = set[j]; set[j] = tt; }
+    opts.innerHTML = ''; set.forEach(function (v) { var b2 = h('button', 'pz-opt', String(v)); b2.type = 'button'; b2.addEventListener('click', function () { pick(v); }); opts.appendChild(b2); });
+  }
+  function st() { ui.score('Score ' + score + ' · Best ' + (store('math_' + getLvl()) || 0)); }
+  function reset() { clearInterval(clock); score = 0; tleft = 30; over = false; combo = 0; info.textContent = 'Go!'; last = Date.now(); mk(); st(); clock = setInterval(tick, 100); }
+  function tick() { var n = Date.now(); tleft -= (n - last) / 1000; last = n; setBar(tleft / 30); if (tleft <= 0) end(); }
+  function pick(v) { if (over) return; if (v === ans) { score++; combo++; Snd.fx('pop'); if (combo && combo % 5 === 0) { Snd.fx('chime'); info.textContent = '🔥 ' + combo + ' in a row!'; } } else { combo = 0; tleft -= 2; Snd.fx('bad'); vib(30); info.textContent = 'Oops! −2s'; } st(); mk(); }
+  function end() { over = true; clearInterval(clock); setBar(0); var b = setBest('math_' + getLvl(), score); lbAdd('math_' + getLvl(), score); Snd.fx(score ? 'win' : 'lose'); info.textContent = 'Time! You solved ' + score + '. Best ' + b; opts.innerHTML = ''; st(); }
+  reset(); return function () { alive = false; clearInterval(clock); };
+}
+
+/* ---- Typing Speed ---- */
+var SENT = ['The quick brown fox jumps over the lazy dog.', 'Practice makes perfect so keep on trying every day.', 'A journey of a thousand miles begins with a single step.', 'Small steps every day lead to big results over time.', 'The sun rises in the east and sets in the west.', 'Learning to type fast is a skill that lasts a lifetime.', 'Every great game starts with a simple idea and lots of fun.', 'Rain fell softly on the green hills as the morning slowly began.', 'Kind words cost nothing but they can change a whole day.', 'Good things come to those who work hard and never give up.', 'The little boat sailed across the calm blue sea at dawn.', 'Cricket, music and good food bring friends and families together.'];
+function typing(stage, ui) {
+  var getLvl = ui.level('typing', ['Short', 'Medium', 'Long'], 0, function () { reset(); }, 'Length');
+  var text = h('div', 'pz-text'), inp = h('input', 'pz-in wide'), info = h('div', 'rpsout', ''); inp.type = 'text'; inp.autocapitalize = 'off'; inp.autocomplete = 'off'; inp.spellcheck = false; inp.placeholder = 'Start typing here…';
+  stage.appendChild(info); stage.appendChild(text); stage.appendChild(inp); pzTools(stage, 'Type the text exactly. The timer starts with your first letter. Your speed is shown in words per minute (WPM).', function () { reset(); });
+  var target, t0, done, clock, alive = true;
+  function reset() { clearInterval(clock); var n = [1, 2, 3][getLvl()], a = SENT.slice(), o = []; while (o.length < n) o.push(a.splice(rnd(a.length), 1)[0]); target = o.join(' '); t0 = 0; done = false; inp.value = ''; inp.disabled = false; info.textContent = ''; draw(''); st(0); }
+  function st(w) { ui.score('WPM ' + w + ' · Best ' + (store('typing_' + getLvl()) || 0)); }
+  function draw(v) { var html = ''; for (var i = 0; i < target.length; i++) { var cl = i < v.length ? (v[i] === target[i] ? 'ok' : 'bad') : (i === v.length ? 'cur' : ''); html += '<span class="' + cl + '">' + target[i] + '</span>'; } text.innerHTML = html; }
+  function wpm(v) { var m = (Date.now() - t0) / 60000; return m > 0 ? Math.round(v.length / 5 / m) : 0; }
+  inp.addEventListener('input', function () {
+    if (done) return; var v = inp.value; if (!t0 && v) { t0 = Date.now(); clock = setInterval(function () { st(wpm(inp.value)); }, 400); } draw(v); if (v.length > target.length) { inp.value = v.slice(0, target.length); return; } Snd.fx('tick');
+    if (v === target) { done = true; clearInterval(clock); var w = wpm(v), acc = 100, b = setBest('typing_' + getLvl(), w); lbAdd('typing_' + getLvl(), w); Snd.fx('win'); confetti(); info.textContent = '🎉 ' + w + ' WPM! Best ' + b; st(w); inp.disabled = true; }
+  });
+  reset(); return function () { alive = false; clearInterval(clock); };
+}
+
+/* ---- Color Match (Stroop) ---- */
+function colorMatch(stage, ui) {
+  var CN = [['RED', '#ff4d6d'], ['BLUE', '#35a7ff'], ['GREEN', '#35e07a'], ['YELLOW', '#ffd23f'], ['PURPLE', '#a855f7']];
+  var setBar = timerBar(stage), word = h('div', 'pz-stroop', ''), opts = h('div', 'pz-opts'), info = h('div', 'rpsout', 'Tap the COLOUR of the text, not the word!'); stage.appendChild(word); stage.appendChild(opts); stage.appendChild(info);
+  pzTools(stage, 'The word says one colour but is painted another. Tap the button for the colour you SEE, not the word you read. 30 seconds. A wrong tap costs 2 seconds.', function () { reset(); });
+  var score, tleft, last, clock, over, ink;
+  CN.forEach(function (c, i) { var b = h('button', 'pz-opt', c[0]); b.type = 'button'; b.addEventListener('click', function () { pick(i); }); opts.appendChild(b); });
+  function mk() { var w = rnd(5); ink = rnd(5); if (Math.random() < .75) while (ink === w) ink = rnd(5); word.textContent = CN[w][0]; word.style.color = CN[ink][1]; }
+  function st() { ui.score('Score ' + score + ' · Best ' + (store('stroop') || 0)); }
+  function reset() { clearInterval(clock); score = 0; tleft = 30; over = false; last = Date.now(); info.textContent = 'Tap the COLOUR of the text, not the word!'; mk(); st(); clock = setInterval(function () { var n = Date.now(); tleft -= (n - last) / 1000; last = n; setBar(tleft / 30); if (tleft <= 0) end(); }, 100); }
+  function pick(i) { if (over) return; if (i === ink) { score++; Snd.fx('pop'); } else { tleft -= 2; Snd.fx('bad'); vib(30); } st(); mk(); }
+  function end() { over = true; clearInterval(clock); setBar(0); var b = setBest('stroop', score); lbAdd('stroop', score); Snd.fx(score ? 'win' : 'lose'); info.textContent = 'Time! Score ' + score + ' · Best ' + b; word.textContent = '⏱'; st(); }
+  reset(); return function () { clearInterval(clock); };
+}
+
+/* ---- Higher or Lower ---- */
+function higherLower(stage, ui) {
+  var SU = ['♠', '♥', '♦', '♣'], RK = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  var info = h('div', 'rpsout', ''), card = h('div', 'pz-card'), acts = h('div', 'sdt'); stage.appendChild(info); stage.appendChild(card); stage.appendChild(acts);
+  acts.appendChild(button('⬆ Higher', function () { go(1); }, 'btn small')); acts.appendChild(button('⬇ Lower', function () { go(-1); }, 'btn small')); acts.appendChild(button('New game', function () { reset(); }, 'btn small'));
+  stage.appendChild(h('p', 'hint', 'Will the next card be higher or lower? Aces are low, kings are high. A matching card is a push. How long can your streak get?'));
+  var deck, cur, streak, over;
+  function reset() { deck = []; for (var i = 0; i < 52; i++) deck.push(i); for (i = 51; i > 0; i--) { var j = rnd(i + 1), t = deck[i]; deck[i] = deck[j]; deck[j] = t; } cur = deck.pop(); streak = 0; over = false; show(cur); info.textContent = 'Higher or lower?'; st(); }
+  function st() { ui.score('Streak ' + streak + ' · Best ' + (store('hilo') || 0)); }
+  function show(c) { var s = SU[(c / 13) | 0], r = RK[c % 13]; card.className = 'pz-card' + ((c / 13 | 0) === 1 || (c / 13 | 0) === 2 ? ' red' : ''); card.innerHTML = '<b>' + r + '</b><i>' + s + '</i><b class="bt">' + r + '</b>'; }
+  function go(d) {
+    if (over) return; if (!deck.length) { deck = []; for (var i = 0; i < 52; i++) if (i !== cur) deck.push(i); }
+    var n = deck.splice(rnd(deck.length), 1)[0], a = cur % 13, b = n % 13; cur = n; show(n);
+    if (a === b) { info.textContent = 'Same rank — push!'; Snd.fx('tick'); return; }
+    if ((b > a ? 1 : -1) === d) { streak++; Snd.fx('match'); info.textContent = '✔ Correct!'; var bst = setBest('hilo', streak); lbAdd('hilo', streak); } else { over = true; Snd.fx('lose'); vib(60); info.textContent = '✖ Wrong! Final streak ' + streak + '. Tap New game.'; }
+    st();
+  }
+  reset(); return function () { };
+}
+
+/* ---- Aim Trainer ---- */
+function aimTrainer(stage, ui) {
+  var getLvl = ui.level('aim', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Level');
+  var setBar = timerBar(stage), area = h('div', 'pz-aimarea'), info = h('div', 'rpsout', ''); stage.appendChild(info); stage.appendChild(area);
+  pzTools(stage, 'Tap the targets before they vanish. 30 seconds. Missing a target (or tapping empty space) counts as a miss.', function () { reset(); });
+  var hits, miss, tleft, last, clock, over, tg, tm, alive = true;
+  function st() { ui.score('Hits ' + hits + ' · Misses ' + miss + ' · Best ' + (store('aim_' + getLvl()) || 0)); }
+  function reset() { clearInterval(clock); clearTimeout(tm); hits = 0; miss = 0; tleft = 30; over = false; last = Date.now(); area.innerHTML = ''; info.textContent = 'Go!'; st(); spawn(); clock = setInterval(function () { var n = Date.now(); tleft -= (n - last) / 1000; last = n; setBar(tleft / 30); if (tleft <= 0) end(); }, 100); }
+  function spawn() {
+    if (over || !alive) return; area.innerHTML = ''; var sz = [64, 52, 40][getLvl()] , t = h('button', 'pz-aim'); t.type = 'button'; t.style.width = t.style.height = sz + 'px';
+    t.style.left = (4 + Math.random() * 92) + '%'; t.style.top = (4 + Math.random() * 92) + '%'; t.style.transform = 'translate(-50%,-50%)'; tg = t;
+    t.addEventListener('pointerdown', function (e) { e.stopPropagation(); if (over) return; hits++; Snd.fx('pop'); vib(8); clearTimeout(tm); st(); spawn(); }); area.appendChild(t);
+    tm = setTimeout(function () { if (over || !alive) return; miss++; st(); spawn(); }, [1700, 1250, 900][getLvl()]);
+  }
+  area.addEventListener('pointerdown', function () { if (over || !tg) return; miss++; Snd.fx('bad'); st(); });
+  function end() { over = true; clearInterval(clock); clearTimeout(tm); setBar(0); area.innerHTML = ''; var b = setBest('aim_' + getLvl(), hits); lbAdd('aim_' + getLvl(), hits); Snd.fx(hits ? 'win' : 'lose'); info.textContent = 'Time! ' + hits + ' hits, ' + miss + ' misses · Best ' + b; st(); }
+  reset(); return function () { alive = false; clearInterval(clock); clearTimeout(tm); };
+}
+
+/* ---- Blackjack ---- */
+function blackjack(stage, ui) {
+  var SU = ['♠', '♥', '♦', '♣'], RK = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  var info = h('div', 'rpsout', ''), dl = h('div', 'pz-hand'), pl = h('div', 'pz-hand'), bets = h('div', 'sdt'), acts = h('div', 'sdt'); var dlab = h('div', 'pz-lbl2', 'Dealer'), plab = h('div', 'pz-lbl2', 'You');
+  stage.appendChild(info); stage.appendChild(dlab); stage.appendChild(dl); stage.appendChild(plab); stage.appendChild(pl); stage.appendChild(bets); stage.appendChild(acts);
+  stage.appendChild(h('p', 'hint', 'Get closer to 21 than the dealer without going over. Dealer stands on 17. Blackjack pays 3 to 2. Play money only — it’s just for fun.'));
+  var chips = store('bj_chips'); if (chips == null || chips < 1) chips = 1000; var deck, P, D, bet, phase, timers = [], alive = true, bestC = store('bj_best') || 1000;
+  function later(fn, ms) { var t = setTimeout(function () { if (alive) fn(); }, ms); timers.push(t); }
+  function val(hand) { var t = 0, a = 0; hand.forEach(function (c) { var r = c % 13; if (r === 0) { a++; t += 11; } else t += r >= 9 ? 10 : r + 1; }); while (t > 21 && a) { t -= 10; a--; } return t; }
+  function cardEl(c, hide) { var s = (c / 13) | 0; var e = h('div', 'pz-pc' + (hide ? ' back' : '') + (s === 1 || s === 2 ? ' red' : '')); if (!hide) e.innerHTML = '<b>' + RK[c % 13] + '</b><i>' + SU[s] + '</i>'; return e; }
+  function draw(hideD) { dl.innerHTML = ''; pl.innerHTML = ''; D.forEach(function (c, i) { dl.appendChild(cardEl(c, hideD && i === 1)); }); P.forEach(function (c) { pl.appendChild(cardEl(c)); }); dlab.textContent = 'Dealer' + (D.length ? ' · ' + (hideD ? '?' : val(D)) : ''); plab.textContent = 'You' + (P.length ? ' · ' + val(P) : ''); ui.score('Chips ' + chips + ' · Best ' + bestC); }
+  function save() { put('bj_chips', chips); if (chips > bestC) { bestC = chips; put('bj_best', bestC); } }
+  function menuBet() {
+    phase = 'bet'; P = []; D = []; acts.innerHTML = ''; bets.innerHTML = ''; draw(false);
+    if (chips < 10) { info.textContent = 'You are out of chips!'; bets.appendChild(button('Get 1000 new chips', function () { chips = 1000; save(); menuBet(); }, 'btn small')); return; }
+    info.textContent = 'Place your bet'; [10, 50, 100, 250].forEach(function (v) { if (v <= chips) bets.appendChild(button('Bet ' + v, function () { deal(v); }, 'btn small')); });
+  }
+  function deal(v) {
+    bet = v; chips -= v; save(); deck = []; for (var i = 0; i < 52; i++) deck.push(i); for (i = 51; i > 0; i--) { var j = rnd(i + 1), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
+    P = [deck.pop(), deck.pop()]; D = [deck.pop(), deck.pop()]; phase = 'play'; bets.innerHTML = ''; Snd.fx('flip'); draw(true);
+    if (val(P) === 21) return finish(); setActs();
+  }
+  function setActs() { acts.innerHTML = ''; info.textContent = 'Hit or stand?'; acts.appendChild(button('Hit', function () { hit(); }, 'btn small')); acts.appendChild(button('Stand', function () { dealer(); }, 'btn small')); if (P.length === 2 && chips >= bet) acts.appendChild(button('Double', function () { chips -= bet; bet *= 2; save(); hit(true); }, 'btn small')); }
+  function hit(dbl) { P.push(deck.pop()); Snd.fx('flip'); draw(true); if (val(P) > 21) return finish(); if (val(P) === 21 || dbl) return dealer(); setActs(); }
+  function dealer() { acts.innerHTML = ''; phase = 'dealer'; draw(false); (function step() { if (!alive) return; if (val(D) < 17) { D.push(deck.pop()); Snd.fx('flip'); draw(false); later(step, 600); } else finish(); })(); }
+  function finish() {
+    acts.innerHTML = ''; draw(false); var p = val(P), d = val(D), bj = P.length === 2 && p === 21, msg;
+    if (p > 21) { msg = 'Bust! You lose ' + bet; Snd.fx('lose'); } else if (bj && !(D.length === 2 && d === 21)) { chips += Math.floor(bet * 2.5); msg = '🎉 Blackjack! You win ' + Math.floor(bet * 1.5); Snd.fx('win'); confetti(); } else if (d > 21 || p > d) { chips += bet * 2; msg = '🎉 You win ' + bet; Snd.fx('win'); } else if (p === d) { chips += bet; msg = 'Push — bet returned'; Snd.fx('draw'); } else { msg = 'Dealer wins. You lose ' + bet; Snd.fx('lose'); }
+    save(); draw(false); info.textContent = msg; later(function () { bets.innerHTML = ''; bets.appendChild(button('Next hand', function () { menuBet(); }, 'btn small')); }, 400);
+  }
+  menuBet(); return function () { alive = false; timers.forEach(clearTimeout); };
+}
+
+/* ---- Tap Speed ---- */
+function tapSpeed(stage, ui) {
+  var getLvl = ui.level('tap', ['5 s', '10 s', '30 s'], 1, function () { reset(); }, 'Time');
+  var info = h('div', 'rpsout', ''), pad = h('button', 'pz-tap', 'TAP!'); pad.type = 'button'; stage.appendChild(info); stage.appendChild(pad);
+  pzTools(stage, 'Tap the big button as fast as you can. The timer starts with your first tap.', function () { reset(); });
+  var n, t0, over, clock, dur;
+  function st() { ui.score('Taps ' + n + ' · Best ' + (store('tap_' + getLvl()) || 0)); }
+  function reset() { clearInterval(clock); n = 0; t0 = 0; over = false; dur = [5, 10, 30][getLvl()]; pad.textContent = 'TAP!'; info.textContent = 'Tap to start the ' + dur + ' second timer'; st(); }
+  pad.addEventListener('pointerdown', function (e) {
+    e.preventDefault(); if (over) return; if (!t0) { t0 = Date.now(); clock = setInterval(function () { var left = dur - (Date.now() - t0) / 1000; if (left <= 0) end(); else info.textContent = left.toFixed(1) + ' s left'; }, 80); }
+    n++; pad.textContent = n; Snd.fx('tap'); vib(5); st(); pad.classList.add('p'); setTimeout(function () { pad.classList.remove('p'); }, 60);
+  });
+  function end() { over = true; clearInterval(clock); var b = setBest('tap_' + getLvl(), n); lbAdd('tap_' + getLvl(), n); Snd.fx('win'); info.textContent = 'Time! ' + n + ' taps = ' + (n / dur).toFixed(1) + ' per second · Best ' + b; st(); }
+  reset(); return function () { clearInterval(clock); };
+}
+
+/* ---- Quiz ---- */
+var QB = [['What is the largest planet in our solar system?', 'Jupiter', 'Saturn', 'Earth', 'Mars'], ['What is the capital of Japan?', 'Tokyo', 'Kyoto', 'Osaka', 'Seoul'], ['How many continents are there?', '7', '5', '6', '8'], ['Which planet is called the Red Planet?', 'Mars', 'Venus', 'Jupiter', 'Mercury'], ['Who painted the Mona Lisa?', 'Leonardo da Vinci', 'Picasso', 'Van Gogh', 'Michelangelo'], ['Which is the largest ocean?', 'Pacific', 'Atlantic', 'Indian', 'Arctic'], ['How many days are in a leap year?', '366', '365', '364', '367'], ['What is the hardest natural substance?', 'Diamond', 'Gold', 'Iron', 'Quartz'], ['Which is the fastest land animal?', 'Cheetah', 'Lion', 'Horse', 'Leopard'], ['What is the capital of France?', 'Paris', 'Lyon', 'Rome', 'Madrid'], ['What is the currency of Japan?', 'Yen', 'Won', 'Yuan', 'Dollar'], ['How many sides does a hexagon have?', '6', '5', '7', '8'], ['Which gas do plants absorb from the air?', 'Carbon dioxide', 'Oxygen', 'Nitrogen', 'Helium'], ['What is the national animal of India?', 'Tiger', 'Lion', 'Elephant', 'Peacock'], ['Which river flows through Egypt?', 'Nile', 'Amazon', 'Ganga', 'Danube'], ['What is the smallest prime number?', '2', '1', '3', '0'], ['Who wrote Romeo and Juliet?', 'William Shakespeare', 'Charles Dickens', 'Mark Twain', 'Jane Austen'], ['At sea level, water boils at how many °C?', '100', '90', '110', '212'], ['What is the capital of Australia?', 'Canberra', 'Sydney', 'Melbourne', 'Perth'], ['What is the largest mammal?', 'Blue whale', 'Elephant', 'Giraffe', 'Shark'], ['How many players are on the field for one football (soccer) team?', '11', '9', '10', '12'], ['Which planet is famous for its rings?', 'Saturn', 'Mars', 'Mercury', 'Venus'], ['What is the capital of India?', 'New Delhi', 'Mumbai', 'Kolkata', 'Chennai'], ['Which organ pumps blood around the body?', 'Heart', 'Lungs', 'Liver', 'Kidney'], ['What is the square root of 144?', '12', '14', '11', '10'], ['How many bones does an adult human have?', '206', '300', '150', '250'], ['Which is the tallest mountain above sea level?', 'Mount Everest', 'K2', 'Kilimanjaro', 'Mont Blanc'], ['Which metal is liquid at room temperature?', 'Mercury', 'Iron', 'Silver', 'Copper'], ['Who invented the telephone?', 'Alexander Graham Bell', 'Thomas Edison', 'Nikola Tesla', 'Isaac Newton'], ['What is the capital of Kerala?', 'Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur'], ['How many colours are in a rainbow?', '7', '5', '6', '8'], ['Which is the largest hot desert?', 'Sahara', 'Gobi', 'Thar', 'Kalahari'], ['Who is called the Father of the Nation in India?', 'Mahatma Gandhi', 'Jawaharlal Nehru', 'Sardar Patel', 'Subhas Bose'], ['Which planet is closest to the Sun?', 'Mercury', 'Venus', 'Earth', 'Mars'], ['What does Ctrl + C do on a computer?', 'Copy', 'Cut', 'Paste', 'Close'], ['How many minutes are in 2 hours?', '120', '100', '90', '150'], ['The Sun is a…', 'Star', 'Planet', 'Moon', 'Comet'], ['What do bees make?', 'Honey', 'Milk', 'Silk', 'Wax paper'], ['Which animal is known as the Ship of the Desert?', 'Camel', 'Horse', 'Donkey', 'Ostrich'], ['How many hours are in a day?', '24', '12', '36', '48'], ['Which festival is called the Festival of Lights?', 'Diwali', 'Holi', 'Onam', 'Eid']];
+function quiz(stage, ui) {
+  var info = h('div', 'rpsout', ''), q = h('div', 'pz-q small', ''), opts = h('div', 'pz-opts one'), nx = h('div', 'sdt'); stage.appendChild(info); stage.appendChild(q); stage.appendChild(opts); stage.appendChild(nx);
+  pzTools(stage, '10 general knowledge questions. Pick the right answer. How many can you get right?', function () { reset(); });
+  var list, i, score, locked;
+  function reset() { var a = QB.slice(); list = []; while (list.length < 10) list.push(a.splice(rnd(a.length), 1)[0]); i = 0; score = 0; show(); }
+  function st() { ui.score('Question ' + Math.min(i + 1, 10) + '/10 · Score ' + score + ' · Best ' + (store('quiz') || 0)); }
+  function show() {
+    nx.innerHTML = ''; if (i >= 10) { var b = setBest('quiz', score); lbAdd('quiz', score); q.textContent = 'Finished! You scored ' + score + ' / 10'; opts.innerHTML = ''; info.textContent = score >= 8 ? '🎉 Brilliant!' : score >= 5 ? 'Nice work!' : 'Keep practising!'; if (score >= 7) { Snd.fx('win'); confetti(); } else Snd.fx('draw'); ui.score('Final ' + score + '/10 · Best ' + b); return; }
+    var it = list[i], o = it.slice(1), right = it[1]; for (var k = o.length - 1; k > 0; k--) { var j = rnd(k + 1), t = o[k]; o[k] = o[j]; o[j] = t; }
+    q.textContent = (i + 1) + '. ' + it[0]; info.textContent = ''; locked = false; opts.innerHTML = '';
+    o.forEach(function (v) { var b2 = h('button', 'pz-opt', v); b2.type = 'button'; b2.addEventListener('click', function () { pick(b2, v === right, right); }); opts.appendChild(b2); }); st();
+  }
+  function pick(b, ok, right) {
+    if (locked) return; locked = true; if (ok) { score++; b.classList.add('good'); Snd.fx('match'); info.textContent = '✔ Correct!'; } else { b.classList.add('bad'); Snd.fx('bad'); info.textContent = '✖ The answer is ' + right; [].forEach.call(opts.children, function (x) { if (x.textContent === right) x.classList.add('good'); }); }
+    st(); nx.appendChild(button(i >= 9 ? 'See result' : 'Next ▶', function () { i++; show(); }, 'btn small'));
+  }
+  reset(); return function () { };
+}
+
 /* ---------------------------------------------------------------- Arcade helpers + games */
 function mkCv(stage, w, hh) { var cv = h('canvas', 'gcanvas gv'); cv.width = w; cv.height = hh; cv.style.aspectRatio = w + ' / ' + hh; stage.appendChild(cv); return cv; }
 function cvPos(cv, e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height }; }
@@ -2879,11 +3800,37 @@ var GAMES = [
   { name: 'Dodge', icon: '☄️', ac: '#ff4d6d', desc: 'Stay alive as long as you can', start: dodge, best: function () { var b = store('dodge'); return b ? 'Best: ' + (b / 10).toFixed(1) + 's' : 'Not played'; } },
   { name: 'Catch', icon: '🧺', ac: '#ff7ad9', desc: 'Catch fruit, dodge bombs', start: catchGame, best: function () { return 'Best: ' + (store('catch') || 0); } },
   { name: 'Runner', icon: '🏃', ac: '#35a7ff', desc: 'Jump over the blocks', start: runner, best: function () { return 'Best: ' + (store('runner') || 0); } },
-  { name: 'Rock Paper Scissors', icon: '✊', ac: '#7cf0c9', desc: 'First to 3 wins', start: rps, best: function () { return 'Streak: ' + (store('rps') || 0); } }
+  { name: 'Rock Paper Scissors', icon: '✊', ac: '#7cf0c9', desc: 'First to 3 wins', start: rps, best: function () { return 'Streak: ' + (store('rps') || 0); } },
+  { name: 'Slide 15', icon: '🔳', ac: '#35a7ff', desc: 'Slide the tiles in order', start: slide15, best: function () { return 'Best: ' + (store('slide_1') || '—'); } },
+  { name: 'Lights Out', icon: '💡', ac: '#ffd23f', desc: 'Turn every light off', start: lightsOut, best: function () { return 'Best: ' + (store('lights_1') || '—'); } },
+  { name: 'Flood-It', icon: '🌊', ac: '#35e07a', desc: 'Fill the board with one colour', start: floodIt, best: function () { return 'Best: ' + (store('flood_1') || '—'); } },
+  { name: 'Mastermind', icon: '🎯', ac: '#a855f7', desc: 'Crack the secret code', start: mastermind, best: function () { return 'Wins: ' + wins('mm'); } },
+  { name: 'Hangman', icon: '🪢', ac: '#ff6b8a', desc: 'Guess the hidden word', start: hangman, best: function () { return 'Wins: ' + wins('hang'); } },
+  { name: 'Simon', icon: '🔔', ac: '#ff9f43', desc: 'Repeat the pattern', start: simon, best: function () { return 'Best: ' + (store('simon_1') || 0); } },
+  { name: 'Maze', icon: '🌀', ac: '#7cf0c9', desc: 'Find the way out', start: maze, best: function () { return (store('maze_0') ? 'Best: ' + fmtT(store('maze_0')) : 'Not played'); } },
+  { name: 'Tower of Hanoi', icon: '🗼', ac: '#00eaff', desc: 'Move the stack', start: hanoi, best: function () { return 'Best: ' + (store('hanoi_0') || '—'); } },
+  { name: 'Odd Colour', icon: '🎨', ac: '#ff7ad9', desc: 'Spot the different shade', start: oddColour, best: function () { return 'Best: ' + (store('odd') || 0); } },
+  { name: 'Number Guess', icon: '🔟', ac: '#ffb13d', desc: 'Higher or lower?', start: numGuess, best: function () { return (store('guess_1') ? 'Best: ' + store('guess_1') + ' tries' : 'Not played'); } },
+  { name: 'Reversi', icon: '⚫', ac: '#13803f', desc: 'Flip the opponent’s discs', start: reversi, best: function () { return 'Wins: ' + wins('rev'); } },
+  { name: 'Gomoku', icon: '⚪', ac: '#e0a050', desc: 'Five in a row', start: gomoku, best: function () { return 'Wins: ' + wins('gomoku'); } },
+  { name: 'Checkers', icon: '🔴', ac: '#ff4d6d', desc: 'Jump and crown kings', start: checkers, best: function () { return 'Wins: ' + wins('chk'); } },
+  { name: 'Mancala', icon: '🥜', ac: '#c98f45', desc: 'Sow stones, capture more', start: mancala, best: function () { return 'Wins: ' + wins('man'); } },
+  { name: 'Battleship', icon: '🚢', ac: '#2a78c8', desc: 'Sink the enemy fleet', start: battleship, best: function () { return 'Wins: ' + wins('bship'); } },
+  { name: 'Dots & Boxes', icon: '🔲', ac: '#35a7ff', desc: 'Close boxes, score points', start: dotsBoxes, best: function () { return 'Wins: ' + wins('dots'); } },
+  { name: 'Pig', icon: '🐷', ac: '#ff7ad9', desc: 'Push your luck to 100', start: pig, best: function () { return 'Wins: ' + wins('pig'); } },
+  { name: 'Nim', icon: '🪵', ac: '#ffb13d', desc: 'Take the last stick', start: nim, best: function () { return 'Wins: ' + wins('nim'); } },
+  { name: 'Math Quiz', icon: '➗', ac: '#35a7ff', desc: 'Solve sums against the clock', start: mathQuiz, best: function () { return 'Best: ' + (store('math_1') || 0); } },
+  { name: 'Typing Speed', icon: '⌨️', ac: '#35e07a', desc: 'How fast can you type?', start: typing, best: function () { return (store('typing_0') ? 'Best: ' + store('typing_0') + ' WPM' : 'Not played'); } },
+  { name: 'Color Match', icon: '🌈', ac: '#a855f7', desc: 'Tap the colour, not the word', start: colorMatch, best: function () { return 'Best: ' + (store('stroop') || 0); } },
+  { name: 'Higher or Lower', icon: '🃏', ac: '#ff4d6d', desc: 'Guess the next card', start: higherLower, best: function () { return 'Best streak: ' + (store('hilo') || 0); } },
+  { name: 'Aim Trainer', icon: '🎯', ac: '#ff6b6b', desc: 'Hit the targets fast', start: aimTrainer, best: function () { return 'Best: ' + (store('aim_1') || 0); } },
+  { name: 'Blackjack', icon: '♠️', ac: '#13803f', desc: 'Beat the dealer to 21', start: blackjack, best: function () { return 'Best chips: ' + (store('bj_best') || 1000); } },
+  { name: 'Tap Speed', icon: '👆', ac: '#ff9f43', desc: 'Tap as fast as you can', start: tapSpeed, best: function () { return 'Best: ' + (store('tap_1') || 0); } },
+  { name: 'Quiz', icon: '❓', ac: '#ffd23f', desc: '10 general knowledge questions', start: quiz, best: function () { return 'Best: ' + (store('quiz') || 0) + '/10'; } }
 ];
-var CATS = { 'Ludo': 'Board', 'Chess': 'Board', 'Snakes & Ladders': 'Board', 'Snake': 'Arcade', '2048': 'Puzzle', 'Connect Four': 'Board', 'Tic-Tac-Toe': 'Board', 'Memory Match': 'Puzzle', 'Reaction Test': 'Quick', 'Whack-a-Mole': 'Quick', 'Orbit Dash': 'Arcade', 'Sudoku': 'Puzzle', 'Tetris': 'Arcade', 'Word Guess': 'Puzzle', 'Minesweeper': 'Puzzle', 'Rock Paper Scissors': 'Quick', 'Flappy': 'Arcade', 'Pong': 'Arcade', 'Breakout': 'Arcade', 'Stack Tower': 'Arcade', 'Space Shooter': 'Arcade', 'Dodge': 'Arcade', 'Catch': 'Arcade', 'Runner': 'Arcade' };
-var MOOD = { 'Ludo': 'play', 'Snakes & Ladders': 'play', 'Connect Four': 'play', 'Tic-Tac-Toe': 'play', 'Memory Match': 'play', 'Whack-a-Mole': 'play', 'Rock Paper Scissors': 'play', 'Chess': 'calm', 'Sudoku': 'calm', 'Word Guess': 'calm', '2048': 'calm', 'Minesweeper': 'calm', 'Reaction Test': null };
-var TWO = ['Ludo', 'Chess', 'Snakes & Ladders', 'Connect Four', 'Tic-Tac-Toe', 'Rock Paper Scissors'];
+var CATS = { 'Ludo': 'Board', 'Chess': 'Board', 'Snakes & Ladders': 'Board', 'Snake': 'Arcade', '2048': 'Puzzle', 'Connect Four': 'Board', 'Tic-Tac-Toe': 'Board', 'Memory Match': 'Puzzle', 'Reaction Test': 'Quick', 'Whack-a-Mole': 'Quick', 'Orbit Dash': 'Arcade', 'Sudoku': 'Puzzle', 'Tetris': 'Arcade', 'Word Guess': 'Puzzle', 'Minesweeper': 'Puzzle', 'Rock Paper Scissors': 'Quick', 'Flappy': 'Arcade', 'Pong': 'Arcade', 'Breakout': 'Arcade', 'Stack Tower': 'Arcade', 'Space Shooter': 'Arcade', 'Dodge': 'Arcade', 'Catch': 'Arcade', 'Runner': 'Arcade', 'Slide 15': 'Puzzle', 'Lights Out': 'Puzzle', 'Flood-It': 'Puzzle', 'Mastermind': 'Puzzle', 'Hangman': 'Puzzle', 'Simon': 'Quick', 'Maze': 'Puzzle', 'Tower of Hanoi': 'Puzzle', 'Odd Colour': 'Quick', 'Number Guess': 'Quick', 'Reversi': 'Board', 'Gomoku': 'Board', 'Checkers': 'Board', 'Mancala': 'Board', 'Battleship': 'Board', 'Dots & Boxes': 'Board', 'Pig': 'Quick', 'Nim': 'Board', 'Math Quiz': 'Quick', 'Typing Speed': 'Quick', 'Color Match': 'Quick', 'Higher or Lower': 'Quick', 'Aim Trainer': 'Quick', 'Blackjack': 'Board', 'Tap Speed': 'Quick', 'Quiz': 'Puzzle' };
+var MOOD = { 'Ludo': 'play', 'Snakes & Ladders': 'play', 'Connect Four': 'play', 'Tic-Tac-Toe': 'play', 'Memory Match': 'play', 'Whack-a-Mole': 'play', 'Rock Paper Scissors': 'play', 'Chess': 'calm', 'Sudoku': 'calm', 'Word Guess': 'calm', '2048': 'calm', 'Minesweeper': 'calm', 'Math Quiz': 'play', 'Typing Speed': 'calm', 'Color Match': 'play', 'Higher or Lower': 'play', 'Aim Trainer': 'drive', 'Blackjack': 'play', 'Tap Speed': 'drive', 'Quiz': 'calm', 'Reversi': 'play', 'Gomoku': 'calm', 'Checkers': 'play', 'Mancala': 'play', 'Battleship': 'drive', 'Dots & Boxes': 'play', 'Pig': 'play', 'Nim': 'calm', 'Slide 15': 'calm', 'Lights Out': 'calm', 'Flood-It': 'calm', 'Mastermind': 'calm', 'Hangman': 'calm', 'Simon': 'play', 'Maze': 'calm', 'Tower of Hanoi': 'calm', 'Odd Colour': 'play', 'Number Guess': 'play', 'Reaction Test': null };
+var TWO = ['Ludo', 'Chess', 'Snakes & Ladders', 'Connect Four', 'Tic-Tac-Toe', 'Rock Paper Scissors', 'Reversi', 'Gomoku', 'Checkers', 'Mancala', 'Dots & Boxes', 'Pig', 'Nim'];
 var TABS = ['All', 'Board', 'Puzzle', 'Arcade', 'Quick', '2 players'], tabNow = 'All';
 try { tabNow = localStorage.getItem('ashix_hubtab') || 'All'; } catch (e) { }
 var hub = $('hub'), view = $('view'), stage = $('stage'), titleEl = $('gtitle'), scoreEl = $('gscore'), bar = $('gbar'), list = $('glist'), cleanup = null;
@@ -3027,7 +3974,7 @@ musLabel(); sndLabel(); renderHub();
     'Ludo': ['ലൂഡോ', '2 അല്ലെങ്കിൽ 4 കളിക്കാർ'], 'Chess': ['ചെസ്സ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Snakes & Ladders': ['പാമ്പും കോണിയും', '100-ലേക്ക് ഓടൂ'], 'Snake': ['പാമ്പ് കളി', 'തിന്നൂ, വളരൂ'], '2048': ['2048', '2048 വരെ ചേർക്കൂ'],
     'Connect Four': ['കണക്ട് ഫോർ', 'നാലെണ്ണം ഒരു വരിയിൽ'], 'Tic-Tac-Toe': ['ടിക്-ടാക്-ടോ', 'എളുപ്പം മുതൽ കഠിനം വരെ'], 'Memory Match': ['ഓർമ്മ കളി', 'ജോഡികൾ കണ്ടെത്തൂ'], 'Reaction Test': ['റിയാക്ഷൻ ടെസ്റ്റ്', 'നിങ്ങൾ എത്ര വേഗം?'],
     'Whack-a-Mole': ['മോൾ അടി', '30 സെക്കൻഡ്, തുടങ്ങൂ!'], 'Orbit Dash': ['ഓർബിറ്റ് ഡാഷ്', 'വളയങ്ങൾ ചാടൂ'], 'Sudoku': ['സുഡോക്കു', 'ക്ലാസിക് നമ്പർ പസിൽ'], 'Tetris': ['ടെട്രിസ്', 'അടുക്കൂ, വരികൾ മായ്ക്കൂ'],
-    'Minesweeper': ['മൈൻസ്വീപ്പർ', 'സുരക്ഷിത കളങ്ങൾ കണ്ടെത്തൂ'], 'Flappy': ['ഫ്ലാപ്പി', 'തട്ടി പറക്കൂ'], 'Pong': ['പോങ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Breakout': ['ബ്രേക്കൗട്ട്', 'എല്ലാ ഇഷ്ടികയും തകർക്കൂ'], 'Stack Tower': ['സ്റ്റാക്ക് ടവർ', 'ആകാശത്തോളം പണിയൂ'], 'Space Shooter': ['സ്പേസ് ഷൂട്ടർ', 'ശത്രുക്കളെ വെടിവെക്കൂ'], 'Dodge': ['ഡോജ്', 'പരമാവധി രക്ഷപ്പെടൂ'], 'Catch': ['ക്യാച്ച്', 'പഴങ്ങൾ പിടിക്കൂ'], 'Runner': ['റണ്ണർ', 'തടസ്സങ്ങൾ ചാടൂ'], 'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
+    'Slide 15': ['സ്ലൈഡ് 15', 'ടൈലുകൾ ക്രമത്തിൽ നിരത്തൂ'], 'Lights Out': ['ലൈറ്റ്സ് ഔട്ട്', 'എല്ലാ ലൈറ്റും ഓഫ് ചെയ്യൂ'], 'Flood-It': ['ഫ്ലഡ്-ഇറ്റ്', 'ഒരേ നിറം കൊണ്ട് നിറയ്ക്കൂ'], 'Mastermind': ['മാസ്റ്റർമൈൻഡ്', 'രഹസ്യ കോഡ് കണ്ടെത്തൂ'], 'Hangman': ['ഹാങ്മാൻ', 'മറഞ്ഞ വാക്ക് ഊഹിക്കൂ'], 'Simon': ['സൈമൺ', 'പാറ്റേൺ ആവർത്തിക്കൂ'], 'Maze': ['മേസ്', 'പുറത്തേക്ക് വഴി കണ്ടെത്തൂ'], 'Tower of Hanoi': ['ഹനോയ് ടവർ', 'അടുക്ക് മാറ്റി വെക്കൂ'], 'Odd Colour': ['വ്യത്യസ്ത നിറം', 'വ്യത്യസ്ത നിറം കണ്ടെത്തൂ'], 'Number Guess': ['നമ്പർ ഊഹം', 'ഉയർന്നോ താഴ്ന്നോ?'], 'Reversi': ['റിവേഴ്സി', 'ഡിസ്കുകൾ മറിക്കൂ'], 'Gomoku': ['ഗോമോകു', 'അഞ്ചെണ്ണം ഒരു വരിയിൽ'], 'Checkers': ['ചെക്കേഴ്സ്', 'ചാടൂ, രാജാവാകൂ'], 'Mancala': ['മൻകല', 'കല്ലുകൾ വിതറി പിടിക്കൂ'], 'Battleship': ['യുദ്ധക്കപ്പൽ', 'ശത്രു കപ്പൽപ്പട മുക്കൂ'], 'Dots & Boxes': ['ഡോട്സ് & ബോക്സസ്', 'പെട്ടികൾ അടച്ച് പോയിന്റ് നേടൂ'], 'Pig': ['പിഗ്', 'ഭാഗ്യം പരീക്ഷിച്ച് 100 നേടൂ'], 'Nim': ['നിം', 'അവസാന കമ്പ് എടുക്കൂ'], 'Math Quiz': ['കണക്ക് ക്വിസ്', 'സമയത്തിനെതിരെ കണക്കുകൾ ചെയ്യൂ'], 'Typing Speed': ['ടൈപ്പിംഗ് സ്പീഡ്', 'എത്ര വേഗത്തിൽ ടൈപ്പ് ചെയ്യും?'], 'Color Match': ['കളർ മാച്ച്', 'വാക്കല്ല, നിറം തൊടൂ'], 'Higher or Lower': ['ഹൈയർ ഓർ ലോവർ', 'അടുത്ത കാർഡ് ഊഹിക്കൂ'], 'Aim Trainer': ['എയിം ട്രെയിനർ', 'ലക്ഷ്യങ്ങൾ വേഗം തൊടൂ'], 'Blackjack': ['ബ്ലാക്ക്ജാക്ക്', '21-ലേക്ക് ഡീലറെ തോൽപ്പിക്കൂ'], 'Tap Speed': ['ടാപ്പ് സ്പീഡ്', 'കഴിയുന്നത്ര വേഗം തട്ടൂ'], 'Quiz': ['ക്വിസ്', '10 പൊതുവിജ്ഞാന ചോദ്യങ്ങൾ'], 'Minesweeper': ['മൈൻസ്വീപ്പർ', 'സുരക്ഷിത കളങ്ങൾ കണ്ടെത്തൂ'], 'Flappy': ['ഫ്ലാപ്പി', 'തട്ടി പറക്കൂ'], 'Pong': ['പോങ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Breakout': ['ബ്രേക്കൗട്ട്', 'എല്ലാ ഇഷ്ടികയും തകർക്കൂ'], 'Stack Tower': ['സ്റ്റാക്ക് ടവർ', 'ആകാശത്തോളം പണിയൂ'], 'Space Shooter': ['സ്പേസ് ഷൂട്ടർ', 'ശത്രുക്കളെ വെടിവെക്കൂ'], 'Dodge': ['ഡോജ്', 'പരമാവധി രക്ഷപ്പെടൂ'], 'Catch': ['ക്യാച്ച്', 'പഴങ്ങൾ പിടിക്കൂ'], 'Runner': ['റണ്ണർ', 'തടസ്സങ്ങൾ ചാടൂ'], 'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
   };
   var H1 = 'Game <span>Zone</span>', H1ML = 'ഗെയിം <span>സോൺ</span>';
   function setMode() { R.setAttribute('data-mode', mode); var m = document.querySelector('meta[name=theme-color]'); if (m) m.content = mode === 'light' ? '#f3f6ff' : '#080018'; if (mb) mb.textContent = mode === 'light' ? '☾ Dark' : '☀ Light'; }
