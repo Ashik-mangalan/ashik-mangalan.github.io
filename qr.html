@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Share by QR code | Anvix</title>
-<meta name="description" content="A QR code for the Anvix website. Scan it to open ashik-mangalan.github.io.">
-<meta name="copyright" content="© 2026 Anvix. All rights reserved.">
+<title>Share by QR code | Manux</title>
+<meta name="description" content="A QR code for the Manux website. Scan it to open ashik-mangalan.github.io.">
+<meta name="copyright" content="© 2026 Manux. All rights reserved.">
 <meta name="theme-color" content="#080018">
-<link rel="icon" href="icon-192.png?v=5"><link rel="apple-touch-icon" href="icon-192.png?v=5">
+<link rel="icon" href="icon-192.png?v=7"><link rel="apple-touch-icon" href="icon-192.png?v=7">
 <style>
 :root{--bg:#050711;--text:#e9f1ff;--muted:#9ba9c4;--cyan:#00eaff;--card:#0b1226}
 html[data-mode=light]{--bg:#f3f6ff;--text:#10182f;--muted:#4a5878;--cyan:#0072a8;--card:#fff}
@@ -29,7 +29,7 @@ h1{font-size:clamp(1.8rem,7vw,2.6rem);margin-bottom:6px}h1 span{color:var(--cyan
 .btn.primary{background:var(--cyan);color:#061018;font-weight:700}html[data-mode=light] .btn.primary{color:#fff}
 footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px 16px 30px}
 </style></head><body>
-<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=5" alt="Anvix logo">Anvix</a><a class="h" href="index.html">← Home</a></div></header>
+<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=7" alt="Manux logo">Manux</a><a class="h" href="index.html">← Home</a></div></header>
 <main>
 <h1>Share by <span>QR code</span></h1><p class="sub">Scan this with a phone camera to open my website. You can save the picture and share or print it.</p>
 <div class="card" style="text-align:center">
@@ -115,6 +115,6 @@ var QR = (function () {
   document.getElementById('cp').addEventListener('click',function(){var t=inp.value.trim();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){msg.textContent='Link copied'},function(){inp.select();msg.textContent='Press and hold the text to copy it'})});
 })();
 </script>
-<footer>© <span id="y"></span> Anvix · All rights reserved</footer>
+<footer>© <span id="y"></span> Manux · All rights reserved</footer>
 <script>try{var m=localStorage.getItem('ashix_mode');if(m==='light'||(!m&&matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.setAttribute('data-mode','light')}catch(e){}document.getElementById('y').textContent=new Date().getFullYear();</script>
 </body></html>

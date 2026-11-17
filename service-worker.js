@@ -1,6 +1,6 @@
 // Anvix offline support: pages, games and icons are saved on first visit and work without internet.
-const CACHE = 'anvix-v21';
-const FILES = ['./', './index.html', './games.html', './manifest.json', './icon-192.png?v=5', './icon-512.png?v=5', './me.jpg','./updates.html','./qr.html','./og-image.jpg'];
+const CACHE = 'manux-v22';
+const FILES = ['./', './index.html', './games.html', './manifest.json', './icon-192.png?v=7', './icon-512.png?v=7', './me.jpg','./updates.html','./qr.html','./og-image.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

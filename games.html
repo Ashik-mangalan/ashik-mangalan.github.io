@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050711">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png?v=5" type="image/png">
-<link rel="apple-touch-icon" href="icon-192.png?v=5">
-<title>Anvix Games</title>
-<meta name="description" content="Anvix Games - Ludo, Chess, Snake, 2048 and more mini games.">
-<meta name="copyright" content="© Anvix. All rights reserved.">
-<meta name="robots" content="noarchive"><meta property="og:title" content="Anvix Games"><meta property="og:description" content="50 free mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="icon-192.png?v=7" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png?v=7">
+<title>Manux Games</title>
+<meta name="description" content="Manux Games - Ludo, Chess, Snake, 2048 and more mini games.">
+<meta name="copyright" content="© Manux. All rights reserved.">
+<meta name="robots" content="noarchive"><meta property="og:title" content="Manux Games"><meta property="og:description" content="51 free mini games. Install and play offline."><meta property="og:image" content="me.jpg"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <style>
 :root{--bg:#050711;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4;--card:#0b1226}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -347,8 +347,8 @@ html[data-mode=light] .pz-pl{background:#0001}
 <linearGradient id="gW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cdd4e2"/></linearGradient>
 <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b4d57"/><stop offset="1" stop-color="#07080b"/></linearGradient>
 </defs></svg>
-<div id="intro"><div class="ring"><img src="me.jpg" alt="Profile photo"></div><h2>Anvix <span>Game Zone</span></h2><p>Tap to enter</p></div>
-<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=5" alt="Anvix logo" width="32" height="32">Anvix</a><div class="navr"><button class="iconbtn" id="tc" type="button" aria-label="Change color">🎨</button><button class="iconbtn" id="cb" type="button" aria-label="Search games">⌕</button><button class="iconbtn" id="snd" type="button" aria-label="Sound on or off">🔊</button><button class="iconbtn" id="mus" type="button" aria-label="Music on or off">🎵</button><a class="home" href="index.html">← Home</a></div></div></header>
+<div id="intro"><div class="ring"><img src="me.jpg" alt="Profile photo"></div><h2>Manux <span>Game Zone</span></h2><p>Tap to enter</p></div>
+<header><div class="nav"><a class="logo" href="index.html"><img src="icon-192.png?v=7" alt="Manux logo" width="32" height="32">Manux</a><div class="navr"><button class="iconbtn" id="tc" type="button" aria-label="Change color">🎨</button><button class="iconbtn" id="cb" type="button" aria-label="Search games">⌕</button><button class="iconbtn" id="snd" type="button" aria-label="Sound on or off">🔊</button><button class="iconbtn" id="mus" type="button" aria-label="Music on or off">🎵</button><a class="home" href="index.html">← Home</a></div></div></header>
 <main>
 <section id="hub">
 <h1>Game <span>Zone</span></h1>
@@ -363,8 +363,8 @@ html[data-mode=light] .pz-pl{background:#0001}
 <div class="stage" id="stage"></div>
 </section>
 </main>
-<footer>© <span id="year"></span> Anvix · All rights reserved<br><span style="font-size:.78rem;opacity:.8">Copying or reusing any part of this website without written permission is not allowed.</span></footer>
-<div id="glow"></div><dialog id="cmd"><input id="cq" placeholder="Jump to a game…" autocomplete="off"><div id="cl"></div></dialog><div id="inst"><span>📲 Install Anvix Games</span><button class="btn small primary" id="ib2" type="button">Install</button></div>
+<footer>© <span id="year"></span> Manux · All rights reserved<br><span style="font-size:.78rem;opacity:.8">Copying or reusing any part of this website without written permission is not allowed.</span></footer>
+<div id="glow"></div><dialog id="cmd"><input id="cq" placeholder="Jump to a game…" autocomplete="off"><div id="cl"></div></dialog><div id="inst"><span>📲 Install Manux Games</span><button class="btn small primary" id="ib2" type="button">Install</button></div>
 <script>
 document.getElementById('year').textContent=new Date().getFullYear();
 var Chess = (function () {
@@ -3550,7 +3550,7 @@ function dailyCode(stage, ui) {
     share.innerHTML = '';
     if (done) {
       info.textContent = won ? '🎉 Solved in ' + hist.length + ' tries! Come back tomorrow for a new code.' : 'Not today — the code is shown below. Come back tomorrow!';
-      var txt = 'Anvix Daily Code ' + key + ' ' + (won ? '✅ ' + hist.length + '/' + MAXT : '❌ X/' + MAXT) + ' 🔥' + st.n + '\n' + hist.map(function (x) { return '⚫'.repeat(x.f[0]) + '⚪'.repeat(x.f[1]) + (x.f[0] + x.f[1] === 0 ? '·' : ''); }).join('\n') + '\nhttps://ashik-mangalan.github.io/games.html';
+      var txt = 'Manux Daily Code ' + key + ' ' + (won ? '✅ ' + hist.length + '/' + MAXT : '❌ X/' + MAXT) + ' 🔥' + st.n + '\n' + hist.map(function (x) { return '⚫'.repeat(x.f[0]) + '⚪'.repeat(x.f[1]) + (x.f[0] + x.f[1] === 0 ? '·' : ''); }).join('\n') + '\nhttps://ashik-mangalan.github.io/games.html';
       share.appendChild(button('📤 Share result', function (b) { if (navigator.share) navigator.share({ text: txt }).catch(function () { }); else if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(function () { b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = '📤 Share result'; }, 1500); }); } }, 'btn small'));
     } else info.textContent = 'Crack today’s code';
   }
