@@ -238,18 +238,23 @@ html[lang=ml] *{letter-spacing:0!important;text-transform:none!important}html[la
   document.getElementById('langBtn').addEventListener('click',function(){L=L==='ml'?'en':'ml';p('ashix_lang',L);applyLang();});
   document.getElementById('themeBtn').addEventListener('click',function(){T=T==='light'?'dark':'light';p('ashix_mode',T);applyTheme();});
   applyTheme();if(L==='ml')applyLang();
-  var f=document.getElementById('cf'),st=document.getElementById('cstat');
+  var T0=Date.now(),f=document.getElementById('cf'),st=document.getElementById('cstat');
   f.addEventListener('submit',function(e){
     e.preventDefault();
     if(f.elements._gotcha.value)return;
     var n=f.elements.name.value.trim(),em=f.elements.email.value.trim(),m=f.elements.message.value.trim();
+    /* anti-spam: too fast = bot, too many links = spam, 60s cooldown between sends */
+    if(Date.now()-T0<4000){st.textContent=tr('err');return;}
+    if((m.match(/https?:\/\/|www\./gi)||[]).length>2){st.textContent=tr('err');return;}
+    var lastS=parseInt(g('manux_last_send')||'0',10);
+    if(Date.now()-lastS<60000){st.textContent=tr('err');return;}
     if(!FORM_URL){
       location.href='mailto:manumangalan78@gmail.com?subject='+encodeURIComponent('Message from '+n+' (Manux website)')+'&body='+encodeURIComponent(m+'\n\nFrom: '+n+' <'+em+'>');
       st.textContent=tr('mail');return;
     }
     st.textContent=tr('sending');
     fetch(FORM_URL,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,message:m})})
-      .then(function(r){if(!r.ok)throw 0;f.reset();st.textContent=tr('ok');})
+      .then(function(r){if(!r.ok)throw 0;f.reset();p('manux_last_send',String(Date.now()));st.textContent=tr('ok');})
       .catch(function(){st.textContent=tr('err');});
   });
 })();
