@@ -846,13 +846,13 @@ var SL = (function () {
     rnd = rnd || Math.random;
     function ri(a, b) { return a + Math.floor(rnd() * (b - a + 1)); }
     for (var tries = 0; tries < 400; tries++) {
-      var used = {}, S = {}, L = {}, nS = ri(8, 10), nL = ri(7, 9), i, a, b, g;
+      var used = {}, S = {}, L = {}, nS = ri(6, 8), nL = ri(6, 7), i, a, b, g;
       function free(n) { return !used[n]; }
-      for (i = 0, g = 0; i < nL && g < 400; g++) { a = ri(2, 78); b = a + ri(10, 46); if (b > 99 || !free(a) || !free(b)) continue; L[a] = b; used[a] = used[b] = 1; i++; }
+      for (i = 0, g = 0; i < nL && g < 400; g++) { a = ri(2, 78); b = a + ri(8, 34); if (b > 99 || !free(a) || !free(b)) continue; L[a] = b; used[a] = used[b] = 1; i++; }
       if (rnd() < .5) { a = ri(70, 88); if (free(a) && free(100)) { L[a] = 100; used[a] = used[100] = 1; } }
-      for (i = 0, g = 0; i < nS && g < 600; g++) { a = ri(16, 99); b = a - ri(10, 56); if (b < 2 || !free(a) || !free(b)) continue; S[a] = b; used[a] = used[b] = 1; i++; }
+      for (i = 0, g = 0; i < nS && g < 600; g++) { a = ri(16, 99); b = a - ri(8, 38); if (b < 2 || !free(a) || !free(b)) continue; S[a] = b; used[a] = used[b] = 1; i++; }
       var m = { snakes: S, ladders: L };
-      if (Object.keys(S).length >= 8 && Object.keys(L).length >= 7 && ok(m)) return m;
+      if (Object.keys(S).length >= 6 && Object.keys(L).length >= 6 && ok(m)) return m;
     }
     return { snakes: MAPS[0].snakes, ladders: MAPS[0].ladders };
   }
@@ -1453,10 +1453,10 @@ function ludo(stage, ui) {
 
 /* ------------------------------------------------------------------ Snakes & Ladders (5 maps + shuffle, 3D board) */
 function snakesLadders(stage, ui) {
-  var getMode = ui.level('sl_mode', ['vs Computer', '2 players'], 0, function () { restart(); }, 'Mode');
+  var getMode = ui.level('sl_mode', ['vs Computer', '2 players', '3 players', '4 players'], 0, function () { restart(); }, 'Mode');
   var getMap = ui.level('sl_map', ['Shuffle', 'Classic', 'Jungle', 'Desert', 'Snow', 'Space'], 0, function () { restart(); }, 'Map');
   var SC = 60, W = 10 * SC, TH = 16, dpr = Math.min(window.devicePixelRatio || 1, 3), tilt = makeTilt(W, dpr, 34, TH, 52), P = tilt.P;
-  var COLS = ['#e8334a', '#1f7ae0'], DARKS = ['#8c1020', '#0b4690'];
+  var COLS = ['#e8334a', '#1f7ae0', '#22b35e', '#f2b01e'], DARKS = ['#8c1020', '#0b4690', '#0e6b36', '#9a6a00'], NP = 2;
   var THEMES = [
     { name: 'Classic', frame: ['#8a5a2b', '#b9824a', '#6e4520'], tiles: ['#fff3c9', '#cfeaff'], line: 'rgba(30,35,60,.22)', num: '#2a2f45', ns: 'rgba(255,255,255,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#2f5aa8 0,#17305f 55%,#0b1630 100%)', side: ['#7a4a22', '#3b200c'], deco: ['⭐', '🌸'] },
     { name: 'Jungle', frame: ['#5b3d1e', '#7d5a2e', '#43290f'], tiles: ['#d6efb0', '#b4d98a'], line: 'rgba(20,60,20,.25)', num: '#1f3d1a', ns: 'rgba(240,255,225,.9)', felt: 'radial-gradient(ellipse at 50% 35%,#2f8a4b 0,#16532e 55%,#08301a 100%)', side: ['#5b3d1e', '#2a1a08'], deco: ['🌴', '🍃', '🦜', '🌺'] },
@@ -1564,7 +1564,7 @@ function snakesLadders(stage, ui) {
   }
 
   /* ---- tokens ---- */
-  function resetTokens() { tk = [0, 1].map(function () { var s = ctr(1); return { x: s.x, y: s.y, q: null, lift: 0 }; }); }
+  function resetTokens() { tk = names.map(function () { var s = ctr(1); return { x: s.x, y: s.y, q: null, lift: 0 }; }); }
   function animate(i, pts, dur, hop, done) {
     var t = tk[i], k = 0;
     function next() {
@@ -1582,11 +1582,12 @@ function snakesLadders(stage, ui) {
       var q = t.q;
       if (q) { var u = Math.min(1, (now - q.t0) / q.dur); t.x = q.from.x + (q.to.x - q.from.x) * u; t.y = q.from.y + (q.to.y - q.from.y) * u; t.lift = q.hop ? Math.sin(u * Math.PI) * 16 : 0; if (u >= 1) { t.lift = 0; var nx = q.next; t.q = null; if (nx) nx(); } }
     });
-    var share = Math.abs(tk[0].x - tk[1].x) < 8 && Math.abs(tk[0].y - tk[1].y) < 8;
-    var order = [0, 1]; if (tk[1].y < tk[0].y) order = [1, 0];
+    var order = tk.map(function (t, i) { return i; }).sort(function (p, q) { return tk[p].y - tk[q].y; });
     order.forEach(function (i) {
-      var t = tk[i], p = P(t.x, t.y), x = p.x + (share ? (i ? 9 : -9) * p.s : 0);
-      drawPawn(ctx, x, p.y, COLS[i], DARKS[i], 15 * p.s, t.lift * p.s, !over && i === ti && !busy, pulse);
+      var t = tk[i], p = P(t.x, t.y), grp = [], k;
+      for (k = 0; k < tk.length; k++) if (Math.abs(tk[k].x - t.x) < 8 && Math.abs(tk[k].y - t.y) < 8) grp.push(k);
+      var gi = grp.indexOf(i), off = grp.length > 1 ? (gi - (grp.length - 1) / 2) * 13 : 0;
+      drawPawn(ctx, p.x + off * p.s, p.y, COLS[i], DARKS[i], 15 * p.s, t.lift * p.s, !over && i === ti && !busy, pulse);
     });
     raf = requestAnimationFrame(frame);
   }
@@ -1595,18 +1596,18 @@ function snakesLadders(stage, ui) {
   function nameOf(i) { return names[i]; }
   function buildChips() {
     chips.innerHTML = ''; chipEls = [];
-    [0, 1].forEach(function (i) { var c = h('div', 'chip'); c.style.setProperty('--cc', COLS[i]); c.appendChild(h('i', 'dot')); c.appendChild(h('b', null, names[i])); var sp = h('span', null, '0'); c.appendChild(sp); chips.appendChild(c); chipEls.push({ el: c, sp: sp }); });
+    names.forEach(function (nm, i) { var c = h('div', 'chip'); c.style.setProperty('--cc', COLS[i]); c.appendChild(h('i', 'dot')); c.appendChild(h('b', null, names[i])); var sp = h('span', null, '0'); c.appendChild(sp); chips.appendChild(c); chipEls.push({ el: c, sp: sp }); });
   }
   function refresh() {
     chipEls.forEach(function (c, i) { c.sp.textContent = pos[i]; c.el.classList.toggle('on', ti === i && !over); });
-    var ready = !over && !busy && (ti === 0 || getMode() === 1);
+    var ready = !over && !busy && (ti === 0 || getMode() >= 1);
     die.el.disabled = !ready; die.el.classList.toggle('ready', ready); die.el.style.setProperty('--dc', COLS[ti]);
     ui.score('Map: ' + mapName + ' · Wins so far: ' + wins('sl'));
   }
   function restart() {
     timers.forEach(clearTimeout); timers = []; die.stop(); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); ovs = [];
-    names = getMode() === 0 ? ['You', 'Computer'] : ['Player 1', 'Player 2'];
-    setMap(); pos = [0, 0]; ti = 0; over = false; busy = false; resetTokens(); buildChips(); info.textContent = names[0] + ', roll the dice.'; refresh();
+    NP = getMode() === 0 ? 2 : getMode() + 1; names = getMode() === 0 ? ['You', 'Computer'] : ['Player 1', 'Player 2', 'Player 3', 'Player 4'].slice(0, NP);
+    setMap(); pos = names.map(function () { return 0; }); ti = 0; over = false; busy = false; resetTokens(); buildChips(); info.textContent = names[0] + ', roll the dice.'; refresh();
   }
   function roll() {
     if (over || busy) return; busy = true; refresh();
@@ -1629,7 +1630,7 @@ function snakesLadders(stage, ui) {
       pos[i] = r.to; Snd.fx('hop');
       if (r.win) {
         over = true; busy = false; die.el.disabled = true; refresh();
-        var me = getMode() === 0 && i === 0, two = getMode() === 1;
+        var me = getMode() === 0 && i === 0, two = getMode() >= 1;
         info.textContent = '🏆 ' + nameOf(i) + (me ? ' win!' : ' wins!');
         if (me || two) { confetti(); Snd.fx('win'); if (me) bump('sl'); } else Snd.fx('lose');
         refresh(); later(function () { ovs.push(winCard(me ? 'You win!' : nameOf(i) + ' wins!', 'Map: ' + mapName, COLS[i], me || two ? '🏆' : '🤖', restart)); }, 900);
@@ -1639,11 +1640,11 @@ function snakesLadders(stage, ui) {
     }
   }
   function endTurn(v) {
-    if (v !== 6) ti = 1 - ti; else info.textContent = nameOf(ti) + ' rolled a 6 — roll again!';
+    if (v !== 6) ti = (ti + 1) % names.length; else info.textContent = nameOf(ti) + ' rolled a 6 — roll again!';
     busy = false; refresh();
     if (!over && ti === 1 && getMode() === 0) { busy = true; refresh(); later(function () { busy = false; roll(); }, 800); }
   }
-  die.el.addEventListener('click', function () { if (!over && !busy && (ti === 0 || getMode() === 1)) roll(); });
+  die.el.addEventListener('click', function () { if (!over && !busy && (ti === 0 || getMode() >= 1)) roll(); });
 
   restart(); raf = requestAnimationFrame(frame);
   return function () { alive = false; cancelAnimationFrame(raf); timers.forEach(clearTimeout); die.stop(); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
@@ -3516,6 +3517,56 @@ function quiz(stage, ui) {
   reset(); return function () { };
 }
 
+/* ------------------------------------------------------------------ Daily Code (same puzzle for everyone each day) */
+function dailyCode(stage, ui) {
+  var d = new Date(), key = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2), MAXT = 10;
+  var seed = 0; for (var i = 0; i < key.length; i++) seed = (seed * 31 + key.charCodeAt(i)) % 2147483647;
+  function nr() { seed = (seed * 48271) % 2147483647; return seed / 2147483647; }
+  var code = [0, 0, 0, 0].map(function () { return Math.floor(nr() * 6); });
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem('ashix_' + k); localStorage.setItem('ashix_' + k, v); } catch (e) { return null; } }
+  var info = h('div', 'rpsout', ''), rows = h('div', 'pz-mm'), pal = h('div', 'pz-pal'), act = h('div', 'sdt'), share = h('div', 'sdt');
+  stage.appendChild(info); stage.appendChild(rows); stage.appendChild(pal); stage.appendChild(act); stage.appendChild(share);
+  stage.appendChild(h('p', 'hint', 'One secret colour code per day — the same for every player. You get ' + MAXT + ' tries. Black pin = right colour, right place. White pin = right colour, wrong place. Come back tomorrow for a new code and keep your streak alive!'));
+  var hist = [], cur = [], done = false, won = false, saved = ls('daily_' + key);
+  if (saved) { try { var o = JSON.parse(saved); hist = o.h || []; done = !!o.d; won = !!o.w; } catch (e) { } }
+  PZC.forEach(function (c, i) { var b = h('button', 'pz-c'); b.type = 'button'; b.style.background = c; b.addEventListener('click', function () { if (!done && cur.length < 4) { cur.push(i); Snd.fx('tick'); draw(); } }); pal.appendChild(b); });
+  var ub = button('⌫ Undo', function () { cur.pop(); draw(); }, 'btn small'), cb = button('✔ Check', function () { check(); }, 'btn small'); act.appendChild(ub); act.appendChild(cb);
+  function fb(g) { var b = 0, w = 0, cc = {}, gc = {}, k; for (k = 0; k < 4; k++) { if (g[k] === code[k]) b++; else { cc[code[k]] = (cc[code[k]] || 0) + 1; gc[g[k]] = (gc[g[k]] || 0) + 1; } } for (var q in gc) w += Math.min(gc[q], cc[q] || 0); return [b, w]; }
+  function peg(v) { var p = h('i', 'pz-peg' + (v == null ? ' empty' : '')); if (v != null) p.style.background = PZC[v]; return p; }
+  function streak() { var s = ls('daily_streak'); try { s = s ? JSON.parse(s) : { n: 0, last: '' }; } catch (e) { s = { n: 0, last: '' }; } return s; }
+  function yest() { var y = new Date(); y.setDate(y.getDate() - 1); return y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2); }
+  function saveState() { ls('daily_' + key, JSON.stringify({ h: hist, d: done, w: won })); }
+  function draw() {
+    rows.innerHTML = '';
+    for (var r = 0; r < MAXT; r++) {
+      var row = h('div', 'pz-mrow'), g = hist[r] ? hist[r].g : (r === hist.length && !done ? cur : []), k;
+      for (k = 0; k < 4; k++) row.appendChild(peg(g[k] != null ? g[k] : null));
+      var f = h('div', 'pz-fb'); if (hist[r]) for (k = 0; k < 4; k++) f.appendChild(h('b', k < hist[r].f[0] ? 'k' : k < hist[r].f[0] + hist[r].f[1] ? 'w' : ''));
+      row.appendChild(f); if (r === hist.length && !done) row.classList.add('cur'); rows.appendChild(row);
+    }
+    if (done) { var s = h('div', 'pz-mrow secret'); for (k = 0; k < 4; k++) s.appendChild(peg(code[k])); s.appendChild(h('span', 'pz-lbl', 'Today’s code')); rows.appendChild(s); }
+    var st = streak(); ui.score('Daily ' + key + ' · Streak ' + st.n + ' 🔥 · Try ' + Math.min(hist.length + 1, MAXT) + '/' + MAXT);
+    ub.disabled = cb.disabled = done; pal.style.opacity = done ? .4 : 1;
+    share.innerHTML = '';
+    if (done) {
+      info.textContent = won ? '🎉 Solved in ' + hist.length + ' tries! Come back tomorrow for a new code.' : 'Not today — the code is shown below. Come back tomorrow!';
+      var txt = 'Anvix Daily Code ' + key + ' ' + (won ? '✅ ' + hist.length + '/' + MAXT : '❌ X/' + MAXT) + ' 🔥' + st.n + '\n' + hist.map(function (x) { return '⚫'.repeat(x.f[0]) + '⚪'.repeat(x.f[1]) + (x.f[0] + x.f[1] === 0 ? '·' : ''); }).join('\n') + '\nhttps://ashik-mangalan.github.io/games.html';
+      share.appendChild(button('📤 Share result', function (b) { if (navigator.share) navigator.share({ text: txt }).catch(function () { }); else if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(function () { b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = '📤 Share result'; }, 1500); }); } }, 'btn small'));
+    } else info.textContent = 'Crack today’s code';
+  }
+  function check() {
+    if (done || cur.length < 4) { if (!done) Snd.fx('bad'); return; }
+    var f = fb(cur); hist.push({ g: cur.slice(), f: f }); cur = [];
+    if (f[0] === 4 || hist.length >= MAXT) {
+      done = true; won = f[0] === 4; var st = streak();
+      if (won) { st.n = st.last === yest() ? st.n + 1 : (st.last === key ? st.n : 1); st.last = key; Snd.fx('win'); confetti(); bump('daily'); } else { st.n = 0; Snd.fx('lose'); }
+      ls('daily_streak', JSON.stringify(st));
+    } else Snd.fx('move');
+    saveState(); draw();
+  }
+  draw(); return function () { };
+}
+
 /* ---------------------------------------------------------------- Arcade helpers + games */
 function mkCv(stage, w, hh) { var cv = h('canvas', 'gcanvas gv'); cv.width = w; cv.height = hh; cv.style.aspectRatio = w + ' / ' + hh; stage.appendChild(cv); return cv; }
 function cvPos(cv, e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height }; }
@@ -3834,10 +3885,11 @@ var GAMES = [
   { name: 'Aim Trainer', icon: '🎯', ac: '#ff6b6b', desc: 'Hit the targets fast', start: aimTrainer, best: function () { return 'Best: ' + (store('aim_1') || 0); } },
   { name: 'Blackjack', icon: '♠️', ac: '#13803f', desc: 'Beat the dealer to 21', start: blackjack, best: function () { return 'Best chips: ' + (store('bj_best') || 1000); } },
   { name: 'Tap Speed', icon: '👆', ac: '#ff9f43', desc: 'Tap as fast as you can', start: tapSpeed, best: function () { return 'Best: ' + (store('tap_1') || 0); } },
-  { name: 'Quiz', icon: '❓', ac: '#ffd23f', desc: '10 general knowledge questions', start: quiz, best: function () { return 'Best: ' + (store('quiz') || 0) + '/10'; } }
+  { name: 'Quiz', icon: '❓', ac: '#ffd23f', desc: '10 general knowledge questions', start: quiz, best: function () { return 'Best: ' + (store('quiz') || 0) + '/10'; } },
+  { name: 'Daily Code', icon: '📅', ac: '#ff9f43', desc: 'New secret code every day', start: dailyCode, best: function () { var s = null; try { s = JSON.parse(localStorage.getItem('ashix_daily_streak')); } catch (e) { } return 'Streak: ' + (s ? s.n : 0) + ' 🔥'; } }
 ];
-var CATS = { 'Ludo': 'Board', 'Chess': 'Board', 'Snakes & Ladders': 'Board', 'Snake': 'Arcade', '2048': 'Puzzle', 'Connect Four': 'Board', 'Tic-Tac-Toe': 'Board', 'Memory Match': 'Puzzle', 'Reaction Test': 'Quick', 'Whack-a-Mole': 'Quick', 'Orbit Dash': 'Arcade', 'Sudoku': 'Puzzle', 'Tetris': 'Arcade', 'Word Guess': 'Puzzle', 'Minesweeper': 'Puzzle', 'Rock Paper Scissors': 'Quick', 'Flappy': 'Arcade', 'Pong': 'Arcade', 'Breakout': 'Arcade', 'Stack Tower': 'Arcade', 'Space Shooter': 'Arcade', 'Dodge': 'Arcade', 'Catch': 'Arcade', 'Runner': 'Arcade', 'Slide 15': 'Puzzle', 'Lights Out': 'Puzzle', 'Flood-It': 'Puzzle', 'Mastermind': 'Puzzle', 'Hangman': 'Puzzle', 'Simon': 'Quick', 'Maze': 'Puzzle', 'Tower of Hanoi': 'Puzzle', 'Odd Colour': 'Quick', 'Number Guess': 'Quick', 'Reversi': 'Board', 'Gomoku': 'Board', 'Checkers': 'Board', 'Mancala': 'Board', 'Battleship': 'Board', 'Dots & Boxes': 'Board', 'Pig': 'Quick', 'Nim': 'Board', 'Math Quiz': 'Quick', 'Typing Speed': 'Quick', 'Color Match': 'Quick', 'Higher or Lower': 'Quick', 'Aim Trainer': 'Quick', 'Blackjack': 'Board', 'Tap Speed': 'Quick', 'Quiz': 'Puzzle' };
-var MOOD = { 'Ludo': 'play', 'Snakes & Ladders': 'play', 'Connect Four': 'play', 'Tic-Tac-Toe': 'play', 'Memory Match': 'play', 'Whack-a-Mole': 'play', 'Rock Paper Scissors': 'play', 'Chess': 'calm', 'Sudoku': 'calm', 'Word Guess': 'calm', '2048': 'calm', 'Minesweeper': 'calm', 'Math Quiz': 'play', 'Typing Speed': 'calm', 'Color Match': 'play', 'Higher or Lower': 'play', 'Aim Trainer': 'drive', 'Blackjack': 'play', 'Tap Speed': 'drive', 'Quiz': 'calm', 'Reversi': 'play', 'Gomoku': 'calm', 'Checkers': 'play', 'Mancala': 'play', 'Battleship': 'drive', 'Dots & Boxes': 'play', 'Pig': 'play', 'Nim': 'calm', 'Slide 15': 'calm', 'Lights Out': 'calm', 'Flood-It': 'calm', 'Mastermind': 'calm', 'Hangman': 'calm', 'Simon': 'play', 'Maze': 'calm', 'Tower of Hanoi': 'calm', 'Odd Colour': 'play', 'Number Guess': 'play', 'Reaction Test': null };
+var CATS = { 'Ludo': 'Board', 'Chess': 'Board', 'Snakes & Ladders': 'Board', 'Snake': 'Arcade', '2048': 'Puzzle', 'Connect Four': 'Board', 'Tic-Tac-Toe': 'Board', 'Memory Match': 'Puzzle', 'Reaction Test': 'Quick', 'Whack-a-Mole': 'Quick', 'Orbit Dash': 'Arcade', 'Sudoku': 'Puzzle', 'Tetris': 'Arcade', 'Word Guess': 'Puzzle', 'Minesweeper': 'Puzzle', 'Rock Paper Scissors': 'Quick', 'Flappy': 'Arcade', 'Pong': 'Arcade', 'Breakout': 'Arcade', 'Stack Tower': 'Arcade', 'Space Shooter': 'Arcade', 'Dodge': 'Arcade', 'Catch': 'Arcade', 'Runner': 'Arcade', 'Slide 15': 'Puzzle', 'Lights Out': 'Puzzle', 'Flood-It': 'Puzzle', 'Mastermind': 'Puzzle', 'Hangman': 'Puzzle', 'Simon': 'Quick', 'Maze': 'Puzzle', 'Tower of Hanoi': 'Puzzle', 'Odd Colour': 'Quick', 'Number Guess': 'Quick', 'Reversi': 'Board', 'Gomoku': 'Board', 'Checkers': 'Board', 'Mancala': 'Board', 'Battleship': 'Board', 'Dots & Boxes': 'Board', 'Pig': 'Quick', 'Nim': 'Board', 'Math Quiz': 'Quick', 'Typing Speed': 'Quick', 'Color Match': 'Quick', 'Higher or Lower': 'Quick', 'Aim Trainer': 'Quick', 'Blackjack': 'Board', 'Tap Speed': 'Quick', 'Quiz': 'Puzzle', 'Daily Code': 'Puzzle' };
+var MOOD = { 'Ludo': 'play', 'Snakes & Ladders': 'play', 'Connect Four': 'play', 'Tic-Tac-Toe': 'play', 'Memory Match': 'play', 'Whack-a-Mole': 'play', 'Rock Paper Scissors': 'play', 'Chess': 'calm', 'Sudoku': 'calm', 'Word Guess': 'calm', '2048': 'calm', 'Minesweeper': 'calm', 'Daily Code': 'calm', 'Math Quiz': 'play', 'Typing Speed': 'calm', 'Color Match': 'play', 'Higher or Lower': 'play', 'Aim Trainer': 'drive', 'Blackjack': 'play', 'Tap Speed': 'drive', 'Quiz': 'calm', 'Reversi': 'play', 'Gomoku': 'calm', 'Checkers': 'play', 'Mancala': 'play', 'Battleship': 'drive', 'Dots & Boxes': 'play', 'Pig': 'play', 'Nim': 'calm', 'Slide 15': 'calm', 'Lights Out': 'calm', 'Flood-It': 'calm', 'Mastermind': 'calm', 'Hangman': 'calm', 'Simon': 'play', 'Maze': 'calm', 'Tower of Hanoi': 'calm', 'Odd Colour': 'play', 'Number Guess': 'play', 'Reaction Test': null };
 var TWO = ['Ludo', 'Chess', 'Snakes & Ladders', 'Connect Four', 'Tic-Tac-Toe', 'Rock Paper Scissors', 'Reversi', 'Gomoku', 'Checkers', 'Mancala', 'Dots & Boxes', 'Pig', 'Nim'];
 var TABS = ['All', 'Board', 'Puzzle', 'Arcade', 'Quick', '2 players'], tabNow = 'All';
 try { tabNow = localStorage.getItem('ashix_hubtab') || 'All'; } catch (e) { }
@@ -3985,7 +4037,7 @@ musLabel(); sndLabel(); renderHub();
     'Ludo': ['ലൂഡോ', '2 അല്ലെങ്കിൽ 4 കളിക്കാർ'], 'Chess': ['ചെസ്സ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Snakes & Ladders': ['പാമ്പും കോണിയും', '100-ലേക്ക് ഓടൂ'], 'Snake': ['പാമ്പ് കളി', 'തിന്നൂ, വളരൂ'], '2048': ['2048', '2048 വരെ ചേർക്കൂ'],
     'Connect Four': ['കണക്ട് ഫോർ', 'നാലെണ്ണം ഒരു വരിയിൽ'], 'Tic-Tac-Toe': ['ടിക്-ടാക്-ടോ', 'എളുപ്പം മുതൽ കഠിനം വരെ'], 'Memory Match': ['ഓർമ്മ കളി', 'ജോഡികൾ കണ്ടെത്തൂ'], 'Reaction Test': ['റിയാക്ഷൻ ടെസ്റ്റ്', 'നിങ്ങൾ എത്ര വേഗം?'],
     'Whack-a-Mole': ['മോൾ അടി', '30 സെക്കൻഡ്, തുടങ്ങൂ!'], 'Orbit Dash': ['ഓർബിറ്റ് ഡാഷ്', 'വളയങ്ങൾ ചാടൂ'], 'Sudoku': ['സുഡോക്കു', 'ക്ലാസിക് നമ്പർ പസിൽ'], 'Tetris': ['ടെട്രിസ്', 'അടുക്കൂ, വരികൾ മായ്ക്കൂ'],
-    'Slide 15': ['സ്ലൈഡ് 15', 'ടൈലുകൾ ക്രമത്തിൽ നിരത്തൂ'], 'Lights Out': ['ലൈറ്റ്സ് ഔട്ട്', 'എല്ലാ ലൈറ്റും ഓഫ് ചെയ്യൂ'], 'Flood-It': ['ഫ്ലഡ്-ഇറ്റ്', 'ഒരേ നിറം കൊണ്ട് നിറയ്ക്കൂ'], 'Mastermind': ['മാസ്റ്റർമൈൻഡ്', 'രഹസ്യ കോഡ് കണ്ടെത്തൂ'], 'Hangman': ['ഹാങ്മാൻ', 'മറഞ്ഞ വാക്ക് ഊഹിക്കൂ'], 'Simon': ['സൈമൺ', 'പാറ്റേൺ ആവർത്തിക്കൂ'], 'Maze': ['മേസ്', 'പുറത്തേക്ക് വഴി കണ്ടെത്തൂ'], 'Tower of Hanoi': ['ഹനോയ് ടവർ', 'അടുക്ക് മാറ്റി വെക്കൂ'], 'Odd Colour': ['വ്യത്യസ്ത നിറം', 'വ്യത്യസ്ത നിറം കണ്ടെത്തൂ'], 'Number Guess': ['നമ്പർ ഊഹം', 'ഉയർന്നോ താഴ്ന്നോ?'], 'Reversi': ['റിവേഴ്സി', 'ഡിസ്കുകൾ മറിക്കൂ'], 'Gomoku': ['ഗോമോകു', 'അഞ്ചെണ്ണം ഒരു വരിയിൽ'], 'Checkers': ['ചെക്കേഴ്സ്', 'ചാടൂ, രാജാവാകൂ'], 'Mancala': ['മൻകല', 'കല്ലുകൾ വിതറി പിടിക്കൂ'], 'Battleship': ['യുദ്ധക്കപ്പൽ', 'ശത്രു കപ്പൽപ്പട മുക്കൂ'], 'Dots & Boxes': ['ഡോട്സ് & ബോക്സസ്', 'പെട്ടികൾ അടച്ച് പോയിന്റ് നേടൂ'], 'Pig': ['പിഗ്', 'ഭാഗ്യം പരീക്ഷിച്ച് 100 നേടൂ'], 'Nim': ['നിം', 'അവസാന കമ്പ് എടുക്കൂ'], 'Math Quiz': ['കണക്ക് ക്വിസ്', 'സമയത്തിനെതിരെ കണക്കുകൾ ചെയ്യൂ'], 'Typing Speed': ['ടൈപ്പിംഗ് സ്പീഡ്', 'എത്ര വേഗത്തിൽ ടൈപ്പ് ചെയ്യും?'], 'Color Match': ['കളർ മാച്ച്', 'വാക്കല്ല, നിറം തൊടൂ'], 'Higher or Lower': ['ഹൈയർ ഓർ ലോവർ', 'അടുത്ത കാർഡ് ഊഹിക്കൂ'], 'Aim Trainer': ['എയിം ട്രെയിനർ', 'ലക്ഷ്യങ്ങൾ വേഗം തൊടൂ'], 'Blackjack': ['ബ്ലാക്ക്ജാക്ക്', '21-ലേക്ക് ഡീലറെ തോൽപ്പിക്കൂ'], 'Tap Speed': ['ടാപ്പ് സ്പീഡ്', 'കഴിയുന്നത്ര വേഗം തട്ടൂ'], 'Quiz': ['ക്വിസ്', '10 പൊതുവിജ്ഞാന ചോദ്യങ്ങൾ'], 'Minesweeper': ['മൈൻസ്വീപ്പർ', 'സുരക്ഷിത കളങ്ങൾ കണ്ടെത്തൂ'], 'Flappy': ['ഫ്ലാപ്പി', 'തട്ടി പറക്കൂ'], 'Pong': ['പോങ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Breakout': ['ബ്രേക്കൗട്ട്', 'എല്ലാ ഇഷ്ടികയും തകർക്കൂ'], 'Stack Tower': ['സ്റ്റാക്ക് ടവർ', 'ആകാശത്തോളം പണിയൂ'], 'Space Shooter': ['സ്പേസ് ഷൂട്ടർ', 'ശത്രുക്കളെ വെടിവെക്കൂ'], 'Dodge': ['ഡോജ്', 'പരമാവധി രക്ഷപ്പെടൂ'], 'Catch': ['ക്യാച്ച്', 'പഴങ്ങൾ പിടിക്കൂ'], 'Runner': ['റണ്ണർ', 'തടസ്സങ്ങൾ ചാടൂ'], 'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
+    'Slide 15': ['സ്ലൈഡ് 15', 'ടൈലുകൾ ക്രമത്തിൽ നിരത്തൂ'], 'Lights Out': ['ലൈറ്റ്സ് ഔട്ട്', 'എല്ലാ ലൈറ്റും ഓഫ് ചെയ്യൂ'], 'Flood-It': ['ഫ്ലഡ്-ഇറ്റ്', 'ഒരേ നിറം കൊണ്ട് നിറയ്ക്കൂ'], 'Mastermind': ['മാസ്റ്റർമൈൻഡ്', 'രഹസ്യ കോഡ് കണ്ടെത്തൂ'], 'Hangman': ['ഹാങ്മാൻ', 'മറഞ്ഞ വാക്ക് ഊഹിക്കൂ'], 'Simon': ['സൈമൺ', 'പാറ്റേൺ ആവർത്തിക്കൂ'], 'Maze': ['മേസ്', 'പുറത്തേക്ക് വഴി കണ്ടെത്തൂ'], 'Tower of Hanoi': ['ഹനോയ് ടവർ', 'അടുക്ക് മാറ്റി വെക്കൂ'], 'Odd Colour': ['വ്യത്യസ്ത നിറം', 'വ്യത്യസ്ത നിറം കണ്ടെത്തൂ'], 'Number Guess': ['നമ്പർ ഊഹം', 'ഉയർന്നോ താഴ്ന്നോ?'], 'Reversi': ['റിവേഴ്സി', 'ഡിസ്കുകൾ മറിക്കൂ'], 'Gomoku': ['ഗോമോകു', 'അഞ്ചെണ്ണം ഒരു വരിയിൽ'], 'Checkers': ['ചെക്കേഴ്സ്', 'ചാടൂ, രാജാവാകൂ'], 'Mancala': ['മൻകല', 'കല്ലുകൾ വിതറി പിടിക്കൂ'], 'Battleship': ['യുദ്ധക്കപ്പൽ', 'ശത്രു കപ്പൽപ്പട മുക്കൂ'], 'Dots & Boxes': ['ഡോട്സ് & ബോക്സസ്', 'പെട്ടികൾ അടച്ച് പോയിന്റ് നേടൂ'], 'Pig': ['പിഗ്', 'ഭാഗ്യം പരീക്ഷിച്ച് 100 നേടൂ'], 'Nim': ['നിം', 'അവസാന കമ്പ് എടുക്കൂ'], 'Math Quiz': ['കണക്ക് ക്വിസ്', 'സമയത്തിനെതിരെ കണക്കുകൾ ചെയ്യൂ'], 'Typing Speed': ['ടൈപ്പിംഗ് സ്പീഡ്', 'എത്ര വേഗത്തിൽ ടൈപ്പ് ചെയ്യും?'], 'Color Match': ['കളർ മാച്ച്', 'വാക്കല്ല, നിറം തൊടൂ'], 'Higher or Lower': ['ഹൈയർ ഓർ ലോവർ', 'അടുത്ത കാർഡ് ഊഹിക്കൂ'], 'Aim Trainer': ['എയിം ട്രെയിനർ', 'ലക്ഷ്യങ്ങൾ വേഗം തൊടൂ'], 'Blackjack': ['ബ്ലാക്ക്ജാക്ക്', '21-ലേക്ക് ഡീലറെ തോൽപ്പിക്കൂ'], 'Tap Speed': ['ടാപ്പ് സ്പീഡ്', 'കഴിയുന്നത്ര വേഗം തട്ടൂ'], 'Quiz': ['ക്വിസ്', '10 പൊതുവിജ്ഞാന ചോദ്യങ്ങൾ'], 'Daily Code': ['ദിവസേനയുള്ള കോഡ്', 'ഇന്നത്തെ രഹസ്യ കോഡ് കണ്ടെത്തൂ'], 'Minesweeper': ['മൈൻസ്വീപ്പർ', 'സുരക്ഷിത കളങ്ങൾ കണ്ടെത്തൂ'], 'Flappy': ['ഫ്ലാപ്പി', 'തട്ടി പറക്കൂ'], 'Pong': ['പോങ്', 'കമ്പ്യൂട്ടറിനെ തോൽപ്പിക്കൂ'], 'Breakout': ['ബ്രേക്കൗട്ട്', 'എല്ലാ ഇഷ്ടികയും തകർക്കൂ'], 'Stack Tower': ['സ്റ്റാക്ക് ടവർ', 'ആകാശത്തോളം പണിയൂ'], 'Space Shooter': ['സ്പേസ് ഷൂട്ടർ', 'ശത്രുക്കളെ വെടിവെക്കൂ'], 'Dodge': ['ഡോജ്', 'പരമാവധി രക്ഷപ്പെടൂ'], 'Catch': ['ക്യാച്ച്', 'പഴങ്ങൾ പിടിക്കൂ'], 'Runner': ['റണ്ണർ', 'തടസ്സങ്ങൾ ചാടൂ'], 'Word Guess': ['വാക്ക് ഊഹിക്കൂ', '5 അക്ഷരം, 6 അവസരം'], 'Rock Paper Scissors': ['കല്ല് കടലാസ് കത്രിക', 'ആദ്യം 3 ജയിക്കൂ']
   };
   var H1 = 'Game <span>Zone</span>', H1ML = 'ഗെയിം <span>സോൺ</span>';
   function setMode() { R.setAttribute('data-mode', mode); var m = document.querySelector('meta[name=theme-color]'); if (m) m.content = mode === 'light' ? '#f3f6ff' : '#080018'; if (mb) mb.textContent = mode === 'light' ? '☾ Dark' : '☀ Light'; }
