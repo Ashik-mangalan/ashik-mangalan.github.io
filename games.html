@@ -1150,7 +1150,7 @@ function ludo(stage, ui) {
       + '.ld.ready{cursor:pointer;animation:ldp 0.9s ease-in-out infinite;box-shadow:0 0 0 3px var(--cc),0 0 14px var(--cc)}@keyframes ldp{50%{transform:scale(1.12)}}'
       + '.ld.shake{animation:lds .12s linear infinite}@keyframes lds{0%{transform:rotate(-12deg) translateY(-2px)}50%{transform:rotate(10deg) translateY(2px)}100%{transform:rotate(-12deg) translateY(-2px)}}'
       + '.lgame canvas{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:6px;touch-action:manipulation;box-shadow:0 0 0 3px #0c2457}'
-      + '.lturn{position:absolute;top:50%;width:0;height:0;border:7px solid transparent}';
+      + 'body.gfull .lgame{max-width:min(500px,calc(100dvh - 270px));min-width:300px}';
     document.head.appendChild(sty);
   }
   var SC = 40, W = 15 * SC, dpr = Math.min(window.devicePixelRatio || 1, 3);
@@ -3903,16 +3903,24 @@ function makeUI() {
     }
   };
 }
+var gstyle = document.createElement('style'); gstyle.textContent = 'body.gfull{overflow:hidden}body.gfull header,body.gfull footer,body.gfull #gscore,body.gfull .hint,body.gfull #glow,body.gfull #inst{display:none!important}' + 'body.gfull main{max-width:none;margin:0;padding:0}' + 'body.gfull #view{position:fixed;inset:0;z-index:55;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:8px 8px 12px;background:var(--bg)}' + 'body.gfull .topbar{width:100%;max-width:560px;margin-bottom:6px}body.gfull .topbar h2{flex:1;font-size:1.1rem}' + 'body.gfull #gbar,body.gfull #ghow{display:none;width:100%;max-width:560px;padding:10px;margin-bottom:8px;border-radius:14px;background:var(--card);border:1px solid rgba(128,140,170,.35);box-sizing:border-box}' + 'body.gfull #ghow{font-size:.9rem;line-height:1.5;color:var(--muted)}' + 'body.gfull.gset #gbar{display:flex}body.gfull.gset #ghow{display:block}' + 'body.gfull #stage{width:100%;display:flex;flex-direction:column;align-items:center}' + '.lgear{background:var(--card);color:var(--text);border:1px solid rgba(128,140,170,.35);font-size:1.15rem;width:40px;height:36px;border-radius:10px;cursor:pointer;flex:none}'; document.head.appendChild(gstyle);
+var gear = h('button', 'lgear', '⚙'); gear.type = 'button'; gear.setAttribute('aria-label', 'Settings and how to play');
+var ghow = h('div', ''); ghow.id = 'ghow'; view.insertBefore(ghow, stage);
+gear.addEventListener('click', function () { document.body.classList.toggle('gset'); Snd.fx('tap'); });
+$('gback').parentNode.appendChild(gear);
 function openGame(g) {
   closeGame(true);
   hub.hidden = true; view.hidden = false; titleEl.textContent = g.icon + ' ' + g.name; scoreEl.textContent = ''; bar.innerHTML = ''; stage.innerHTML = '';
+  document.body.classList.add('gfull'); document.body.classList.remove('gset');
   cleanup = g.start(stage, makeUI()) || null;
+  var hints = [].slice.call(stage.querySelectorAll('.hint')).map(function (x) { return x.textContent; }); ghow.textContent = hints.join(' ') || 'Have fun!'; gear.style.display = '';
   Snd.music.play(MOOD[g.name] || (CATS[g.name] === 'Arcade' ? 'drive' : null));
   window.scrollTo(0, 0);
 }
 function closeGame(keep) {
   if (typeof cleanup === 'function') { try { cleanup(); } catch (e) { } }
-  cleanup = null; stage.innerHTML = ''; bar.innerHTML = '';
+  cleanup = null; stage.innerHTML = ''; bar.innerHTML = ''; ghow.textContent = '';
+  if (!keep) document.body.classList.remove('gfull', 'gset');
   if (!keep) { Snd.music.stop(); view.hidden = true; hub.hidden = false; renderHub(); }
 }
 $('gback').addEventListener('click', function () { Snd.fx('tap'); closeGame(false); });
