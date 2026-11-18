@@ -1,7 +1,7 @@
 {
   "name": "Manux – Ashik Mangalan",
   "short_name": "Manux",
-  "description": "Personal website of Ashik Mangalan with 51 free games.",
+  "description": "Personal website of Ashik Mangalan with 52 free games.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
