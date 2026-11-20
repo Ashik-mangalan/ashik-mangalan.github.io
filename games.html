@@ -4653,19 +4653,19 @@ function bounce(stage, ui) {
   var bar = h('div', 'sdt'), lvTxt = h('span', 'rpsout', ''); lvTxt.style.minWidth = '110px';
   var bPrev = button('◀', function () { go(cur - 1); }, 'btn small'), bNext = button('▶', function () { go(cur + 1); }, 'btn small'), bRe = button('↻ Restart', function () { go(cur); }, 'btn small');
   bar.appendChild(bPrev); bar.appendChild(lvTxt); bar.appendChild(bNext); bar.appendChild(bRe); stage.appendChild(bar);
-  stage.appendChild(h('p', 'hint', 'The ball bounces by itself. Hold ◀ ▶ to roll, tap JUMP just before you land for a big bounce. Collect every ring ⭕ to open the gate 🚪. Avoid spikes and spiky balls (jump on top of them to squash). Yellow springs launch you high, flags are checkpoints. Keys: arrows / WASD + Space.'));
+  stage.appendChild(h('p', 'hint', 'Hold ◀ ▶ to roll and tap JUMP to jump (the ball only jumps when you press it). Collect every ring ⭕ to open the gate 🚪. Avoid spikes and spiky balls (jump on top of them to squash). Yellow springs launch you high, flags are checkpoints. Keys: arrows / WASD + Space.'));
 
   /* ---------- level generator (original caves, deterministic) ---------- */
   function mul(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function gen(n) {
-    var R = mul(n * 7919 + 13), d = Math.min(1, (n - 1) / 24), W = 44 + Math.min(n, 25) * 3, g = [], fl = [], ce = [], segs = [], c, r, x = 0, f = 11, cv0 = 4, rings = 0, ens = [], pitPrev = false, flat0 = 8;
+    var R = mul(n * 7919 + 13), d = Math.min(1, (n - 1) / 14), W = 44 + Math.min(n, 25) * 3, g = [], fl = [], ce = [], segs = [], c, r, x = 0, f = 11, cv0 = 4, rings = 0, ens = [], pitPrev = false, flat0 = 8;
     for (r = 0; r < H; r++) { g[r] = []; for (c = 0; c < W; c++) g[r][c] = '.'; }
     for (x = 0; x < W; x++) { fl[x] = f; ce[x] = 3; }
     x = 0;
     while (x < W) {
       var len = 3 + Math.floor(R() * 5), kind = R();
       if (x < flat0 || x > W - 9) { for (c = 0; c < Math.min(len, W - x); c++) { fl[x + c] = f; } if (x >= W - 9) { segs.push({ x0: x, x1: Math.min(W - 1, x + len - 1), f: f }); } x += len; continue; }
-      if (!pitPrev && kind < .12 + d * .14) { var pw = 1 + Math.floor(R() * (2 + (d > .4 ? 1 : 0))); for (c = 0; c < pw && x + c < W - 9; c++) fl[x + c] = 15; x += pw; pitPrev = true; continue; }
+      if (!pitPrev && kind < .16 + d * .2) { var pw = 1 + Math.floor(R() * (2 + (n > 3 ? 1 : 0))); for (c = 0; c < pw && x + c < W - 9; c++) fl[x + c] = 15; x += pw; pitPrev = true; continue; }
       pitPrev = false;
       if (kind < .5) { var dr = R() < .5 ? -1 : 1; f = Math.max(8, Math.min(13, f + dr * (dr > 0 && R() < d * .3 ? 2 : 1))); }
       for (c = 0; c < len && x + c < W; c++) fl[x + c] = f;
@@ -4680,11 +4680,12 @@ function bounce(stage, ui) {
     segs.forEach(function (sg, si) {
       var w = sg.x1 - sg.x0 + 1;
       if (sg.x0 > flat0 && sg.x1 < W - 10) {
-        if (w >= 3 && R() < .15 + d * .35) { var sx = sg.x0 + 1 + Math.floor(R() * (w - 2)); if (g[sg.f - 1][sx] === '.') g[sg.f - 1][sx] = '^'; }
-        if (w >= 5 && n >= 3 && R() < .1 + d * .3) ens.push({ x: sg.x0 + w / 2, y: sg.f - .42, x0: sg.x0 + .45, x1: sg.x1 + .55, dir: R() < .5 ? -1 : 1 });
+        if (w >= 3 && R() < .25 + d * .45) { var sx = sg.x0 + 1 + Math.floor(R() * (w - 2)); if (g[sg.f - 1][sx] === '.') { g[sg.f - 1][sx] = '^'; if (w >= 5 && n > 6 && R() < d * .5 && sx + 1 < sg.x1 && g[sg.f - 1][sx + 1] === '.') g[sg.f - 1][sx + 1] = '^'; } }
+        if (w >= 4 && n >= 2 && R() < .2 + d * .45) ens.push({ x: sg.x0 + w / 2, y: sg.f - .42, x0: sg.x0 + .45, x1: sg.x1 + .55, dir: R() < .5 ? -1 : 1 });
         if (si > 0 && si % 6 === 0 && g[sg.f - 1][sg.x0] === '.') g[sg.f - 1][sg.x0] = 'C';
       }
     });
+    if (n >= 5) for (x = flat0 + 2; x < W - 10; x++) { if (fl[x] !== 15 && fl[x] - ce[x] >= 5 && g[ce[x]][x] === '.' && R() < .05 + d * .1 && g[fl[x] - 1][x] !== 'C') g[ce[x]][x] = 'v'; }
     var want = 5 + Math.round(n * .45 + d * 4), tries = 0, lastc = -9;
     for (x = 9; x < W - 10 && rings < want && tries < 4000; x++) {
       tries++; if (x - lastc < Math.floor((W - 20) / want) || fl[x] === 15) continue;
@@ -4692,7 +4693,7 @@ function bounce(stage, ui) {
       g[rr][x] = 'o'; rings++; lastc = x;
     }
     if (rings < 3) { for (x = 10; x < 14; x++) { g[fl[x] - 1][x] = 'o'; rings++; } }
-    var ex = W - 5; for (r = ce[ex]; r < fl[ex]; r++) { } g[fl[ex] - 1][ex] = 'E'; for (var q = ex - 2; q <= ex + 1; q++) { if (g[fl[q] - 1][q] === '^' || g[fl[q] - 1][q] === 'o') g[fl[q] - 1][q] = '.'; if (ce[q] > fl[q] - 3) { for (r = ce[q] - 1; r >= fl[q] - 3 && r >= 1; r--) g[r][q] = '.'; } }
+    var ex = W - 5; for (r = ce[ex]; r < fl[ex]; r++) { } g[fl[ex] - 1][ex] = 'E'; for (var q = ex - 2; q <= ex + 1; q++) { if (g[ce[q]][q] === 'v') g[ce[q]][q] = '.'; if (g[fl[q] - 1][q] === '^' || g[fl[q] - 1][q] === 'o') g[fl[q] - 1][q] = '.'; if (ce[q] > fl[q] - 3) { for (r = ce[q] - 1; r >= fl[q] - 3 && r >= 1; r--) g[r][q] = '.'; } }
     rings = 0; for (r = 0; r < H; r++) for (c = 0; c < W; c++) if (g[r][c] === 'o') rings++;
     return { W: W, g: g, rings: rings, ens: ens, start: { x: 3.5, y: fl[3] - HS - .02 }, ex: { c: ex, r: fl[ex] - 1 } };
   }
@@ -4726,13 +4727,14 @@ function bounce(stage, ui) {
     for (c = Math.floor(bx - HS); c <= Math.floor(bx + HS); c++) for (r = Math.floor(by - HS); r <= Math.floor(by + HS); r++) if (solid(c, r)) { if (vx > 0) bx = c - HS - .001; else if (vx < 0) bx = c + 1 + HS + .001; vx = 0; hit = true; }
     var pvy = vy; by += vy * dt;
     for (c = Math.floor(bx - HS); c <= Math.floor(bx + HS); c++) for (r = Math.floor(by - HS); r <= Math.floor(by + HS); r++) if (solid(c, r)) {
-      if (vy > 0) { by = r - HS - .001; if (jbuf > 0 || wantJ) { vy = -11.2; jbuf = 0; Snd.fx('tap'); } else { vy = -Math.max(6.4, Math.min(7.4, pvy * .5)); } coy = .12; squash = .12; }
+      if (vy > 0) { by = r - HS - .001; if (jbuf > 0 || wantJ) { vy = -11.2; jbuf = 0; Snd.fx('tap'); } else { vy = 0; } coy = .12; if (pvy > 6) squash = .1; }
       else if (vy < 0) { by = r + 1 + HS + .001; vy = 0; }
     }
     /* things */
     for (c = Math.floor(bx - 1); c <= Math.floor(bx + 1); c++) for (r = Math.floor(by - 1); r <= Math.floor(by + 1); r++) {
       if (c < 0 || c >= L.W || r < 0 || r >= H) continue; var ch = L.g[r][c];
       if (ch === 'o' && Math.hypot(bx - c - .5, by - r - .5) < .62) { L.g[r][c] = '.'; got++; score += 10; Snd.fx('pop'); stat(); if (got === total) { msg = 'Gate open! Reach the exit 🚪'; msgT = 2.2; } }
+      else if (ch === 'v' && bx > c + .12 && bx < c + .88 && by - HS < r + .5 && by + HS > r) die();
       else if (ch === '^' && bx > c + .1 && bx < c + .9 && by + HS > r + .5 && by - HS < r + 1) die();
       else if (ch === 'P' && vy > 0 && bx > c && bx < c + 1 && by + HS > r + .55) { vy = -15.8; coy = 0; Snd.fx('hop'); vib(15); }
       else if (ch === 'C' && Math.abs(bx - c - .5) < .6 && Math.abs(by - r - .5) < .9 && (sp.x !== c + .5)) { sp = { x: c + .5, y: r + 1 - HS - .02 }; msg = 'Checkpoint ✔'; msgT = 1.2; Snd.fx('match'); }
@@ -4740,7 +4742,7 @@ function bounce(stage, ui) {
     if (over) return;
     var E = L.ex; if (bx > E.c - .1 && bx < E.c + 1.1 && by > E.r - 1 && by < E.r + 1.2) { if (got >= total) { clearLevel(); return; } else if (msgT <= 0) { msg = 'Collect all rings first (' + got + '/' + total + ')'; msgT = 1.4; } }
     L.ens.forEach(function (e) {
-      if (e.dead) return; e.x += e.dir * 1.5 * dt; if (e.x > e.x1) { e.x = e.x1; e.dir = -1; } if (e.x < e.x0) { e.x = e.x0; e.dir = 1; }
+      if (e.dead) return; e.x += e.dir * (1.4 + cur / 30 * 1.6) * dt; if (e.x > e.x1) { e.x = e.x1; e.dir = -1; } if (e.x < e.x0) { e.x = e.x0; e.dir = 1; }
       if (Math.hypot(bx - e.x, by - e.y) < HS + .42) { if (vy > 1 && by < e.y - .1) { e.dead = true; vy = -9.5; score += 25; Snd.fx('capture'); } else die(); }
     });
     if (by > H + 1) die();
@@ -4763,6 +4765,7 @@ function bounce(stage, ui) {
       }
       else if (ch === 'o') { var bob = Math.sin(tm * 3 + c) * 1.5; ctx.strokeStyle = P.ring; ctx.lineWidth = 6; ctx.beginPath(); ctx.ellipse(x + TS / 2, y + TS / 2 + bob, TS * .17, TS * .42, 0, 0, 6.283); ctx.stroke(); ctx.strokeStyle = P.ring2; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(x + TS / 2, y + TS / 2 + bob, TS * .17, TS * .42, 0, 0, 6.283); ctx.stroke(); }
       else if (ch === '^') { ctx.fillStyle = P.spike; ctx.beginPath(); ctx.moveTo(x + 2, y + TS); ctx.lineTo(x + TS / 4 + 1, y + TS * .35); ctx.lineTo(x + TS / 2, y + TS); ctx.lineTo(x + TS * .75 - 1, y + TS * .35); ctx.lineTo(x + TS - 2, y + TS); ctx.closePath(); ctx.fill(); ctx.strokeStyle = P.line; ctx.lineWidth = 1; ctx.stroke(); }
+      else if (ch === 'v') { ctx.fillStyle = P.spike; ctx.beginPath(); ctx.moveTo(x + 2, y); ctx.lineTo(x + TS / 4 + 1, y + TS * .65); ctx.lineTo(x + TS / 2, y); ctx.lineTo(x + TS * .75 - 1, y + TS * .65); ctx.lineTo(x + TS - 2, y); ctx.closePath(); ctx.fill(); ctx.strokeStyle = P.line; ctx.lineWidth = 1; ctx.stroke(); }
       else if (ch === 'P') { ctx.strokeStyle = P.pad; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x + 5, y + TS - 3); for (i = 0; i < 4; i++) ctx.lineTo(x + (i % 2 ? TS - 6 : 6), y + TS - 3 - (i + 1) * 5); ctx.stroke(); ctx.fillStyle = P.pad; ctx.fillRect(x + 3, y + TS * .25, TS - 6, 6); }
       else if (ch === 'C') { var act = Math.abs(sp.x - c - .5) < .01; ctx.fillStyle = P.line; ctx.fillRect(x + 6, y + 2, 3, TS - 2); ctx.fillStyle = act ? P.ex : P.flag; ctx.beginPath(); ctx.moveTo(x + 9, y + 3); ctx.lineTo(x + TS - 4, y + 10); ctx.lineTo(x + 9, y + 17); ctx.closePath(); ctx.fill(); }
       else if (ch === 'E') { var open = got >= total; ctx.fillStyle = P.line; ctx.fillRect(x - 3, y - TS + 2, TS + 6, TS * 2 - 2); ctx.fillStyle = open ? P.ex : P.spike; ctx.beginPath(); ctx.moveTo(x + 3, y + TS); ctx.lineTo(x + 3, y - TS * .35); ctx.arc(x + TS / 2, y - TS * .35, TS / 2 - 3, Math.PI, 0); ctx.lineTo(x + TS - 3, y + TS); ctx.closePath(); ctx.fill(); if (open) { ctx.fillStyle = 'rgba(255,255,255,' + (.35 + .25 * Math.sin(tm * 5)) + ')'; ctx.fill(); } else { ctx.fillStyle = P.line; ctx.fillRect(x + TS / 2 - 3, y + 2, 6, 8); } }
