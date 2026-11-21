@@ -2327,110 +2327,6 @@ function connect4(stage, ui) {
   return function () { alive = false; timers.forEach(clearTimeout); };
 }
 
-/* ------------------------------------------------------------------ Sudoku */
-var SUD = (function () {
-  function bits(n) { var c = 0; while (n) { c += n & 1; n >>= 1; } return c; }
-  function solve(g, limit) { // counts solutions up to limit; fills g with the first one found
-    var rows = [], cols = [], boxes = [], i, count = 0, first = null;
-    for (i = 0; i < 9; i++) { rows[i] = cols[i] = boxes[i] = 0; }
-    for (i = 0; i < 81; i++) if (g[i]) { var b = 1 << g[i], r = (i / 9) | 0, c = i % 9, k = ((r / 3) | 0) * 3 + ((c / 3) | 0); if ((rows[r] | cols[c] | boxes[k]) & b) return 0; rows[r] |= b; cols[c] |= b; boxes[k] |= b; }
-    function go() {
-      var best = -1, bm = 0, bc = 10, j;
-      for (j = 0; j < 81; j++) if (!g[j]) { var r2 = (j / 9) | 0, c2 = j % 9, k2 = ((r2 / 3) | 0) * 3 + ((c2 / 3) | 0), m = ~(rows[r2] | cols[c2] | boxes[k2]) & 0x3fe, n = bits(m); if (n < bc) { bc = n; best = j; bm = m; if (n <= 1) break; } }
-      if (best < 0) { count++; if (!first) first = g.slice(); return count >= limit; }
-      if (!bc) return false;
-      var r3 = (best / 9) | 0, c3 = best % 9, k3 = ((r3 / 3) | 0) * 3 + ((c3 / 3) | 0), d;
-      for (d = 1; d <= 9; d++) if (bm & (1 << d)) {
-        g[best] = d; rows[r3] |= 1 << d; cols[c3] |= 1 << d; boxes[k3] |= 1 << d;
-        var stop = go();
-        g[best] = 0; rows[r3] &= ~(1 << d); cols[c3] &= ~(1 << d); boxes[k3] &= ~(1 << d);
-        if (stop) return true;
-      }
-      return false;
-    }
-    go(); if (first) for (i = 0; i < 81; i++) g[i] = first[i];
-    return count;
-  }
-  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-  function full() {
-    var g = [], i; for (i = 0; i < 81; i++) g[i] = 0;
-    // seed the diagonal boxes randomly, then solve the rest
-    for (var b = 0; b < 3; b++) { var d = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]); for (i = 0; i < 9; i++) g[(b * 3 + ((i / 3) | 0)) * 9 + b * 3 + (i % 3)] = d[i]; }
-    solve(g, 1); return g;
-  }
-  function make(clues) {
-    var sol = full(), p = sol.slice(), order = shuffle(Array.apply(null, Array(81)).map(function (_, i) { return i; })), left = 81, t0 = Date.now();
-    for (var n = 0; n < 81 && left > clues && Date.now() - t0 < 1500; n++) {
-      var i = order[n], v = p[i]; p[i] = 0;
-      if (solve(p.slice(), 2) !== 1) p[i] = v; else left--;
-    }
-    return { puzzle: p, solution: sol };
-  }
-  return { make: make, solve: solve };
-})();
-
-function sudoku(stage, ui) {
-  var getLvl = ui.level('sudoku', ['Easy', 'Medium', 'Hard'], 0, function () { reset(); }, 'Level');
-  var CL = [40, 32, 27];
-  var grid = h('div', 'sdg'), cells = [], pad = h('div', 'sdp'), info = h('div', 'rpsout', ''), pads = [];
-  var puz, sol, cur, sel, given, clock = null, t0 = 0, secs = 0, over = false, mistakes = 0, alive = true, i;
-  for (i = 0; i < 81; i++) (function (k) {
-    var c = h('button', 'sdc'); c.type = 'button'; c.setAttribute('aria-label', 'Cell ' + (((k / 9) | 0) + 1) + ',' + (k % 9 + 1));
-    if (k % 9 === 2 || k % 9 === 5) c.classList.add('r3'); if (((k / 9) | 0) === 2 || ((k / 9) | 0) === 5) c.classList.add('b3');
-    c.addEventListener('click', function () { sel = k; Snd.fx('tap'); render(); });
-    cells.push(c); grid.appendChild(c);
-  })(i);
-  for (i = 1; i <= 9; i++) (function (d) { var b = h('button', 'sdn', String(d)); b.type = 'button'; b.addEventListener('click', function () { enter(d); }); pads.push(b); pad.appendChild(b); })(i);
-  var tools = h('div', 'sdt');
-  tools.appendChild(button('⌫ Erase', function () { enter(0); }, 'btn small'));
-  tools.appendChild(button('💡 Hint', function () { hint(); }, 'btn small'));
-  tools.appendChild(button('New puzzle', function () { reset(); }, 'btn small'));
-  stage.appendChild(info); stage.appendChild(grid); stage.appendChild(pad); stage.appendChild(tools);
-  stage.appendChild(h('p', 'hint', 'Tap a square, then a number. Every row, column and 3×3 box needs 1 to 9 once. Wrong numbers turn red.'));
-  function fmt(s) { return ((s / 60) | 0) + ':' + ('0' + (s % 60)).slice(-2); }
-  function conflict(k) { var v = cur[k]; if (!v) return false; var r = (k / 9) | 0, c = k % 9, j; for (j = 0; j < 81; j++) { if (j === k || cur[j] !== v) continue; var r2 = (j / 9) | 0, c2 = j % 9; if (r2 === r || c2 === c || (((r2 / 3) | 0) === ((r / 3) | 0) && ((c2 / 3) | 0) === ((c / 3) | 0))) return true; } return false; }
-  function render() {
-    var sv = sel >= 0 ? cur[sel] : 0, sr = sel >= 0 ? (sel / 9) | 0 : -1, sc = sel >= 0 ? sel % 9 : -1;
-    cells.forEach(function (c, k) {
-      var r = (k / 9) | 0, cc = k % 9, v = cur[k];
-      c.textContent = v || ''; c.className = 'sdc' + (cc === 2 || cc === 5 ? ' r3' : '') + (r === 2 || r === 5 ? ' b3' : '') + (given[k] ? ' g' : '') + (k === sel ? ' sel' : (r === sr || cc === sc || (sel >= 0 && ((r / 3) | 0) === ((sr / 3) | 0) && ((cc / 3) | 0) === ((sc / 3) | 0)) ? ' rel' : '')) + (v && v === sv && k !== sel ? ' same' : '') + (!given[k] && v && (conflict(k) || v !== sol[k]) ? ' bad' : '');
-    });
-    var cnt = {}; cur.forEach(function (v) { if (v && true) cnt[v] = (cnt[v] || 0) + 1; });
-    pads.forEach(function (b, d) { b.classList.toggle('done', (cnt[d + 1] || 0) >= 9); });
-  }
-  function status() { ui.score('Time ' + fmt(secs) + ' · Mistakes ' + mistakes); }
-  function enter(d) {
-    if (over || sel < 0 || given[sel]) return;
-    cur[sel] = d; if (d && d !== sol[sel]) { mistakes++; Snd.fx('bad'); vib(30); } else Snd.fx(d ? 'pop' : 'tap');
-    render(); status(); check();
-  }
-  function hint() {
-    if (over) return; var k = sel >= 0 && !given[sel] && cur[sel] !== sol[sel] ? sel : -1, j;
-    if (k < 0) { var wrong = []; for (j = 0; j < 81; j++) if (cur[j] !== sol[j]) wrong.push(j); if (!wrong.length) return; k = wrong[rnd(wrong.length)]; }
-    sel = k; cur[k] = sol[k]; given[k] = true; secs += 15; Snd.fx('match'); render(); status(); check();
-  }
-  function check() {
-    for (var j = 0; j < 81; j++) if (cur[j] !== sol[j]) return;
-    over = true; clearInterval(clock); Snd.fx('win'); confetti(); lbAdd('sudoku_' + getLvl(), secs, true); setBest('sudoku_' + getLvl(), secs, true);
-    info.textContent = 'Solved in ' + fmt(secs) + '! 🎉'; bump('sudoku');
-  }
-  function reset() {
-    clearInterval(clock); over = false; mistakes = 0; secs = 0; sel = -1; info.textContent = 'Making a puzzle…';
-    setTimeout(function () {
-      if (!alive) return;
-      var m = SUD.make(CL[getLvl()]); puz = m.puzzle; sol = m.solution; cur = puz.slice(); given = puz.map(function (v) { return !!v; });
-      info.textContent = 'Best: ' + (store('sudoku_' + getLvl()) ? fmt(store('sudoku_' + getLvl())) : 'not yet'); t0 = Date.now(); status(); render();
-      clock = setInterval(function () { if (!over) { secs++; status(); } }, 1000);
-    }, 30);
-  }
-  var off = onKeys(function (e) {
-    if (e.key >= '1' && e.key <= '9') enter(+e.key); else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') enter(0);
-    else if (sel >= 0 && /Arrow/.test(e.key)) { e.preventDefault(); var r = (sel / 9) | 0, c = sel % 9; if (e.key === 'ArrowUp') r = (r + 8) % 9; if (e.key === 'ArrowDown') r = (r + 1) % 9; if (e.key === 'ArrowLeft') c = (c + 8) % 9; if (e.key === 'ArrowRight') c = (c + 1) % 9; sel = r * 9 + c; render(); }
-  });
-  reset();
-  return function () { alive = false; clearInterval(clock); off(); };
-}
-
 /* ------------------------------------------------------------------ Tetris */
 function tetris(stage, ui) {
   var getLvl = ui.level('tetris', ['Easy', 'Normal', 'Hard'], 1, function () { reset(); }, 'Speed');
@@ -2628,6 +2524,240 @@ function minesweeper(stage, ui) {
   }
   reset();
   return function () { alive = false; clearInterval(clock); };
+}
+
+/* ------------------------------------------------------------------ Sudoku (12 types) */
+var SDK_TYPES = [
+  { id: 'classic', name: 'Classic 9×9', n: 9, bw: 3, bh: 3, clues: [40, 32, 27], info: 'Every row, column and 3×3 box needs 1 to 9 once.' },
+  { id: 'mini', name: 'Mini 6×6', n: 6, bw: 3, bh: 2, clues: [20, 16, 13], info: 'Use 1 to 6. Boxes are 3 wide and 2 tall.' },
+  { id: 'kids', name: 'Kids 4×4', n: 4, bw: 2, bh: 2, sym: ['🐶', '🐱', '🐸', '🐵'], clues: [10, 8, 6], info: 'Each animal once in every row, column and 2×2 box.' },
+  { id: 'fruit', name: 'Fruit 6×6', n: 6, bw: 3, bh: 2, sym: ['🍎', '🍊', '🍋', '🍇', '🍓', '🥝'], clues: [20, 16, 13], info: 'Each fruit once in every row, column and box.' },
+  { id: 'diag', name: 'Diagonal X', n: 9, bw: 3, bh: 3, diag: true, clues: [38, 31, 26], info: 'Normal rules, and both long diagonals (shaded) also need 1 to 9 once.' },
+  { id: 'hyper', name: 'Hyper', n: 9, bw: 3, bh: 3, hyper: true, clues: [38, 31, 26], info: 'Normal rules, and the 4 shaded extra boxes also need 1 to 9 once.' },
+  { id: 'jig', name: 'Jigsaw', n: 9, bw: 3, bh: 3, jig: true, clues: [44, 38, 33], info: 'The boxes are irregular shapes (thick lines). Each shape needs 1 to 9 once, plus rows and columns.' },
+  { id: 'knight', name: 'Anti-Knight', n: 9, bw: 3, bh: 3, knight: true, clues: [30, 24, 19], info: 'Normal rules, and the same number can never be a chess knight\'s move apart.' },
+  { id: 'king', name: 'Anti-King', n: 9, bw: 3, bh: 3, king: true, clues: [32, 26, 21], info: 'Normal rules, and the same number can never touch, even diagonally.' },
+  { id: 'nonc', name: 'Non-Consecutive', n: 9, bw: 3, bh: 3, nonc: true, clues: [26, 18, 12], info: 'Normal rules, and side-by-side squares can never hold numbers that differ by 1.' },
+  { id: 'eo', name: 'Even-Odd', n: 9, bw: 3, bh: 3, eo: true, clues: [30, 24, 19], marks: [50, 42, 34], info: 'Normal rules. Round shaded squares hold even numbers, square shaded ones hold odd numbers.' },
+  { id: 'killer', name: 'Killer', n: 9, bw: 3, bh: 3, killer: true, clues: [18, 14, 10], info: 'Normal rules. The small number in a dotted-outline group is the total of that group, and a group never repeats a number.' }
+];
+var SDK = (function () {
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pop(m) { m -= (m >> 1) & 0x55555555; m = (m & 0x33333333) + ((m >> 2) & 0x33333333); return (((m + (m >> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24; }
+  function boxReg(T) { var reg = [], r, c, per = T.n / T.bw; for (r = 0; r < T.n; r++) for (c = 0; c < T.n; c++) reg.push(Math.floor(r / T.bh) * per + Math.floor(c / T.bw)); return reg; }
+  function jigGrow(N) {
+    var NC = N * N, reg = [], sz = [], i, seeds = [], left = NC - N, perm = shuffle(Array.apply(null, Array(N)).map(function (_, k) { return k; }));
+    for (i = 0; i < N; i++) seeds.push(i * N + perm[i]);
+    for (i = 0; i < NC; i++) reg[i] = -1; for (i = 0; i < N; i++) { reg[seeds[i]] = i; sz[i] = 1; }
+    while (left > 0) {
+      var mn = 99, rs = []; for (i = 0; i < N; i++) if (sz[i] < N && sz[i] < mn) mn = sz[i];
+      for (i = 0; i < N; i++) if (sz[i] === mn) rs.push(i); var rg = rs[rnd(rs.length)], opts = [];
+      for (i = 0; i < NC; i++) if (reg[i] === rg) { var r = (i / N) | 0, c = i % N; [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].forEach(function (p) { if (p[0] >= 0 && p[0] < N && p[1] >= 0 && p[1] < N && reg[p[0] * N + p[1]] < 0) opts.push(p[0] * N + p[1]); }); }
+      if (!opts.length) return null; var pick = opts[rnd(opts.length)]; reg[pick] = rg; sz[rg]++; left--;
+    }
+    return reg;
+  }
+  function jigsaw(N, T) {
+    for (var at = 0; at < 6000; at++) { var gr = jigGrow(N); if (gr) return gr; }
+    var NC = N * N, reg = boxReg(T), it, i;
+    function nbs(k) { var r = (k / N) | 0, c = k % N, o = []; if (r > 0) o.push(k - N); if (r < N - 1) o.push(k + N); if (c > 0) o.push(k - 1); if (c < N - 1) o.push(k + 1); return o; }
+    function connected(rg, skip) { var cells = [], st, seen = {}, n = 0; for (var q = 0; q < NC; q++) if (reg[q] === rg && q !== skip) cells.push(q); if (!cells.length) return false; st = [cells[0]]; seen[cells[0]] = 1; while (st.length) { var x = st.pop(); n++; nbs(x).forEach(function (y) { if (reg[y] === rg && y !== skip && !seen[y]) { seen[y] = 1; st.push(y); } }); } return n === cells.length; }
+    for (it = 0; it < 6000; it++) {
+      var a = rnd(NC), cand = nbs(a).filter(function (y) { return reg[y] !== reg[a]; }); if (!cand.length) continue;
+      var b = cand[rnd(cand.length)], ra = reg[a], rb = reg[b];
+      /* swap a and b between the two regions, keep both connected */
+      reg[a] = rb; reg[b] = ra;
+      if (!(connected(ra, -1) && connected(rb, -1))) { reg[a] = ra; reg[b] = rb; }
+    }
+    return reg;
+  }
+  function engine(c) {
+    var N = c.n, NC = N * N, W = N + 1, ps = [], peers = [], adj = [], par = c.par || null, cages = c.cages || null, cageOf = c.cageOf || null, i, j, k, r, cc, d, ODD = 0, EVEN = 0;
+    for (d = 1; d <= N; d++) { if (d & 1) ODD |= 1 << d; else EVEN |= 1 << d; }
+    for (i = 0; i < NC; i++) { ps[i] = {}; adj[i] = []; }
+    function grp(a) { for (var x = 0; x < a.length; x++) for (var y = 0; y < a.length; y++) if (a[x] !== a[y]) ps[a[x]][a[y]] = 1; }
+    for (r = 0; r < N; r++) { var row = [], col = []; for (cc = 0; cc < N; cc++) { row.push(r * N + cc); col.push(cc * N + r); } grp(row); grp(col); }
+    var byReg = {}; c.reg.forEach(function (g, q) { (byReg[g] = byReg[g] || []).push(q); }); Object.keys(byReg).forEach(function (g) { grp(byReg[g]); });
+    (c.extra || []).forEach(grp); if (cages) cages.forEach(function (cg) { grp(cg.cells); });
+    for (r = 0; r < N; r++) for (cc = 0; cc < N; cc++) {
+      k = r * N + cc;
+      if (c.knight) [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]].forEach(function (o) { var a = r + o[0], b = cc + o[1]; if (a >= 0 && a < N && b >= 0 && b < N) ps[k][a * N + b] = 1; });
+      if (c.king) [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (o) { var a = r + o[0], b = cc + o[1]; if (a >= 0 && a < N && b >= 0 && b < N) ps[k][a * N + b] = 1; });
+      if (c.nonc) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (o) { var a = r + o[0], b = cc + o[1]; if (a >= 0 && a < N && b >= 0 && b < N) adj[k].push(a * N + b); });
+    }
+    for (i = 0; i < NC; i++) peers[i] = Object.keys(ps[i]).map(Number);
+    function solve(g, limit, cap, rand) {
+      var use = new Uint8Array(NC * W), nodes = 0, count = 0, first = null, aborted = false, q;
+      function place(p, dd, s) { var pr = peers[p], z; for (z = 0; z < pr.length; z++) use[pr[z] * W + dd] += s; }
+      function cand(p) {
+        var m = 0, base = p * W, dd, z;
+        for (dd = 1; dd <= N; dd++) if (!use[base + dd]) m |= 1 << dd;
+        if (par && par[p]) m &= par[p] === 1 ? ODD : EVEN;
+        if (c.nonc) { var ad = adj[p]; for (z = 0; z < ad.length; z++) { var v = g[ad[z]]; if (v) m &= ~((1 << (v - 1)) | (1 << (v + 1))); } }
+        if (cageOf && cageOf[p] >= 0) {
+          var CG = cages[cageOf[p]], s = 0, rem = 0, cl = CG.cells; for (z = 0; z < cl.length; z++) if (cl[z] !== p) { if (g[cl[z]]) s += g[cl[z]]; else rem++; }
+          var need = CG.sum - s;
+          if (rem === 0) { m &= (need >= 1 && need <= N) ? (1 << need) : 0; }
+          else { var lo = rem * (rem + 1) / 2, hi = rem * N - rem * (rem - 1) / 2; for (dd = 1; dd <= N; dd++) if (m & (1 << dd)) { var rr = need - dd; if (rr < lo || rr > hi) m &= ~(1 << dd); } }
+        }
+        return m;
+      }
+      for (q = 0; q < NC; q++) if (g[q]) { if (use[q * W + g[q]]) return { count: 0, aborted: false }; place(q, g[q], 1); }
+      function go() {
+        if (++nodes > cap) { aborted = true; return true; }
+        var best = -1, bm = 0, bc = 99, p, m, n2;
+        for (p = 0; p < NC; p++) if (!g[p]) { m = cand(p); n2 = pop(m); if (n2 < bc) { bc = n2; best = p; bm = m; if (n2 <= 1) break; } }
+        if (best < 0) { count++; if (!first) first = g.slice(); return count >= limit; }
+        if (bc === 0) return false;
+        var ds = [], dd, t; for (dd = 1; dd <= N; dd++) if (bm & (1 << dd)) ds.push(dd); if (rand) shuffle(ds);
+        for (t = 0; t < ds.length; t++) { g[best] = ds[t]; place(best, ds[t], 1); var stop = go(); place(best, ds[t], -1); g[best] = 0; if (stop) return true; }
+        return false;
+      }
+      go(); if (first) for (q = 0; q < NC; q++) g[q] = first[q];
+      return { count: count, aborted: aborted };
+    }
+    return { solve: solve, peers: peers, N: N };
+  }
+  function cageUp(sol, N) {
+    var NC = N * N, asg = [], cages = [], order = shuffle(Array.apply(null, Array(NC)).map(function (_, k) { return k; })), i;
+    for (i = 0; i < NC; i++) asg[i] = -1;
+    function nb(k) { var r = (k / N) | 0, c = k % N, o = []; if (r > 0) o.push(k - N); if (r < N - 1) o.push(k + N); if (c > 0) o.push(k - 1); if (c < N - 1) o.push(k + 1); return o; }
+    order.forEach(function (s) {
+      if (asg[s] >= 0) return; var qq, cg = { cells: [s], digs: {} }, qq = rnd(10), tg = qq < 5 ? 2 : (qq < 8 ? 3 : 4); cg.digs[sol[s]] = 1; asg[s] = cages.length;
+      while (cg.cells.length < tg) {
+        var op = []; cg.cells.forEach(function (x) { nb(x).forEach(function (y) { if (asg[y] < 0 && !cg.digs[sol[y]] && op.indexOf(y) < 0) op.push(y); }); });
+        if (!op.length) break; var y = op[rnd(op.length)]; cg.cells.push(y); cg.digs[sol[y]] = 1; asg[y] = cages.length;
+      }
+      cages.push(cg);
+    });
+    cages.forEach(function (cg, ci) {
+      if (cg.cells.length !== 1) return; var s = cg.cells[0], o = shuffle(nb(s));
+      for (var t = 0; t < o.length; t++) { var oc = cages[asg[o[t]]]; if (oc && oc !== cg && oc.cells.length < 5 && !oc.digs[sol[s]]) { oc.cells.push(s); oc.digs[sol[s]] = 1; asg[s] = asg[o[t]]; cg.cells = []; break; } }
+    });
+    var out = [], of = []; for (i = 0; i < NC; i++) of[i] = -1;
+    cages.forEach(function (cg) { if (!cg.cells.length) return; var sum = 0; cg.cells.forEach(function (x) { sum += sol[x]; of[x] = out.length; }); out.push({ cells: cg.cells, sum: sum }); });
+    return { cages: out, cageOf: of };
+  }
+  function make(T, lvl) {
+    var t0 = Date.now(), N = T.n, NC = N * N, i, att, base;
+    for (att = 0; att < 12; att++) {
+      var cfg = { n: N, reg: T.jig ? jigsaw(N, T) : boxReg(T), extra: [], knight: !!T.knight, king: !!T.king, nonc: !!T.nonc };
+      if (!cfg.reg) continue;
+      if (T.diag) { var a = [], b = []; for (i = 0; i < N; i++) { a.push(i * N + i); b.push(i * N + N - 1 - i); } cfg.extra.push(a, b); cfg.diagCells = a.concat(b); }
+      if (T.hyper) { cfg.hyperCells = []; [[1, 1], [1, 5], [5, 1], [5, 5]].forEach(function (o) { var w = []; for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) w.push((o[0] + r) * N + o[1] + c); cfg.extra.push(w); cfg.hyperCells = cfg.hyperCells.concat(w); }); }
+      var E = engine(cfg), sol = []; for (i = 0; i < NC; i++) sol[i] = 0;
+      var res = E.solve(sol, 1, 60000, true); if (res.count !== 1) continue;
+      if (T.eo) { cfg.par = []; var cells = shuffle(Array.apply(null, Array(NC)).map(function (_, k) { return k; })); for (i = 0; i < NC; i++) cfg.par[i] = 0; cells.slice(0, T.marks[lvl]).forEach(function (k) { cfg.par[k] = (sol[k] & 1) ? 1 : 2; }); E = engine(cfg); }
+      var p;
+      if (T.killer) {
+        var cu = cageUp(sol, N); cfg.cages = cu.cages; cfg.cageOf = cu.cageOf; E = engine(cfg);
+        var gv = T.clues[lvl], tries = 0, ord = shuffle(Array.apply(null, Array(NC)).map(function (_, k) { return k; })), used = 0;
+        p = []; for (i = 0; i < NC; i++) p[i] = 0;
+        while (true) {
+          for (; used < gv && used < NC; used++) p[ord[used]] = sol[ord[used]];
+          var r2 = E.solve(p.slice(), 2, 15000); if ((r2.count === 1 && !r2.aborted) || ++tries > 8) break; gv += 5;
+        }
+        return { cfg: cfg, puzzle: p, solution: sol, T: T };
+      }
+      p = sol.slice(); var order = shuffle(Array.apply(null, Array(NC)).map(function (_, k) { return k; })), left = NC, tgt = T.clues[lvl], t1 = Date.now();
+      for (var n = 0; n < NC && left > tgt && Date.now() - t1 < 1400; n++) { var q = order[n], v = p[q]; p[q] = 0; var r3 = E.solve(p.slice(), 2, 20000); if (r3.count !== 1 || r3.aborted) p[q] = v; else left--; }
+      return { cfg: cfg, puzzle: p, solution: sol, T: T };
+    }
+    return null;
+  }
+  return { make: make, engine: engine, jigsaw: jigsaw, boxReg: boxReg };
+})();
+
+function sudoku(stage, ui) {
+  var getLvl = ui.level('sudoku', ['Easy', 'Medium', 'Hard'], 0, function () { reset(); }, 'Level');
+  if (!document.getElementById('sdcss')) {
+    var sty = document.createElement('style'); sty.id = 'sdcss';
+    sty.textContent = '.sdty{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 8px;margin:2px auto 4px;max-width:min(94vw,460px);-webkit-overflow-scrolling:touch;scrollbar-width:none}.sdty::-webkit-scrollbar{display:none}.sdty button{flex:0 0 auto;border:1px solid #7d8db555;border-radius:999px;padding:6px 12px;font:600 .8rem Inter,sans-serif;background:transparent;color:inherit;cursor:pointer;white-space:nowrap}.sdty button.on{background:#7cf0c9;color:#062;border-color:#7cf0c9}.sdc{position:relative}.sdc.nt{font-size:.58rem;font-weight:600;color:#6a78a0;display:grid;grid-template-columns:repeat(3,1fr);align-content:center;line-height:1.05;padding:1px}.sdc.nt i{font-style:normal}.sdc.pe{background-image:radial-gradient(circle,#7fb0f0aa 58%,transparent 60%)}.sdc.po{background-image:linear-gradient(#f0a64faa,#f0a64faa);background-size:66% 66%;background-repeat:no-repeat;background-position:center}.sdc.dg{box-shadow:inset 0 0 0 100px rgba(80,160,255,.16)}.sdc.hy{box-shadow:inset 0 0 0 100px rgba(60,200,120,.18)}.sdk{position:absolute;left:2px;top:0;font:700 .5rem Inter,sans-serif;color:#b3402a;line-height:1.3}.sdc.big{font-size:clamp(1.4rem,8vw,2rem)}.sdn.on{background:#ffe27a;color:#111}';
+    document.head.appendChild(sty);
+  }
+  var typeIdx = Math.min(SDK_TYPES.length - 1, store('sudoku_type') || 0), T = SDK_TYPES[typeIdx], N = T.n, cfg = null;
+  var chips = h('div', 'sdty'), chipB = [];
+  SDK_TYPES.forEach(function (t, k) { var b = h('button', '', t.name); b.type = 'button'; b.addEventListener('click', function () { if (k === typeIdx) return; typeIdx = k; put('sudoku_type', k); T = t; Snd.fx('tap'); layout(); reset(); chips.querySelectorAll('button').forEach(function (x, q) { x.classList.toggle('on', q === k); }); }); chipB.push(b); chips.appendChild(b); });
+  var grid = h('div', 'sdg'), cells = [], pad = h('div', 'sdp'), info = h('div', 'rpsout', ''), pads = [], tools = h('div', 'sdt'), howT = h('p', 'hint', '');
+  var puz, sol, cur, notes, sel = -1, given, clock = null, secs = 0, over = false, mistakes = 0, alive = true, noteMode = false, undo = [], noteBtn;
+  stage.appendChild(chips); stage.appendChild(info); stage.appendChild(grid); stage.appendChild(pad); stage.appendChild(tools); stage.appendChild(howT);
+  chipB[typeIdx].classList.add('on'); setTimeout(function () { try { chipB[typeIdx].scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) { } }, 50);
+  tools.appendChild(button('⌫ Erase', function () { enter(0); }, 'btn small'));
+  noteBtn = button('✏️ Notes: off', function () { noteMode = !noteMode; noteBtn.textContent = '✏️ Notes: ' + (noteMode ? 'ON' : 'off'); }, 'btn small'); tools.appendChild(noteBtn);
+  tools.appendChild(button('↩ Undo', function () { doUndo(); }, 'btn small'));
+  tools.appendChild(button('💡 Hint', function () { hint(); }, 'btn small'));
+  tools.appendChild(button('New puzzle', function () { reset(); }, 'btn small'));
+  function lab(d) { return T.sym ? T.sym[d - 1] : String(d); }
+  function layout() {
+    N = T.n; grid.innerHTML = ''; pad.innerHTML = ''; cells = []; pads = [];
+    grid.style.gridTemplateColumns = 'repeat(' + N + ',minmax(0,1fr))'; pad.style.gridTemplateColumns = 'repeat(' + N + ',minmax(0,1fr))';
+    for (var i = 0; i < N * N; i++) (function (k) { var c = h('button', 'sdc'); c.type = 'button'; c.setAttribute('aria-label', 'Cell ' + (((k / N) | 0) + 1) + ',' + (k % N + 1)); c.addEventListener('click', function () { sel = k; Snd.fx('tap'); render(); }); cells.push(c); grid.appendChild(c); })(i);
+    for (var d = 1; d <= N; d++) (function (dd) { var b = h('button', 'sdn', lab(dd)); b.type = 'button'; b.addEventListener('click', function () { enter(dd); }); pads.push(b); pad.appendChild(b); })(d);
+    howT.textContent = T.info + ' Tap a square, then a number. Wrong numbers turn red. Use ✏️ Notes to jot small candidate numbers.';
+  }
+  function fmt(s) { return ((s / 60) | 0) + ':' + ('0' + (s % 60)).slice(-2); }
+  function key() { return 'sudoku_' + (typeIdx === 0 ? '' : T.id + '_') + getLvl(); }
+  function render() {
+    if (!cur) return; var sv = sel >= 0 ? cur[sel] : 0, sr = sel >= 0 ? (sel / N) | 0 : -1, sc = sel >= 0 ? sel % N : -1, rg = cfg.reg;
+    cells.forEach(function (c, k) {
+      var r = (k / N) | 0, cc = k % N, v = cur[k], cls = 'sdc', st = '';
+      if (T.sym || N < 9) cls += ' big'; if (given[k]) cls += ' g';
+      if (k === sel) cls += ' sel'; else if (r === sr || cc === sc || (sel >= 0 && rg[k] === rg[sel])) cls += ' rel';
+      if (v && v === sv && k !== sel) cls += ' same'; if (!given[k] && v && v !== sol[k]) cls += ' bad';
+      if (cfg.par && cfg.par[k]) cls += cfg.par[k] === 2 ? ' pe' : ' po';
+      if (cfg.diagCells && cfg.diagCells.indexOf(k) >= 0) cls += ' dg'; if (cfg.hyperCells && cfg.hyperCells.indexOf(k) >= 0) cls += ' hy';
+      var bd = '2px solid #7d8db5'; if (cc < N - 1 && rg[k] !== rg[k + 1]) st += 'border-right:' + bd + ';'; if (r < N - 1 && rg[k] !== rg[k + N]) st += 'border-bottom:' + bd + ';';
+      var inner = '', ns = notes[k];
+      if (cfg.cageOf) {
+        var co = cfg.cageOf[k], cg = cfg.cages[co], sh = [], cl = '#d0583d';
+        if (cc === 0 || cfg.cageOf[k - 1] !== co) sh.push('inset 2px 0 0 0 ' + cl); if (cc === N - 1 || cfg.cageOf[k + 1] !== co) sh.push('inset -2px 0 0 0 ' + cl);
+        if (r === 0 || cfg.cageOf[k - N] !== co) sh.push('inset 0 2px 0 0 ' + cl); if (r === N - 1 || cfg.cageOf[k + N] !== co) sh.push('inset 0 -2px 0 0 ' + cl);
+        if (sh.length) st += 'box-shadow:' + sh.join(',') + ';';
+        var first = Math.min.apply(null, cg.cells); if (first === k) inner += '<b class="sdk">' + cg.sum + '</b>';
+      }
+      if (v) inner += lab(v); else if (ns) { cls += ' nt'; for (var d = 1; d <= N; d++) inner += '<i>' + (ns & (1 << d) ? lab(d) : '') + '</i>'; }
+      c.className = cls; c.style.cssText = st; c.innerHTML = inner;
+    });
+    var cnt = {}; cur.forEach(function (v) { if (v) cnt[v] = (cnt[v] || 0) + 1; });
+    pads.forEach(function (b, d) { b.classList.toggle('done', (cnt[d + 1] || 0) >= N); });
+  }
+  function status() { ui.score('Time ' + fmt(secs) + ' · Mistakes ' + mistakes); }
+  function enter(d) {
+    if (over || sel < 0 || given[sel]) return;
+    undo.push({ k: sel, v: cur[sel], n: notes[sel] }); if (undo.length > 200) undo.shift();
+    if (noteMode && d) { if (cur[sel]) { undo.pop(); return; } notes[sel] ^= 1 << d; Snd.fx('tap'); render(); return; }
+    cur[sel] = d; notes[sel] = 0; if (d && d !== sol[sel]) { mistakes++; Snd.fx('bad'); vib(30); } else Snd.fx(d ? 'pop' : 'tap');
+    render(); status(); check();
+  }
+  function doUndo() { if (over || !undo.length) return; var u = undo.pop(); cur[u.k] = u.v; notes[u.k] = u.n; sel = u.k; Snd.fx('tap'); render(); }
+  function hint() {
+    if (over) return; var k = sel >= 0 && !given[sel] && cur[sel] !== sol[sel] ? sel : -1, j;
+    if (k < 0) { var wrong = []; for (j = 0; j < N * N; j++) if (cur[j] !== sol[j]) wrong.push(j); if (!wrong.length) return; k = wrong[rnd(wrong.length)]; }
+    sel = k; cur[k] = sol[k]; notes[k] = 0; given[k] = true; secs += 15; Snd.fx('match'); render(); status(); check();
+  }
+  function check() {
+    for (var j = 0; j < N * N; j++) if (cur[j] !== sol[j]) return;
+    over = true; clearInterval(clock); Snd.fx('win'); confetti(); lbAdd(key(), secs, true); setBest(key(), secs, true);
+    info.textContent = 'Solved in ' + fmt(secs) + '! 🎉'; bump('sudoku');
+  }
+  function reset() {
+    clearInterval(clock); over = false; mistakes = 0; secs = 0; sel = -1; undo = []; info.textContent = 'Making a puzzle…'; cur = null;
+    setTimeout(function () {
+      if (!alive) return; var m = SDK.make(T, getLvl());
+      if (!m) { info.textContent = 'Could not make that puzzle, tap New puzzle'; return; }
+      cfg = m.cfg; puz = m.puzzle; sol = m.solution; cur = puz.slice(); notes = []; for (var i = 0; i < cur.length; i++) notes[i] = 0; given = puz.map(function (v) { return !!v; });
+      info.textContent = T.name + ' · Best: ' + (store(key()) ? fmt(store(key())) : 'not yet'); status(); render();
+      clock = setInterval(function () { if (!over) { secs++; status(); } }, 1000);
+    }, 30);
+  }
+  var off = onKeys(function (e) {
+    if (e.key >= '1' && e.key <= '9' && +e.key <= N) enter(+e.key); else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') enter(0);
+    else if (e.key === 'n') noteBtn.click(); else if (e.key === 'z') doUndo();
+    else if (sel >= 0 && /Arrow/.test(e.key)) { e.preventDefault(); var r = (sel / N) | 0, c = sel % N; if (e.key === 'ArrowUp') r = (r + N - 1) % N; if (e.key === 'ArrowDown') r = (r + 1) % N; if (e.key === 'ArrowLeft') c = (c + N - 1) % N; if (e.key === 'ArrowRight') c = (c + 1) % N; sel = r * N + c; render(); }
+  });
+  layout(); reset();
+  stage.__sd = { SDK: SDK, make: function (t, l) { return SDK.make(SDK_TYPES[t], l); }, S: function () { return { cur: cur, sol: sol, cfg: cfg, T: T }; }, pick: function (k) { chipB[k].click(); } };
+  return function () { alive = false; clearInterval(clock); off(); };
 }
 
 /* ------------------------------------------------------------------ Puzzle batch 2 */
@@ -5123,7 +5253,7 @@ var GAMES = [
   { name: 'Whack-a-Mole', icon: '🔨', ac: '#ff6b3d', desc: '30 seconds, go!', start: whack, best: function () { return 'Best: ' + Math.max(store('whack_0') || 0, store('whack_1') || 0, store('whack_2') || 0); } },
   { name: 'Orbit Dash', icon: '🪐', ac: '#00eaff', desc: 'Original · hop the rings', start: orbit, best: function () { return 'Best: ' + (store('orbit') || 0); } },
   { name: 'Bounce', icon: '🔴', ac: '#ff4d4d', desc: 'Roll the red ball, grab every ring', start: bounce, best: function () { return 'Level ' + (store('bounce_unlocked') || 1) + ' of 30'; } },
-  { name: 'Sudoku', icon: '🧩', ac: '#7cf0c9', desc: 'Classic number puzzle', start: sudoku, best: function () { var b = store('sudoku_0'); return b ? 'Easy best: ' + ((b / 60) | 0) + ':' + ('0' + (b % 60)).slice(-2) : 'Not played'; } },
+  { name: 'Sudoku', icon: '🧩', ac: '#7cf0c9', desc: '12 types: Killer, Jigsaw, Diagonal, Kids…', start: sudoku, best: function () { var b = store('sudoku_0'); return b ? 'Easy best: ' + ((b / 60) | 0) + ':' + ('0' + (b % 60)).slice(-2) : 'Not played'; } },
   { name: 'Tetris', icon: '🧱', ac: '#a855f7', desc: 'Stack and clear lines', start: tetris, best: function () { return 'Best: ' + (store('tetris') || 0); } },
   { name: 'Word Guess', icon: '🔤', ac: '#35e07a', desc: '5 letters, 6 tries', start: wordle, best: function () { return 'Best streak: ' + (store('word') || 0); } },
   { name: 'Minesweeper', icon: '💣', ac: '#ff6b6b', desc: 'Find the safe squares', start: minesweeper, best: function () { var b = store('mines_0'); return b ? 'Easy best: ' + ((b / 60) | 0) + ':' + ('0' + (b % 60)).slice(-2) : 'Not played'; } },
