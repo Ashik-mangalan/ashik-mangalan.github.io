@@ -4782,7 +4782,24 @@ function bounce(stage, ui) {
   wrap.appendChild(cv); stage.appendChild(wrap);
   var bar = h('div', 'sdt'), lvTxt = h('span', 'rpsout', ''); lvTxt.style.minWidth = '110px';
   var bPrev = button('◀', function () { go(cur - 1); }, 'btn small'), bNext = button('▶', function () { go(cur + 1); }, 'btn small'), bRe = button('↻ Restart', function () { go(cur); }, 'btn small');
-  bar.appendChild(bPrev); bar.appendChild(lvTxt); bar.appendChild(bNext); bar.appendChild(bRe); stage.appendChild(bar);
+  var bLv = button('☰ Levels', function () { openPick(); }, 'btn small'); lvTxt.style.cursor = 'pointer'; lvTxt.onclick = function () { openPick(); };
+  function openPick() {
+    var unl = store('bounce_unlocked') || 1, was = paused; paused = true;
+    var ov = h('div', ''); ov.style.cssText = 'position:fixed;inset:0;z-index:80;background:#0b0b1c;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;align-items:center';
+    var t = h('div', '', 'Choose a level'); t.style.cssText = 'font-size:20px;font-weight:800;color:#fff;margin-bottom:4px'; ov.appendChild(t);
+    var sub = h('div', '', 'Levels you have cleared can be played again any time · cleared ' + Math.min(TOT, unl - 1) + ' of ' + TOT); sub.style.cssText = 'font-size:13px;color:#b9b9d6;margin-bottom:12px;text-align:center'; ov.appendChild(sub);
+    var gr = h('div', ''); gr.style.cssText = 'display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:420px'; ov.appendChild(gr);
+    for (var i = 1; i <= TOT; i++) (function (n) {
+      var done = n < unl || (n === TOT && unl > TOT), open = n <= unl;
+      var c = h('button', '', done ? n + ' ✓' : open ? String(n) : '🔒'); c.type = 'button';
+      c.style.cssText = 'padding:12px 0;border-radius:12px;font-weight:800;font-size:16px;border:2px solid ' + (n === cur ? '#fff' : done ? '#3ddc84' : open ? '#ff5fa2' : '#44445f') + ';background:' + (done ? 'rgba(61,220,132,.16)' : open ? 'rgba(255,95,162,.2)' : 'rgba(255,255,255,.05)') + ';color:' + (open ? '#fff' : '#77779a');
+      c.onclick = function () { if (!open) return; document.body.removeChild(ov); paused = was; go(n); };
+      gr.appendChild(c);
+    })(i);
+    var cl = button('Close', function () { document.body.removeChild(ov); paused = was; }, 'btn'); cl.style.marginTop = '14px'; ov.appendChild(cl);
+    document.body.appendChild(ov); ovs.push(ov);
+  }
+  bar.appendChild(bPrev); bar.appendChild(lvTxt); bar.appendChild(bNext); bar.appendChild(bRe); bar.appendChild(bLv); stage.appendChild(bar);
   stage.appendChild(h('p', 'hint', 'Hold ◀ ▶ to roll, tap ▲ to jump. Collect every ring to open the exit door. In water the ball sinks slowly: hold ▲ to swim up slowly, and at the top of the water it leaps out. Watch out for crumbling bridges, moving & vanishing platforms, rolling spiked boulders, spike wheels, moving walls, shrinking spikes, electric barriers, falling rocks, spring traps, narrow tunnels, slippery ice, swinging maces, fire jets, laser beams and crushers. Avoid spike posts, spiky balls (jump on them to squash) and spiders. 💎 gives an extra life, flags are checkpoints. Keys: arrows / WASD + Space.'));
 
   /* ---------- level generator (original, deterministic) ---------- */
@@ -4834,7 +4851,7 @@ function bounce(stage, ui) {
         else if (kd === 'ret' && w >= 3 && cs.some(function (q) { return q + 1 <= sg.x1; })) { var rc = cs.filter(function (q) { return q + 1 <= sg.x1 && g[sg.f - 1][q + 1] === '.'; }); if (rc.length) trs.push({ k: 'ret', x: rc[Math.floor(R() * rc.length)], f: sg.f, w: 2, per: Math.max(2.6, 3.8 - d * .9), ph: R() * 4, h: .14 }); }
         else if (w >= 5 && cs.length) {
           var cx = cs[Math.floor(R() * cs.length)], per = Math.max(1.9, 3.6 + R() * 1.4 - d * 1.7), gap = sg.f - ce[cx];
-          if (kd === 'wheel' && gap >= 5) trs.push({ k: 'whl', x: cx + .5, y: sg.f - 2.3, rad: 1.7, spd: (kd.length ? 1.5 : 1) + d * 1.3, ph: R() * 6.28, a: 0 });
+          if (kd === 'wheel' && gap >= 5) trs.push({ k: 'whl', x: cx + .5, y: sg.f - 2.7, rad: 1.7, spd: .85 + d * .9, ph: R() * 6.28, a: 0 });
           else if (kd === 'rock' && gap >= 4) trs.push({ k: 'rok', x: cx, y0: ce[cx], f: sg.f, per: Math.max(2.6, 4.2 - d * 1.2), ph: R() * 4 });
           else if (kd === 'ele') { var ec = cs.filter(function (q) { return q + 3 <= sg.x1 && g[sg.f - 1][q + 1] === '.' && g[sg.f - 1][q + 2] === '.' && g[sg.f - 1][q + 3] === '.'; }); if (ec.length) trs.push({ k: 'ele', x: ec[Math.floor(R() * ec.length)], f: sg.f, per: Math.max(2.6, 3.8 - d * .8), onT: 1.4, ph: R() * 4 }); }
           else if (kd === 'spring' && gap >= 5 && gap <= 6.2 && g[ce[cx]][cx] === '.') { g[ce[cx]][cx] = 'v'; trs.push({ k: 'spr', x: cx, f: sg.f, an: 0 }); }
@@ -4928,7 +4945,7 @@ function bounce(stage, ui) {
       else if (t.k === 'cru') { var r1 = t.per - 2.4; t.pr = ph < r1 ? 0 : ph < r1 + .55 ? 0 : ph < r1 + .7 ? (ph - r1 - .55) / .15 : ph < r1 + 1.25 ? 1 : 1 - (ph - r1 - 1.25) / 1.15; t.shake = ph >= r1 && ph < r1 + .55; t.bot = t.y0 + 1 + (t.f - t.y0 - 1) * Math.max(0, t.pr); if (bx > t.x - HS * .6 && bx < t.x + 2 + HS * .6 && by - HS < t.bot && by + HS > t.y0) bad = true; }
       else if (t.k === 'mac') { var a = t.amp * Math.sin(tt * 6.283 / t.per + t.ph); t.px = t.x + .5 + Math.sin(a) * t.len; t.py = t.y0 + Math.cos(a) * t.len; if (Math.hypot(bx - t.px, by - t.py) < HS + .5) bad = true; }
       else if (t.k === 'sld') { t.px = t.x0 + (t.x1 - t.x0) * (.5 - .5 * Math.cos(tt * 6.283 / t.per + t.ph)); if (Math.abs(bx - t.px - .6) < HS + .55 && by + HS > t.f - .5) bad = true; }
-      else if (t.k === 'whl') { t.a = tt * t.spd + t.ph; for (var ai = 0; ai < 3 && !bad; ai++) { var an = t.a + ai * 2.094; for (var rr = .6; rr <= t.rad + .01; rr += .37) if (Math.hypot(bx - t.x - Math.cos(an) * rr, by - t.y - Math.sin(an) * rr) < HS + .3) { bad = true; break; } } }
+      else if (t.k === 'whl') { t.a = tt * t.spd + t.ph; for (var ai = 0; ai < 3 && !bad; ai++) { var an = t.a + ai * 2.094; for (var rr = .6; rr <= t.rad + .01; rr += .37) if (Math.hypot(bx - t.x - Math.cos(an) * rr, by - t.y - Math.sin(an) * rr) < HS + .2) { bad = true; break; } } }
       else if (t.k === 'ele') { t.on = ph > t.per - t.onT; t.warn = !t.on && ph > t.per - t.onT - .7; if (t.on && bx > t.x + .5 - HS * .5 && bx < t.x + 3.5 + HS * .5 && by + HS > t.f - 1.5 && by - HS < t.f) bad = true; }
       else if (t.k === 'rok') { var fs = t.per - 1; t.warn = ph > t.per - 1.9 && ph < fs; t.fall = ph >= fs; t.ry = t.y0 + .6 + 11 * (ph - fs) * (ph - fs); if (t.fall && t.ry < t.f - .4 && Math.hypot(bx - t.x - .5, by - t.ry) < HS + .38) bad = true; if (t.fall && t.ry >= t.f - .4) t.fall = false; }
       else if (t.k === 'ret') { var q2 = ph / t.per; t.h = q2 < .45 ? .14 : q2 < .65 ? .14 + (q2 - .45) / .2 * .16 : q2 < .72 ? .3 + (q2 - .65) / .07 * .7 : q2 < .9 ? 1 : 1 - (q2 - .9) / .1 * .86; t.warn = q2 >= .45 && q2 < .72; if (t.h > .45 && bx > t.x + .05 - HS * .5 && bx < t.x + t.w - .05 + HS * .5 && by + HS > t.f - t.h * .95) bad = true; }
@@ -5054,7 +5071,7 @@ function bounce(stage, ui) {
   var off = onKeys(function (e) { var k = e.key.length === 1 ? e.key.toLowerCase() : e.key; keys[k] = true; if (k === ' ' || k.indexOf('Arrow') === 0) e.preventDefault(); if (k === 'p') pb.click(); }), offU = function (e) { var k = e.key.length === 1 ? e.key.toLowerCase() : e.key; keys[k] = false; }; document.addEventListener('keyup', offU);
   function resize() { var w = Math.min(440, stage.clientWidth || window.innerWidth); CW = Math.floor(w); CH = Math.max(340, Math.min(window.innerHeight - 230, 680)); TS = Math.max(34, Math.round(CW / 9)); wrap.style.height = CH + 'px'; cv.width = CW * dpr; cv.height = CH * dpr; buildTiles(); }
   window.addEventListener('resize', resize); resize(); go(cur); raf = requestAnimationFrame(frame);
-  stage.__bn = { S: function () { return { bx: bx, by: by, got: got, total: total, lives: lives, cur: cur, over: over, L: L }; }, tp: function (x, y) { bx = x; by = y; vx = vy = 0; }, held: held, go: go, solve: function () { for (var r = 0; r < H; r++) for (var c = 0; c < L.W; c++) if (L.g[r][c] === 'o' || L.g[r][c] === 'O') { L.g[r][c] = '.'; got++; } } };
+  stage.__bn = { S: function () { return { secs: secs, bx: bx, by: by, got: got, total: total, lives: lives, cur: cur, over: over, L: L }; }, tp: function (x, y) { bx = x; by = y; vx = vy = 0; }, held: held, go: go, solve: function () { for (var r = 0; r < H; r++) for (var c = 0; c < L.W; c++) if (L.g[r][c] === 'o' || L.g[r][c] === 'O') { L.g[r][c] = '.'; got++; } } };
   return function () { alive = false; cancelAnimationFrame(raf); off(); document.removeEventListener('keyup', offU); window.removeEventListener('resize', resize); ovs.forEach(function (o) { if (o.parentNode) o.parentNode.removeChild(o); }); };
 }
 
@@ -5418,7 +5435,7 @@ function makeUI() {
     }
   };
 }
-var gstyle = document.createElement('style'); gstyle.textContent = 'body.gfull{overflow:hidden}body.gfull header,body.gfull footer,body.gfull #gscore,body.gfull .hint,body.gfull #glow,body.gfull #inst{display:none!important}' + 'body.gfull main{max-width:none;margin:0;padding:0}' + 'body.gfull #view{position:fixed;inset:0;z-index:55;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:8px 8px 12px;background:var(--bg)}' + 'body.gfull .topbar{width:100%;max-width:560px;margin-bottom:6px}body.gfull .topbar h2{flex:1;font-size:1.1rem}' + 'body.gfull #gbar,body.gfull #ghow{display:none;width:100%;max-width:560px;padding:10px;margin-bottom:8px;border-radius:14px;background:var(--card);border:1px solid rgba(128,140,170,.35);box-sizing:border-box}' + 'body.gfull #ghow{font-size:.9rem;line-height:1.5;color:var(--muted)}' + 'body.gfull.gset #gbar{display:flex}body.gfull.gset #ghow{display:block}' + 'body.gfull #stage{width:100%;display:flex;flex-direction:column;align-items:center}' + '.lgear{background:var(--card);color:var(--text);border:1px solid rgba(128,140,170,.35);font-size:1.15rem;width:40px;height:36px;border-radius:10px;cursor:pointer;flex:none}'; document.head.appendChild(gstyle);
+var gstyle = document.createElement('style'); gstyle.textContent = 'body.gfull{overflow:hidden}body.gfull header,body.gfull footer,body.gfull #gscore,body.gfull .hint,body.gfull #glow,body.gfull #inst{display:none!important}' + 'body.gfull main{max-width:none;margin:0;padding:0}' + 'body.gfull #view{position:fixed;inset:0;z-index:55;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:8px 8px 12px;background:var(--bg)}' + 'body.gfull .topbar{width:100%;max-width:560px;margin-bottom:6px}body.gfull .topbar h2{flex:1;font-size:1.1rem}' + 'body.gfull #gbar,body.gfull #ghow{display:none;width:100%;max-width:560px;padding:10px;margin-bottom:8px;border-radius:14px;background:var(--card);border:1px solid rgba(128,140,170,.35);box-sizing:border-box}' + 'body.gfull #ghow{font-size:.9rem;line-height:1.5;color:var(--muted)}' + 'body.gfull.gset #gbar{display:flex}body.gfull.gset #ghow{display:block}' + 'body.gfull #stage{width:100%;display:flex;flex-direction:column;align-items:center;margin:auto 0}' + '.lgear{background:var(--card);color:var(--text);border:1px solid rgba(128,140,170,.35);font-size:1.15rem;width:40px;height:36px;border-radius:10px;cursor:pointer;flex:none}'; document.head.appendChild(gstyle);
 var gear = h('button', 'lgear', '⚙'); gear.type = 'button'; gear.setAttribute('aria-label', 'Settings and how to play');
 var ghow = h('div', ''); ghow.id = 'ghow'; view.insertBefore(ghow, stage);
 gear.addEventListener('click', function () { document.body.classList.toggle('gset'); Snd.fx('tap'); });
@@ -5427,6 +5444,7 @@ function openGame(g) {
   closeGame(true);
   hub.hidden = true; view.hidden = false; titleEl.textContent = g.icon + ' ' + g.name; scoreEl.textContent = ''; bar.innerHTML = ''; stage.innerHTML = '';
   document.body.classList.add('gfull'); document.body.classList.remove('gset');
+  if (!gPushed) { try { history.pushState({ g: 1 }, ''); gPushed = true; } catch (e) { } }
   cleanup = g.start(stage, makeUI()) || null;
   var hints = [].slice.call(stage.querySelectorAll('.hint')).map(function (x) { return x.textContent; }); ghow.textContent = hints.join(' ') || 'Have fun!'; gear.style.display = '';
   Snd.music.play(MOOD[g.name] || (CATS[g.name] === 'Arcade' ? 'drive' : null));
@@ -5438,7 +5456,36 @@ function closeGame(keep) {
   if (!keep) document.body.classList.remove('gfull', 'gset');
   if (!keep) { Snd.music.stop(); view.hidden = true; hub.hidden = false; renderHub(); }
 }
-$('gback').addEventListener('click', function () { Snd.fx('tap'); closeGame(false); });
+var gPaused = false, gOff = 0, gPauseAt = 0, gPend = [], gCancel = {};
+(function () {
+  var raf0 = window.requestAnimationFrame.bind(window), caf0 = window.cancelAnimationFrame.bind(window), si0 = window.setInterval.bind(window), st0 = window.setTimeout.bind(window);
+  window.requestAnimationFrame = function (cb) { var id = raf0(function (ts) { if (gPaused) { gPend.push({ cb: cb, id: id }); return; } cb(ts - gOff); }); return id; };
+  window.cancelAnimationFrame = function (id) { gCancel[id] = true; caf0(id); };
+  window.setInterval = function (cb, ms) { var a = [].slice.call(arguments, 2); return si0(function () { if (!gPaused) cb.apply(null, a); }, ms); };
+  window.setTimeout = function (cb, ms) { if (typeof cb !== 'function') return st0(cb, ms); var a = [].slice.call(arguments, 2); function run() { if (gPaused) st0(run, 120); else cb.apply(null, a); } return st0(run, ms); };
+  window.__gPause = function (on) {
+    if (on === gPaused) return;
+    if (on) { gPaused = true; gPauseAt = performance.now(); }
+    else { gOff += performance.now() - gPauseAt; gPaused = false; var p = gPend; gPend = []; p.forEach(function (q) { if (gCancel[q.id]) { delete gCancel[q.id]; return; } raf0(function (ts) { q.cb(ts - gOff); }); }); }
+  };
+})();
+var gPushed = false, gAsk = null;
+function askLeave() {
+  if (gAsk || view.hidden) return; var ml = document.documentElement.lang === 'ml';
+  var ov = h('div', ''); ov.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px';
+  var bx = h('div', ''); bx.style.cssText = 'background:var(--card);color:var(--text);border:1px solid rgba(128,140,170,.5);border-radius:18px;padding:20px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)';
+  var t = h('div', '', ml ? 'ഗെയിം വിട്ട് പോകണോ?' : 'Leave this game?'); t.style.cssText = 'font-size:1.2rem;font-weight:800;margin-bottom:6px';
+  var p = h('div', '', ml ? 'ഇപ്പോഴത്തെ കളി നഷ്ടപ്പെടും, ആദ്യം മുതൽ തുടങ്ങേണ്ടി വരും.' : 'Your current play will be lost and you will start again from the beginning.'); p.style.cssText = 'font-size:.92rem;color:var(--muted);margin-bottom:14px;line-height:1.45';
+  var row = h('div', ''); row.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap';
+  function shut() { if (ov.parentNode) ov.parentNode.removeChild(ov); gAsk = null; window.__gPause(false); }
+  var keep = button(ml ? '▶ കളി തുടരുക' : '▶ Keep playing', function () { shut(); }, 'btn');
+  var leave = button(ml ? 'പുറത്തേക്ക്' : 'Leave', function () { shut(); leaveNow(); }, 'btn small');
+  row.appendChild(keep); row.appendChild(leave); bx.appendChild(t); bx.appendChild(p); bx.appendChild(row); ov.appendChild(bx); document.body.appendChild(ov); gAsk = shut; window.__gPause(true);
+}
+function leaveNow() { window.__gPause(false); if (gPushed) { gPushed = false; gIgnore = true; try { history.back(); } catch (e) { } } closeGame(false); }
+var gIgnore = false;
+window.addEventListener('popstate', function () { if (gIgnore) { gIgnore = false; return; } if (!view.hidden) { gPushed = false; try { history.pushState({ g: 1 }, ''); gPushed = true; } catch (e) { } askLeave(); } });
+$('gback').addEventListener('click', function () { Snd.fx('tap'); askLeave(); });
 var sndBtn = $('snd');
 function sndLabel() { sndBtn.textContent = Snd.on() ? '🔊' : '🔇'; }
 sndBtn.addEventListener('click', function () { Snd.toggle(); sndLabel(); });
