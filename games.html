@@ -4783,7 +4783,7 @@ function bounce(stage, ui) {
   var bar = h('div', 'sdt'), lvTxt = h('span', 'rpsout', ''); lvTxt.style.minWidth = '110px';
   var bPrev = button('◀', function () { go(cur - 1); }, 'btn small'), bNext = button('▶', function () { go(cur + 1); }, 'btn small'), bRe = button('↻ Restart', function () { go(cur); }, 'btn small');
   bar.appendChild(bPrev); bar.appendChild(lvTxt); bar.appendChild(bNext); bar.appendChild(bRe); stage.appendChild(bar);
-  stage.appendChild(h('p', 'hint', 'Hold ◀ ▶ to roll, tap ▲ to jump. Collect every ring to open the exit door. In water the ball floats: tap ▲ to swim up; near the surface the jump is a full leap out. Watch out for crumbling bridges, moving & vanishing platforms, rolling spiked boulders, spike wheels, moving walls, shrinking spikes, electric barriers, falling rocks, spring traps, narrow tunnels, slippery ice, swinging maces, fire jets, laser beams and crushers. Avoid spike posts, spiky balls (jump on them to squash) and spiders. 💎 gives an extra life, flags are checkpoints. Keys: arrows / WASD + Space.'));
+  stage.appendChild(h('p', 'hint', 'Hold ◀ ▶ to roll, tap ▲ to jump. Collect every ring to open the exit door. In water the ball sinks slowly: hold ▲ to swim up slowly, and at the top of the water it leaps out. Watch out for crumbling bridges, moving & vanishing platforms, rolling spiked boulders, spike wheels, moving walls, shrinking spikes, electric barriers, falling rocks, spring traps, narrow tunnels, slippery ice, swinging maces, fire jets, laser beams and crushers. Avoid spike posts, spiky balls (jump on them to squash) and spiders. 💎 gives an extra life, flags are checkpoints. Keys: arrows / WASD + Space.'));
 
   /* ---------- level generator (original, deterministic) ---------- */
   function mul(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -4890,9 +4890,9 @@ function bounce(stage, ui) {
     if (iceT > 0) iceT -= dt; vx += (ax * (W2 ? 3.0 : 4.6) - vx) * Math.min(1, dt * (iceT > 0 ? 1.5 : coy > 0 ? 14 : 8));
     if (coy > 0) coy -= dt; if (jbuf > 0) jbuf -= dt; if (squash > 0) squash -= dt; if (swimT > 0) swimT -= dt;
     var press = wantJ && !step.jp; step.jp = !!wantJ;
-    if (W2) { if (press && swimT <= 0) { vy = inWater(bx, by - .9) ? -6.4 : -12.6; swimT = .2; Snd.fx('tap'); } }
+    if (W2) { if (wantJ && swimT <= 0 && !inWater(bx, by - .9)) { vy = -12.6; swimT = .4; Snd.fx('tap'); } }
     else if (press) { jbuf = .14; if (coy > 0) { vy = -11.2; coy = 0; jbuf = 0; Snd.fx('tap'); } }
-    if (W2) { vy = Math.max(-7, Math.min(3.2, vy + 9 * dt)); vy -= vy * .9 * dt; } else vy = Math.min(16, vy + 28 * dt);
+    if (W2) { if (swimT > .3) { } else if (wantJ) vy += (-2.2 - vy) * Math.min(1, dt * 4); else vy = Math.max(-7, Math.min(2.0, vy + 7 * dt)); if (swimT <= .3) vy -= vy * .9 * dt; } else vy = Math.min(16, vy + 28 * dt);
     var c, r;
     bx += vx * dt;
     for (c = Math.floor(bx - HS); c <= Math.floor(bx + HS); c++) for (r = Math.floor(by - HS); r <= Math.floor(by + HS); r++) if (solid(c, r)) { if (vx > 0) bx = c - HS - .001; else if (vx < 0) bx = c + 1 + HS + .001; vx = 0; }
