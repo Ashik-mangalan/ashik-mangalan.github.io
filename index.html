@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#050711">
 <link rel="manifest" href="manifest.json">
+<script>window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bip=e;if(window.__bipShow)window.__bipShow();});</script>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
@@ -127,7 +128,8 @@ html[lang=ml] *{letter-spacing:0!important;text-transform:none!important}html[la
 <script>
 (function(){
   var installBtn=document.getElementById('installBtn');
-  var deferredPrompt=null;
+  var deferredPrompt=window.__bip||null;
+  window.__bipShow=function(){deferredPrompt=window.__bip;installBtn.hidden=false;};
   var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
   if(standalone)return;
