@@ -12,14 +12,14 @@
 <title>Manux | Ashik Mangalan – Personal Website &amp; Games</title>
 <meta name="copyright" content="© Manux. All rights reserved.">
 <meta name="robots" content="noarchive">
-<meta name="description" content="Manux is the personal website of Ashik Mangalan: web projects, skills, contact links and 52 free games you can play offline.">
+<meta name="description" content="Manux is the personal website of Ashik Mangalan: web projects, skills, contact links and 53 free games you can play offline.">
 <meta name="keywords" content="Manux, Ashik Mangalan, Ashik, personal website, portfolio, web developer, free games">
 <meta name="author" content="Ashik Mangalan">
 <link rel="canonical" href="https://ashik-mangalan.github.io/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Ashik Mangalan","alternateName":"Manux","url":"https://ashik-mangalan.github.io/","sameAs":["https://instagram.com/ashik_bin_abdulsalam"]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Manux | Ashik Mangalan">
-<meta property="og:description" content="Personal website of Ashik Mangalan: projects, skills and 52 free games you can play online or offline.">
+<meta property="og:description" content="Personal website of Ashik Mangalan: projects, skills and 53 free games you can play online or offline.">
 <meta property="og:url" content="https://ashik-mangalan.github.io/">
 <meta property="og:site_name" content="Manux">
 <meta property="og:image" content="https://ashik-mangalan.github.io/og-image.jpg">
@@ -28,7 +28,7 @@
 <meta property="og:image:alt" content="Manux – Ashik Mangalan personal website and games">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Manux | Ashik Mangalan">
-<meta name="twitter:description" content="Personal website of Ashik Mangalan: projects, skills and 52 free games.">
+<meta name="twitter:description" content="Personal website of Ashik Mangalan: projects, skills and 53 free games.">
 <meta name="twitter:image" content="https://ashik-mangalan.github.io/og-image.jpg">
 <style>
 :root{--bg:#050711;--panel:#0b1020;--cyan:#00eaff;--purple:#a855f7;--text:#edf7ff;--muted:#9ba9c4}
@@ -113,7 +113,7 @@ html[lang=ml] *{letter-spacing:0!important;text-transform:none!important}html[la
 <header><div class="nav"><a class="logo" href="#home"><img src="icon-192.png?v=7" alt="Manux logo">Manux</a><nav><a href="#about" data-t="nav_about">About</a><a href="#skills" data-t="nav_skills">Skills</a><a href="#projects" data-t="nav_projects">Projects</a><a href="#contact" data-t="nav_contact">Contact</a><a href="games.html" data-t="nav_games">Games</a></nav><div class="tools"><button class="tbtn" id="themeBtn" type="button" aria-label="Light or dark mode">☀</button><button class="tbtn" id="langBtn" type="button" aria-label="Language">മല</button></div></div></header>
 <main>
 <section class="hero" id="home">
-<div><div class="eyebrow" data-t="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>Manux</span><br><span class="typed-wrap"><span id="typed">Future Creator.</span><span class="cursor">|</span></span></h1><p data-t="hero_p">I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects" data-t="b_explore">Explore Projects ↗</a><a class="btn" href="#contact" data-t="b_hello">Say Hello</a><a class="btn" href="games.html" data-t="b_games">Play Games 🎮</a><button class="btn" id="installBtn" type="button" data-t="b_install" hidden>Install App ⬇</button></div></div>
+<div><div class="eyebrow" data-t="eyebrow">● Welcome to My digital space</div><h1>Hey, I'm <span>Manux</span><br><span class="typed-wrap"><span id="typed">Future Creator.</span><span class="cursor">|</span></span></h1><p data-t="hero_p">I’m learning, building, and exploring the world of technology. This is my corner of the internet—more projects and adventures coming soon.</p><div class="actions"><a class="btn primary" href="#projects" data-t="b_explore">Explore Projects ↗</a><a class="btn" href="#contact" data-t="b_hello">Say Hello</a><a class="btn" href="games.html" data-t="b_games">Play Games 🎮</a><button class="btn" id="installBtn" type="button" data-t="b_install">Install App ⬇</button></div></div>
 <div class="orb-wrap"><img class="hero-logo" src="icon-512.png?v=7" alt="Manux logo"></div>
 </section>
 <section id="about"><h2 class="section-title" data-t="t_about">About <span>Me</span></h2><p class="sub" data-t="s_about">A little introduction</p><div class="card about"><img class="me" src="me.jpg" alt="Ashik" onerror="this.remove()"><p>Hi! I’m <b>Ashik</b>. I’m curious about coding, design, and creating things on the web. I enjoy learning new skills and turning ideas into real projects and don't get it wrong, I'm not a book learner . </p></div></section>
@@ -133,13 +133,25 @@ html[lang=ml] *{letter-spacing:0!important;text-transform:none!important}html[la
   if(standalone)return;
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});
   window.addEventListener('appinstalled',function(){installBtn.hidden=true;deferredPrompt=null;});
-  if(isIOS)installBtn.hidden=false;
+  installBtn.hidden=false;
+  var inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|Telegram|MiuiBrowser|; wv\)|GSA\//i.test(navigator.userAgent);
+  function ml(){return document.documentElement.lang==='ml';}
+  function tip(t){
+    var ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px';
+    var bx=document.createElement('div');bx.style.cssText='background:#0c1e2a;color:#e9f6f3;border:1px solid #0f9d8a;border-radius:18px;padding:20px;max-width:340px;width:100%;text-align:center;font:16px/1.55 system-ui,sans-serif';
+    bx.innerHTML='<div style="font-weight:800;font-size:18px;margin-bottom:8px">'+(ml()?'ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യാൻ':'Install the app')+'</div><div style="margin-bottom:14px">'+t+'</div>';
+    var c=document.createElement('button');c.type='button';c.className='btn';c.textContent='OK';c.onclick=function(){document.body.removeChild(ov);};bx.appendChild(c);ov.appendChild(bx);document.body.appendChild(ov);
+  }
   installBtn.addEventListener('click',function(){
     if(deferredPrompt){
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(){deferredPrompt=null;installBtn.hidden=true;});
+      deferredPrompt.userChoice.then(function(){deferredPrompt=null;});
     }else if(isIOS){
-      alert('Tap the Share button, then choose "Add to Home Screen".');
+      tip(ml()?'Share ബട്ടൺ അമർത്തി <b>Add to Home Screen</b> തിരഞ്ഞെടുക്കുക.':'Tap the Share button, then choose <b>Add to Home Screen</b>.');
+    }else if(inApp){
+      tip(ml()?'ഈ ബ്രൗസറിൽ ഇൻസ്റ്റാൾ ചെയ്യാൻ പറ്റില്ല. മുകളിലെ <b>⋮</b> മെനു അമർത്തി <b>Open in Chrome</b> തിരഞ്ഞെടുക്കുക, എന്നിട്ട് ഇവിടെ വീണ്ടും അമർത്തുക.':'This in-app browser cannot install apps. Tap the <b>⋮</b> menu and choose <b>Open in Chrome</b>, then tap this button again.');
+    }else{
+      tip(ml()?'Chrome-ലെ <b>⋮</b> മെനു അമർത്തി <b>Install app</b> (അല്ലെങ്കിൽ <b>Add to Home screen</b>) തിരഞ്ഞെടുക്കുക.':'Open the Chrome <b>⋮</b> menu and choose <b>Install app</b> (or <b>Add to Home screen</b>).');
     }
   });
 })();
