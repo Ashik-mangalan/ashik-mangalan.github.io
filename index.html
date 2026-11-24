@@ -129,13 +129,17 @@ html[lang=ml] *{letter-spacing:0!important;text-transform:none!important}html[la
 (function(){
   var installBtn=document.getElementById('installBtn');
   var deferredPrompt=window.__bip||null;
-  window.__bipShow=function(){deferredPrompt=window.__bip;installBtn.hidden=false;};
+  window.__bipShow=function(){deferredPrompt=window.__bip;LS.set('manux_installed','0');installBtn.hidden=false;};
   var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
-  if(standalone)return;
+  var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  if(window.__bip)LS.set('manux_installed','0');
+  if(standalone){LS.set('manux_installed','1');return;}
+  if(LS.get('manux_installed')==='1')installBtn.hidden=true;
+  if(navigator.getInstalledRelatedApps){navigator.getInstalledRelatedApps().then(function(a){if(a&&a.length){LS.set('manux_installed','1');installBtn.hidden=true;window.__bipShow=null;}}).catch(function(){});}
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});
-  window.addEventListener('appinstalled',function(){installBtn.hidden=true;deferredPrompt=null;});
-  installBtn.hidden=false;
+  window.addEventListener('appinstalled',function(){LS.set('manux_installed','1');installBtn.hidden=true;deferredPrompt=null;});
+  if(LS.get('manux_installed')!=='1')installBtn.hidden=false;
   var inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|Telegram|MiuiBrowser|; wv\)|GSA\//i.test(navigator.userAgent);
   function ml(){return document.documentElement.lang==='ml';}
   function tip(t){
