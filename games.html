@@ -5333,7 +5333,14 @@ function bounce(stage, ui) {
 }
 
 /* ---------------------------------------------------------------- Arcade helpers + games */
-function mkCv(stage, w, hh) { var cv = h('canvas', 'gcanvas gv'); cv.width = w; cv.height = hh; cv.style.aspectRatio = w + ' / ' + hh; stage.appendChild(cv); return cv; }
+function mkCv(stage, w, hh) {
+  var cv = h('canvas', 'gcanvas gv'), D = Math.min(2.5, window.devicePixelRatio || 1), P = HTMLCanvasElement.prototype, dw = Object.getOwnPropertyDescriptor(P, 'width'), dh = Object.getOwnPropertyDescriptor(P, 'height'), gc = P.getContext;
+  dw.set.call(cv, Math.round(w * D)); dh.set.call(cv, Math.round(hh * D));
+  Object.defineProperty(cv, 'width', { get: function () { return w; }, set: function () { } });
+  Object.defineProperty(cv, 'height', { get: function () { return hh; }, set: function () { } });
+  cv.getContext = function () { var c = gc.call(cv, '2d'); c.setTransform(D, 0, 0, D, 0, 0); return c; };
+  cv.style.aspectRatio = w + ' / ' + hh; stage.appendChild(cv); return cv;
+}
 function cvPos(cv, e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height }; }
 function loopFn(fn) { var raf = 0, last = performance.now(), dead = false; (function f(ts) { if (dead) return; var dt = Math.min(.04, (ts - last) / 1000); last = ts; try { fn(dt); } catch (e) { } raf = requestAnimationFrame(f); })(last); return function () { dead = true; cancelAnimationFrame(raf); }; }
 function heldKeys() { var k = {}, d = function (e) { k[e.key] = 1; if (/^Arrow|^ $/.test(e.key)) e.preventDefault(); }, u = function (e) { k[e.key] = 0; }; document.addEventListener('keydown', d); document.addEventListener('keyup', u); return { k: k, off: function () { document.removeEventListener('keydown', d); document.removeEventListener('keyup', u); } }; }
