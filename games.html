@@ -4394,7 +4394,7 @@ function battle(stage, ui) {
   var getView = ui.level('br_view', ['3D', 'Top-down'], 0, function () { restart(); }, 'View');
   if (!document.getElementById('brcss')) {
     var sty = document.createElement('style'); sty.id = 'brcss';
-    sty.textContent = '.brrot{position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(5,8,20,.94);color:#fff;text-align:center;padding:20px}.brrot-ic{font-size:64px;animation:brspin 2s ease-in-out infinite}.brrot-t{font:800 22px system-ui}.brrot-s{opacity:.75;margin-bottom:8px}@keyframes brspin{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}.brwrap{position:relative;width:100%;max-width:560px;margin:0 auto;border-radius:12px;overflow:hidden;background:#000;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.brwrap canvas{display:block;width:100%;height:100%}.brwrap canvas.hud{position:absolute;left:0;top:0;pointer-events:none}'
+    sty.textContent = 'body.brland .brb-scope{right:104px!important;left:auto!important;bottom:20px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-take{right:104px!important;left:auto!important;bottom:68px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-swap{right:152px!important;left:auto!important;bottom:20px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-rel{right:152px!important;left:auto!important;bottom:68px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-heal{right:200px!important;left:auto!important;bottom:20px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-gren{right:200px!important;left:auto!important;bottom:68px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-gloo{left:140px!important;right:auto!important;bottom:20px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brb-smoke{left:190px!important;right:auto!important;bottom:20px!important;top:auto!important;width:42px!important;height:42px!important}body.brland .brfire{bottom:14px!important}.brrot{position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(5,8,20,.94);color:#fff;text-align:center;padding:20px}.brrot-ic{font-size:64px;animation:brspin 2s ease-in-out infinite}.brrot-t{font:800 22px system-ui}.brrot-s{opacity:.75;margin-bottom:8px}@keyframes brspin{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}.brwrap{position:relative;width:100%;max-width:560px;margin:0 auto;border-radius:12px;overflow:hidden;background:#000;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.brwrap canvas{display:block;width:100%;height:100%}.brwrap canvas.hud{position:absolute;left:0;top:0;pointer-events:none}'
       + '.brfire{position:absolute;right:12px;bottom:62px;width:84px;height:84px;border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 30%,#ff8a5b,#d6341d);box-shadow:0 0 18px #ff5a3699;color:#fff;font-size:34px;padding:0;display:flex;align-items:center;justify-content:center;touch-action:none;-webkit-tap-highlight-color:transparent}.brfire:active,.brfire.on{transform:scale(.93);filter:brightness(1.2)}.brfire.hid{display:none}'
       + '.brb{position:absolute;width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:rgba(10,16,34,.6);color:#fff;font-size:21px;line-height:1;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}.brb:active{transform:scale(.92);background:rgba(60,90,170,.7)}'
       + '.brb i{position:absolute;right:-3px;bottom:-3px;min-width:18px;height:18px;border-radius:9px;background:#ff9f1c;color:#111;font:700 11px/18px sans-serif;text-align:center;font-style:normal;padding:0 3px}.brb.off{opacity:.35}.brb.hid{display:none}.brb.pulse{animation:brp .7s ease-in-out infinite;border-color:#ffd23f}@keyframes brp{50%{transform:scale(1.14)}}'
@@ -4851,7 +4851,7 @@ function battle(stage, ui) {
   /* ---------- buttons ---------- */
   var B = {};
   function mkBtn(id, ic, css, fn) {
-    var b = h('button', 'brb'); b.type = 'button'; b.innerHTML = ic + '<i></i>'; b.style.cssText = css;
+    var b = h('button', 'brb brb-' + id); b.type = 'button'; b.innerHTML = ic + '<i></i>'; b.style.cssText = css;
     b.addEventListener('pointerdown', function (e) { e.stopPropagation(); }); b.addEventListener('click', function (e) { e.stopPropagation(); if (over || phase !== 'play' || !P.alive) return; fn(); });
     wrap.appendChild(b); B[id] = b; return b;
   }
@@ -4923,7 +4923,7 @@ function battle(stage, ui) {
   window.addEventListener('keydown', kd); window.addEventListener('keyup', ku);
 
   /* ---------- sizing ---------- */
-  var land = true, rotWait = false;
+  var isLand = true, rotWait = false;
   var rot = h('div', 'brrot'); rot.innerHTML = '<div class="brrot-ic">📱</div><div class="brrot-t">Turn your phone sideways</div><div class="brrot-s">Battle Royale plays in landscape</div>';
   var rotBtn = h('button', 'btn primary', 'Full screen + rotate'); rotBtn.type = 'button'; rot.appendChild(rotBtn); wrap.appendChild(rot);
   function goLand() {
@@ -4934,12 +4934,12 @@ function battle(stage, ui) {
   rotBtn.addEventListener('click', function (e) { e.stopPropagation(); goLand(); });
   rot.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
   function resize() {
-    land = window.innerWidth >= window.innerHeight; rotWait = !land;
+    isLand = window.innerWidth >= window.innerHeight; rotWait = !isLand;
     var w, hh;
-    if (land) { w = Math.min(window.innerWidth - 6, 1100); wrap.style.maxWidth = w + 'px'; var tp = wrap.getBoundingClientRect().top; hh = Math.max(220, Math.min(900, window.innerHeight - Math.max(0, Math.min(tp, 90)) - 6)); }
+    if (isLand) { w = Math.min(window.innerWidth - 6, 1100); wrap.style.maxWidth = w + 'px'; var tp = wrap.getBoundingClientRect().top; hh = Math.max(220, Math.min(900, window.innerHeight - Math.max(0, Math.min(tp, 90)) - 6)); }
     else { w = Math.min(560, stage.clientWidth || window.innerWidth); hh = Math.max(380, Math.min(window.innerHeight - 120, 860)); wrap.style.maxWidth = ''; }
-    CW = Math.floor(w); CH = Math.floor(hh); wrap.style.height = CH + 'px'; cv.width = CW * dpr; cv.height = CH * dpr; Z = (land ? CH / 620 : CW / 560) * 1.05; gv.width = Math.floor(CW * gdpr); gv.height = Math.floor(CH * gdpr); if (gfx) gfx.size(gv.width, gv.height);
-    rot.style.display = land ? 'none' : 'flex'; document.body.classList.toggle('brland', land);
+    CW = Math.floor(w); CH = Math.floor(hh); wrap.style.height = CH + 'px'; cv.width = CW * dpr; cv.height = CH * dpr; Z = (isLand ? CH / 620 : CW / 560) * 1.05; gv.width = Math.floor(CW * gdpr); gv.height = Math.floor(CH * gdpr); if (gfx) gfx.size(gv.width, gv.height);
+    rot.style.display = isLand ? 'none' : 'flex'; document.body.classList.toggle('brland', isLand);
   }
   window.addEventListener('orientationchange', function () { setTimeout(resize, 250); });
   goLand();
